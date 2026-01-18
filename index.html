@@ -1,1331 +1,1298 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SHEIN PCheck</title>
-    
-    <!-- Icons & Fonts -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <!-- QR Code Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiU0hFSU4gUENoZWNrIiwiYmFja2dyb3VuZF9jb2xvciI6IiNmZmZmZmYiLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsInRoZW1lX2NvbG9yIjoiIzAwMDAwMCIsImljb25zIjpbeyJzcmMiOiJodHRwczovL2ltZy5pY29uczguY29tL2ZsYXNneS85Ni8wMDAwMDAvc2hvcHBpbmctYmFnLTIucG5nIiwic2l6ZXMiOiI5Nng5NiIsInR5cGUiOiJpbWFnZS9wbmcifV19">
-    <meta name="theme-color" content="#ffffff">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SHEIN PCheck</title>
+    <!-- Icons & Fonts (Cached by SW) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiU0hFSU4gUENoZWNrIiwiYmFja2dyb3VuZF9jb2xvciI6IiNmZmZmZmYiLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsInRoZW1lX2NvbG9yIjoiIzAwMDAwMCIsImljb25zIjpbeyJzcmMiOiJodHRwczovL2ltZy5pY29uczguY29tL2ZsYXNneS85Ni8wMDAwMDAvc2hvcHBpbmctYmFnLTIucG5nIiwic2l6ZXMiOiI5Nng5NiIsInR5cGUiOiJpbWFnZS9wbmcifV19">
+    <meta name="theme-color" content="#ffffff">
 
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Roboto+Mono:wght@400;500&display=swap');
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Roboto+Mono:wght@400;500&display=swap');
 
-        /* --- CRITICAL CSS FALLBACKS (For Offline Safety) --- */
-        .hidden { display: none !important; }
-        .block { display: block; }
-        .flex { display: flex; }
-        .flex-col { flex-direction: column; }
-        .items-center { align-items: center; }
-        .justify-between { justify-content: space-between; }
-        .justify-center { justify-content: center; }
-        .w-full { width: 100%; }
-        .h-full { height: 100%; }
-        .fixed { position: fixed; }
-        .absolute { position: absolute; }
-        .relative { position: relative; }
-        .top-0 { top: 0; }
-        .left-0 { left: 0; }
-        .bottom-0 { bottom: 0; }
-        .z-50 { z-index: 50; }
-        .bg-white { background-color: white; }
-        .text-center { text-align: center; }
+        /* --- CRITICAL CSS FALLBACKS (For Offline Safety) --- */
+        /* These ensure the app structure works even if Tailwind CDN fails to load offline */
+        .hidden { display: none !important; }
+        .block { display: block; }
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .justify-center { justify-content: center; }
+        .w-full { width: 100%; }
+        .h-full { height: 100%; }
+        .fixed { position: fixed; }
+        .absolute { position: absolute; }
+        .relative { position: relative; }
+        .top-0 { top: 0; }
+        .left-0 { left: 0; }
+        .bottom-0 { bottom: 0; }
+        .z-50 { z-index: 50; }
+        .bg-white { background-color: white; }
+        .text-center { text-align: center; }
+        /* --------------------------------------------------- */
 
-        body {
-            font-family: 'Inter', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-            background-color: #f6f6f6;
-        }
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            background-color: #f6f6f6;
+        }
 
-        /* SHEIN Form Styles */
-        .shein-input-group {
-            background-color: white;
-            padding: 16px;
-            margin-bottom: 10px;
-        }
+        /* SHEIN Form Styles */
+        .shein-input-group {
+            background-color: white;
+            padding: 16px;
+            margin-bottom: 10px;
+        }
 
-        .shein-input {
-            width: 100%;
-            padding: 12px 0;
-            font-size: 16px;
-            border: none;
-            border-bottom: 1px solid #e5e7eb;
-            outline: none;
-            transition: border-color 0.2s;
-            font-weight: 600;
-            background: transparent;
-            border-radius: 0; /* Mobile fix */
-        }
-        
-        .shein-input:disabled {
-            color: #9ca3af;
-            cursor: not-allowed;
-            background-color: transparent;
-        }
+        .shein-input {
+            width: 100%;
+            padding: 12px 0;
+            font-size: 16px;
+            border: none;
+            border-bottom: 1px solid #e5e7eb;
+            outline: none;
+            transition: border-color 0.2s;
+            font-weight: 600;
+            background: transparent;
+            border-radius: 0; /* Mobile fix */
+        }
+        
+        .shein-input:disabled {
+            color: #9ca3af;
+            cursor: not-allowed;
+            background-color: transparent;
+        }
 
-        .shein-input:focus {
-            border-bottom: 1px solid #000;
-        }
+        .shein-input:focus {
+            border-bottom: 1px solid #000;
+        }
 
-        .shein-input::placeholder {
-            color: #9ca3af;
-            font-weight: 400;
-        }
+        .shein-input::placeholder {
+            color: #9ca3af;
+            font-weight: 400;
+        }
 
-        .shein-label {
-            font-size: 12px;
-            color: #666;
-            text-transform: uppercase;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            margin-bottom: 4px;
-            display: block;
-        }
+        .shein-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+            display: block;
+        }
 
-        /* Toggles */
-        .points-switch {
-            position: relative;
-            display: inline-block;
-            width: 44px;
-            height: 24px;
-        }
-        .points-switch input { opacity: 0; width: 0; height: 0; }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 34px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        input:checked + .slider { background-color: #000; }
-        input:checked + .slider:before { transform: translateX(20px); }
-        input:checked + .slider.green-slider { background-color: #22c55e; }
-        input:checked + .slider.blue-slider { background-color: #3b82f6; }
-        input:checked + .slider.purple-slider { background-color: #8b5cf6; }
-        input:disabled + .slider { opacity: 0.6; cursor: not-allowed; }
+        /* Toggles */
+        .points-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        .points-switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider { background-color: #000; }
+        input:checked + .slider:before { transform: translateX(20px); }
+        input:checked + .slider.green-slider { background-color: #22c55e; }
+        input:checked + .slider.blue-slider { background-color: #3b82f6; }
+        input:checked + .slider.purple-slider { background-color: #8b5cf6; }
+        input:disabled + .slider { opacity: 0.6; cursor: not-allowed; }
 
-        /* Vouchers */
-        .voucher-scroll {
-            display: flex;
-            overflow-x: auto;
-            gap: 12px;
-            padding: 4px 4px 12px 4px;
-            margin-bottom: 8px;
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-        .voucher-scroll::-webkit-scrollbar { display: none; }
-        
-        .voucher-ticket {
-            flex: 0 0 auto;
-            width: 220px;
-            height: 70px;
-            background: #fff;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            display: flex;
-            position: relative;
-            cursor: pointer;
-            transition: all 0.2s;
-            overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
+        /* Vouchers */
+        .voucher-scroll {
+            display: flex;
+            overflow-x: auto;
+            gap: 12px;
+            padding: 4px 4px 12px 4px;
+            margin-bottom: 8px;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .voucher-scroll::-webkit-scrollbar { display: none; }
+        
+        .voucher-ticket {
+            flex: 0 0 auto;
+            width: 220px;
+            height: 70px;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            display: flex;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
 
-        .voucher-ticket.active {
-            border: 1px solid #ef4444;
-            background-color: #fff8f8;
-            box-shadow: 0 2px 5px rgba(239, 68, 68, 0.2);
-        }
+        .voucher-ticket.active {
+            border: 1px solid #ef4444;
+            background-color: #fff8f8;
+            box-shadow: 0 2px 5px rgba(239, 68, 68, 0.2);
+        }
 
-        .voucher-ticket.disabled {
-            border-color: #f3f4f6;
-            background-color: #fafafa;
-            opacity: 0.5;
-            cursor: not-allowed;
-            box-shadow: none;
-            filter: grayscale(100%);
-        }
+        .voucher-ticket.disabled {
+            border-color: #f3f4f6;
+            background-color: #fafafa;
+            opacity: 0.5;
+            cursor: not-allowed;
+            box-shadow: none;
+            filter: grayscale(100%);
+        }
 
-        .voucher-left {
-            width: 75px;
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: white;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            font-weight: 800;
-            line-height: 1;
-            position: relative;
-            border-right: 2px dashed rgba(255,255,255,0.4);
-        }
-        .voucher-ticket.active .voucher-left { background: linear-gradient(135deg, #b91c1c, #991b1b); }
-        .voucher-ticket.disabled .voucher-left { background: #d1d5db; }
+        .voucher-left {
+            width: 75px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-weight: 800;
+            line-height: 1;
+            position: relative;
+            border-right: 2px dashed rgba(255,255,255,0.4);
+        }
+        .voucher-ticket.active .voucher-left { background: linear-gradient(135deg, #b91c1c, #991b1b); }
+        .voucher-ticket.disabled .voucher-left { background: #d1d5db; }
 
-        .voucher-amount { font-size: 22px; }
-        .voucher-percent-symbol { font-size: 12px; vertical-align: top; }
-        .voucher-off-text { font-size: 10px; font-weight: 500; margin-top: 2px; }
+        .voucher-amount { font-size: 22px; }
+        .voucher-percent-symbol { font-size: 12px; vertical-align: top; }
+        .voucher-off-text { font-size: 10px; font-weight: 500; margin-top: 2px; }
 
-        .voucher-right { flex: 1; padding: 0 12px; display: flex; flex-direction: column; justify-content: center; }
-        .voucher-title { font-size: 13px; font-weight: 700; color: #1f2937; margin-bottom: 2px; }
-        .voucher-sub { font-size: 10px; color: #6b7280; }
-        
-        .voucher-selected-badge {
-            font-size: 9px; background-color: #ef4444; color: white; padding: 2px 6px;
-            border-radius: 99px; position: absolute; top: 6px; right: 6px; font-weight: 700; display: none;
-        }
-        .voucher-ticket.active .voucher-selected-badge { display: block; }
+        .voucher-right { flex: 1; padding: 0 12px; display: flex; flex-direction: column; justify-content: center; }
+        .voucher-title { font-size: 13px; font-weight: 700; color: #1f2937; margin-bottom: 2px; }
+        .voucher-sub { font-size: 10px; color: #6b7280; }
+        
+        .voucher-selected-badge {
+            font-size: 9px; background-color: #ef4444; color: white; padding: 2px 6px;
+            border-radius: 99px; position: absolute; top: 6px; right: 6px; font-weight: 700; display: none;
+        }
+        .voucher-ticket.active .voucher-selected-badge { display: block; }
 
-        .voucher-cutout-top, .voucher-cutout-bottom {
-            position: absolute; width: 12px; height: 12px; background-color: white; border-radius: 50%; left: 69px; z-index: 10;
-        }
-        .voucher-cutout-top { top: -7px; box-shadow: inset 0 -1px 2px rgba(0,0,0,0.05); }
-        .voucher-cutout-bottom { bottom: -7px; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05); }
+        .voucher-cutout-top, .voucher-cutout-bottom {
+            position: absolute; width: 12px; height: 12px; background-color: white; border-radius: 50%; left: 69px; z-index: 10;
+        }
+        .voucher-cutout-top { top: -7px; box-shadow: inset 0 -1px 2px rgba(0,0,0,0.05); }
+        .voucher-cutout-bottom { bottom: -7px; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05); }
 
-        /* Animations */
-        .collapsible-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
-        .collapsible-content.open { max-height: 100px; }
-        .chevron { transition: transform 0.3s; }
-        .chevron.rotate { transform: rotate(180deg); }
-        .bulk-item-row { display: flex; align-items: center; gap: 8px; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* Modal Styles */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.2s;
-        }
-        .modal-overlay.show { opacity: 1; pointer-events: auto; }
-        .modal-card {
-            background: white; width: 90%; max-width: 350px; border-radius: 12px;
-            padding: 20px; transform: translateY(20px); transition: transform 0.2s;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        }
-        .modal-overlay.show .modal-card { transform: translateY(0); }
-        
-        /* Receipt Style */
-        .receipt-line {
-            display: flex; justify-content: space-between; font-family: 'Inter', sans-serif;
-            font-size: 13px; margin-bottom: 6px; color: #333;
-        }
-        .receipt-divider { border-top: 1px dashed #e5e7eb; margin: 12px 0; }
-        #receipt-content {
-             background-color: #f9fafb;
-             border: 1px solid #e5e7eb;
-             padding: 16px;
-             border-radius: 8px;
-             font-family: 'Inter', sans-serif;
-             white-space: normal;
-             text-align: left;
-        }
+        /* Animations */
+        .collapsible-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
+        .collapsible-content.open { max-height: 100px; }
+        .chevron { transition: transform 0.3s; }
+        .chevron.rotate { transform: rotate(180deg); }
+        .bulk-item-row { display: flex; align-items: center; gap: 8px; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+        }
+        .modal-overlay.show { opacity: 1; pointer-events: auto; }
+        .modal-card {
+            background: white; width: 90%; max-width: 350px; border-radius: 12px;
+            padding: 20px; transform: translateY(20px); transition: transform 0.2s;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .modal-overlay.show .modal-card { transform: translateY(0); }
+        
+        /* Receipt Style */
+        .receipt-line {
+            display: flex; justify-content: space-between; font-family: 'Inter', sans-serif;
+            font-size: 13px; margin-bottom: 6px; color: #333;
+        }
+        .receipt-divider { border-top: 1px dashed #e5e7eb; margin: 12px 0; }
+        #receipt-content {
+             background-color: #f9fafb;
+             border: 1px solid #e5e7eb;
+             padding: 16px;
+             border-radius: 8px;
+             font-family: 'Inter', sans-serif;
+             white-space: normal;
+             text-align: left;
+        }
 
-        /* Status Bar */
-        .status-bar {
-            font-size: 10px; text-align: center; padding: 4px; font-weight: 600; letter-spacing: 0.5px;
-        }
-        .status-weekend { background-color: #dcfce7; color: #166534; }
-        .status-weekday { background-color: #f3f4f6; color: #4b5563; }
+        /* Status Bar */
+        .status-bar {
+            font-size: 10px; text-align: center; padding: 4px; font-weight: 600; letter-spacing: 0.5px;
+        }
+        .status-weekend { background-color: #dcfce7; color: #166534; }
+        .status-weekday { background-color: #f3f4f6; color: #4b5563; }
 
-        /* Breakdown Alignment */
-        .summary-row {
-            display: flex; justify-content: space-between; align-items: center; width: 100%;
-            font-size: 14px; color: #333; margin-bottom: 8px;
-        }
-        .discount-text { color: #ef4444; text-align: right; }
-        
-        /* Sidebar Menu */
-        #sidebar {
-            position: fixed; top: 0; left: 0; width: 280px; height: 100%;
-            background: white; z-index: 200; transform: translateX(-100%);
-            transition: transform 0.3s ease-in-out; box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-        }
-        #sidebar.open { transform: translateX(0); }
-        #sidebar-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); z-index: 199;
-            opacity: 0; pointer-events: none; transition: opacity 0.3s;
-        }
-        #sidebar-overlay.open { opacity: 1; pointer-events: auto; }
-        
-        .menu-item {
-            display: flex; align-items: center; padding: 16px 20px;
-            color: #333; font-weight: 600; border-bottom: 1px solid #f3f4f6;
-            cursor: pointer; transition: background 0.2s;
-        }
-        .menu-item:hover { background-color: #f9fafb; }
-        .menu-item i { width: 24px; text-align: center; margin-right: 12px; }
-
-        /* QR Code Container */
-        #qrcode img {
-            margin: 0 auto;
-            border: 4px solid white;
-            border-radius: 8px;
-        }
-    </style>
+        /* Breakdown Alignment */
+        .summary-row {
+            display: flex; justify-content: space-between; align-items: center; width: 100%;
+            font-size: 14px; color: #333; margin-bottom: 8px;
+        }
+        .discount-text { color: #ef4444; text-align: right; }
+        
+        /* Sidebar Menu */
+        #sidebar {
+            position: fixed; top: 0; left: 0; width: 280px; height: 100%;
+            background: white; z-index: 200; transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out; box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        #sidebar.open { transform: translateX(0); }
+        #sidebar-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 199;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        #sidebar-overlay.open { opacity: 1; pointer-events: auto; }
+        
+        .menu-item {
+            display: flex; align-items: center; padding: 16px 20px;
+            color: #333; font-weight: 600; border-bottom: 1px solid #f3f4f6;
+            cursor: pointer; transition: background 0.2s;
+        }
+        .menu-item:hover { background-color: #f9fafb; }
+        .menu-item i { width: 24px; text-align: center; margin-right: 12px; }
+    </style>
 </head>
-<body class="bg-gray-100 h-screen overflow-hidden">
-
-    <!-- Smart Status Bar -->
-    <div id="status-bar" class="status-bar">Detecting Date...</div>
-
-    <!-- SIDEBAR -->
-    <div id="sidebar-overlay" onclick="toggleMenu()"></div>
-    <div id="sidebar">
-        <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-black text-white">
-            <h2 class="text-xl font-black italic">SHEIN PCheck</h2>
-            <button onclick="toggleMenu()"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="flex flex-col">
-            <div class="menu-item" onclick="switchView('calculator')">
-                <i class="fas fa-calculator"></i> Calculator
-            </div>
-            <div class="menu-item" onclick="switchView('acl')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-3 w-5 h-5 text-blue-500"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> ACL Gen 
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="ml-2 w-3 h-3 text-gray-400"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            </div>
-            <!-- OFFLINE INSTALLER -->
-            <div class="mt-4 px-5">
-                <button onclick="downloadApp()" class="w-full bg-gray-100 border border-gray-300 text-gray-600 font-bold text-xs py-2 rounded flex items-center justify-center gap-2 hover:bg-gray-200">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download App (HTML)
-                </button>
-                <p class="text-[9px] text-gray-400 mt-1 text-center">Save file and open to use offline.</p>
-            </div>
-        </div>
-        <div class="absolute bottom-4 left-0 w-full text-center text-[10px] text-gray-400 p-4">
-            v1.0.0 • Made with <span class="text-red-500">❤</span> by Joven Campomanes
-        </div>
-    </div>
-
-    <div class="max-w-md mx-auto h-full relative bg-gray-50 shadow-2xl overflow-hidden flex flex-col">
-        
-        <!-- HEADER -->
-        <header class="bg-white sticky top-0 z-50 px-4 py-3 shadow-sm flex items-center justify-between border-b border-gray-100">
-            <div class="flex items-center gap-2">
-                <button class="text-xl text-gray-800" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
-                <h1 class="text-lg font-black italic tracking-tighter">SHEIN <span class="text-black font-normal not-italic text-sm">PCheck</span></h1>
-            </div>
-            <div class="flex items-center gap-3">
-                 <button class="text-gray-600 hover:text-black" id="btn-history" title="History"><i class="fas fa-history"></i></button>
-                 <button class="text-sm text-black font-medium" id="btn-reset">Reset</button>
-            </div>
-        </header>
-
-        <!-- VIEW: CALCULATOR -->
-        <div id="view-calculator" class="h-full flex flex-col relative">
-            <!-- MAIN FORM -->
-            <main class="flex-1 overflow-y-auto pb-24 pt-2">
-
-                <!-- 1. ITEM PRICE (Bulk or Single) -->
-                <div class="shein-input-group">
-                    <div class="flex justify-between items-center mb-2">
-                        <div class="flex items-center gap-2">
-                            <label class="shein-label mb-0">Item Price</label>
-                            <button id="btn-lock-inputs" class="text-gray-400 hover:text-black transition-colors px-2" title="Lock Inputs">
-                                <i class="fas fa-unlock"></i>
-                            </button>
-                        </div>
-                        
-                        <div class="flex items-center gap-2">
-                            <span class="text-[10px] text-gray-400 font-medium">Multiple Items</span>
-                            <label class="points-switch scale-75 origin-right">
-                                <input type="checkbox" id="toggle-bulk">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- SINGLE MODE INPUT -->
-                    <div id="single-input-wrapper" class="relative">
-                        <span class="absolute left-0 top-3 text-lg font-bold text-gray-400">₱</span>
-                        <input type="number" id="input-price" class="shein-input pl-6" placeholder="0.00" inputmode="decimal">
-                    </div>
-
-                    <!-- BULK MODE INPUT -->
-                    <div id="bulk-input-wrapper" class="hidden">
-                        <div id="bulk-items-list" class="space-y-3 mb-4">
-                            <!-- Items injected here -->
-                        </div>
-                        
-                        <button id="btn-add-item" class="text-xs font-bold flex items-center gap-2 text-black border border-gray-200 rounded-full px-4 py-2 hover:bg-gray-50 active:scale-95 transition-transform w-full justify-center disabled:opacity-50 disabled:cursor-not-allowed">
-                            <i class="fas fa-plus"></i> Add Another Item
-                        </button>
-
-                        <div class="border-t border-dashed border-gray-200 mt-4 pt-3 flex justify-between items-end">
-                            <span class="text-xs font-bold text-gray-400 uppercase">Total Order Value</span>
-                            <span class="text-xl font-bold text-black" id="bulk-total-display">₱0.00</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 2. VOUCHER / COUPON -->
-                <div class="shein-input-group">
-                    <div class="flex justify-between items-center mb-2">
-                        <label class="shein-label"><i class="fas fa-ticket-alt mr-1"></i> Apply Coupon</label>
-                    </div>
-
-                    <!-- Quick Select Vouchers -->
-                    <div class="voucher-scroll" id="voucher-list">
-                        <!-- Vouchers injected via JS -->
-                    </div>
-                    
-                    <div class="flex gap-3">
-                        <div class="w-1/2">
-                            <label class="text-[10px] text-gray-400">Discount %</label>
-                            <div class="relative">
-                                <input type="number" id="input-voucher-percent" class="shein-input" placeholder="15" inputmode="numeric">
-                                <span class="absolute right-0 top-3 text-gray-400 text-sm">%</span>
-                            </div>
-                        </div>
-                        <div class="w-1/2">
-                            <label class="text-[10px] text-gray-400">Cap Limit (₱)</label>
-                            <input type="number" id="input-voucher-cap" class="shein-input" placeholder="Optional" inputmode="decimal">
-                        </div>
-                    </div>
-                    <div class="mt-2 text-[10px] text-gray-400">
-                        Enter manually or select a voucher above.
-                    </div>
-                </div>
-
-                <!-- 3. POINTS -->
-                <div class="shein-input-group">
-                    <div class="flex justify-between items-center mb-2">
-                        <label class="shein-label"><i class="fas fa-coins mr-1 text-yellow-500"></i> Points</label>
-                        <label class="points-switch">
-                            <input type="checkbox" id="toggle-points" checked>
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    
-                    <div id="points-container" class="transition-all duration-300">
-                        <div class="flex items-end gap-2">
-                            <input type="number" id="input-points" class="shein-input text-yellow-600" placeholder="0" inputmode="numeric">
-                            <span class="text-sm font-medium mb-3 text-gray-500">pts</span>
-                        </div>
-                        
-                        <div class="flex justify-between mt-2 text-xs">
-                            <span class="text-gray-500" id="points-rate-display">Rate Loading...</span>
-                            <span class="text-red-500" id="points-warning">Max 30%</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 4. SHIPPING -->
-                <div class="shein-input-group">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <div class="flex items-center">
-                                <label class="shein-label mb-0"><i class="fas fa-truck mr-1 text-green-500"></i> Free Shipping</label>
-                                <!-- Smart Notice Banner / Help Button -->
-                                <div id="shipping-notice-badge" class="hidden ml-2 text-[10px] font-bold px-2 py-0.5 rounded-full w-fit bg-green-100 text-green-700">
-                                    <!-- Injected JS -->
-                                </div>
-                                <button id="shipping-manual-help" class="ml-2 text-gray-400 hover:text-black hidden" title="Force Enable Free Shipping">
-                                    <i class="fas fa-question-circle text-[12px]"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <label class="points-switch">
-                            <input type="checkbox" id="toggle-shipping" checked>
-                            <span class="slider green-slider"></span>
-                        </label>
-                    </div>
-
-                    <div id="shipping-manual-notice" class="hidden mt-2 p-3 bg-gray-50 rounded-lg border border-gray-100 relative">
-                        <div class="absolute -top-1.5 left-20 w-3 h-3 bg-gray-50 border-t border-l border-gray-100 transform rotate-45"></div>
-                        <p class="text-[10px] text-gray-500 leading-snug">
-                            <strong>Manual Override:</strong> You can force enable free shipping if you have a voucher.
-                        </p>
-                    </div>
-                    
-                    <div id="shipping-input-container" class="mt-2 hidden">
-                         <label class="text-[10px] text-gray-400">Shipping Fee (₱)</label>
-                         <input type="number" id="input-shipping" class="shein-input" placeholder="245" value="245" inputmode="decimal">
-                    </div>
-
-                    <div id="shipping-add-more-container" class="hidden mt-3 bg-orange-50 p-2 rounded border border-orange-100">
-                        <div class="flex items-center text-orange-600 text-xs mb-1">
-                            <i class="fas fa-exclamation-circle mr-1"></i>
-                            <span id="shipping-add-more-text">Add ₱50.00 more for Free Shipping</span>
-                        </div>
-                        <div class="w-full bg-orange-200 h-1.5 rounded-full overflow-hidden">
-                            <div id="shipping-progress-bar" class="bg-orange-500 h-full rounded-full" style="width: 0%"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 5. SERVICE FEE -->
-                <div class="shein-input-group">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <label class="shein-label mb-0 text-purple-600"><i class="fas fa-hand-holding-usd mr-1"></i> Booker/Seller Mode</label>
-                            <p class="text-[10px] text-gray-400">Account Price/Check Out Fee</p>
-                        </div>
-                        <label class="points-switch">
-                            <input type="checkbox" id="toggle-booker">
-                            <span class="slider purple-slider"></span>
-                        </label>
-                    </div>
-                    
-                    <div id="booker-input-container" class="mt-2 hidden">
-                         <div class="relative">
-                            <label class="text-[10px] text-gray-400">Total Fee Amount</label>
-                            <input type="number" id="input-service-fee" class="shein-input text-purple-600" placeholder="50" inputmode="decimal">
-                         </div>
-                    </div>
-                </div>
-
-                <!-- BREAKDOWN -->
-                <div class="px-4 py-4">
-                    <h3 class="font-bold text-sm mb-3">Price Details</h3>
-                    
-                    <div class="summary-row">
-                        <span>Retail Price</span>
-                        <span class="font-bold" id="display-subtotal">₱0.00</span>
-                    </div>
-                    
-                    <div class="summary-row">
-                        <span class="flex items-center gap-1"><i class="fas fa-ticket-alt text-xs text-gray-400"></i> Coupon</span>
-                        <span class="discount-text" id="display-voucher-discount">-₱0.00</span>
-                    </div>
-                    
-                    <div class="summary-row">
-                        <span class="flex items-center gap-1"><i class="fas fa-coins text-xs text-yellow-500"></i> Points</span>
-                        <span class="discount-text" id="display-points-discount">-₱0.00</span>
-                    </div>
-
-                    <div class="summary-row">
-                        <span class="flex items-center gap-1"><i class="fas fa-truck text-xs text-green-500"></i> Shipping Fee</span>
-                        <div class="flex items-center">
-                             <div class="relative group mr-2">
-                                <i id="shipping-help-icon" class="fas fa-question-circle text-gray-400 text-[10px] hidden cursor-help"></i>
-                                <div id="shipping-tooltip" class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 hidden group-hover:block bg-gray-800 text-white text-[10px] px-2 py-1 rounded whitespace-nowrap z-10 shadow-lg"></div>
-                            </div>
-                            <span class="text-green-600 font-bold" id="display-shipping">Free</span>
-                        </div>
-                    </div>
-
-                      <!-- Service Fee Row -->
-                    <div class="summary-row hidden" id="row-service-fee">
-                        <span class="flex items-center gap-1"><i class="fas fa-hand-holding-usd text-xs text-purple-500"></i> Service Fee</span>
-                        <span class="text-purple-600 font-bold" id="display-service-fee">+₱0.00</span>
-                    </div>
-                    
-                    <hr class="border-dashed border-gray-300 my-3">
-                    
-                    <div class="flex justify-between items-end">
-                        <span class="font-bold text-lg">Total Payable</span>
-                        <div class="flex flex-col items-end">
-                            <span class="text-xs text-gray-400 line-through mb-[-2px] hidden" id="display-original-total">₱0.00</span>
-                            <span class="text-2xl font-black text-black" id="display-total">₱0.00</span>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-2 text-right">
-                        <span class="text-[10px] bg-red-100 text-red-600 px-2 py-1 rounded font-bold" id="total-savings-badge">
-                            You Save: ₱0.00 (0%)
-                        </span>
-                    </div>
-                </div>
-
-                <!-- DISCLAIMER -->
-                <div class="mt-8 px-6 text-center opacity-70 mb-20">
-                    <p class="text-[10px] text-gray-400 leading-tight">
-                        <i class="fas fa-info-circle mr-1"></i>
-                        <strong>Disclaimer:</strong> This calculation is an estimate. Final costs may vary due to real-time currency fluctuations. Weekend free shipping is automatically detected.
-                    </p>
-                </div>
-
-            </main>
-
-            <!-- FOOTER ACTION -->
-            <!-- Changed from fixed to absolute inside the relative parent for better layout structure -->
-            <div class="absolute bottom-0 left-0 w-full bg-gray-50 p-4 z-50 flex gap-3 border-t border-gray-100">
-                 <button id="btn-generate-receipt" class="flex-1 bg-white text-black border-2 border-black font-bold py-3.5 rounded-sm uppercase tracking-widest text-sm hover:bg-gray-50 active:scale-[0.99] transition-all flex items-center justify-center gap-2">
-                    <i class="fas fa-receipt"></i> Receipt
-                </button>
-                <button id="btn-checkout" class="flex-1 bg-black text-white font-bold py-3.5 rounded-sm uppercase tracking-widest text-sm hover:opacity-90 active:scale-[0.99] transition-all">
-                    Checkout
-                </button>
-            </div>
-        </div> 
-        <!-- END VIEW: CALCULATOR -->
-
-        <!-- VIEW: ACL GEN -->
-        <div id="view-acl" class="hidden h-full flex-col overflow-hidden">
-            <!-- ACL AUTH SCREEN -->
-            <div id="acl-auth" class="flex-1 flex flex-col justify-center items-center p-6 text-center">
-                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 text-2xl">
-                    <i class="fas fa-lock text-3xl text-gray-400"></i>
-                </div>
-                <h2 class="font-bold text-lg mb-2">Restricted Feature</h2>
-                <p class="text-sm text-gray-500 mb-6">Enter the authentication code to access the ACL Generator.</p>
-                
-                <input type="password" id="acl-auth-input" class="w-full max-w-xs border border-gray-300 rounded px-4 py-3 mb-3 text-center tracking-widest" placeholder="ENTER CODE">
-                <button onclick="checkAclAuth()" class="w-full max-w-xs bg-black text-white font-bold py-3 rounded">UNLOCK</button>
-                <p id="acl-error" class="text-red-500 text-xs mt-3 hidden">Invalid Code. Please try again.</p>
-            </div>
-
-            <!-- ACL MAIN INTERFACE -->
-            <div id="acl-main" class="hidden flex-1 p-4">
-                <div class="bg-white rounded-xl shadow-sm p-6 mb-4">
-                    <h2 class="font-black italic text-xl mb-4 text-blue-600">ACL <span class="text-black not-italic font-normal">Generator</span></h2>
-                    
-                    <label class="shein-label">Base Link (Ark)</label>
-                    <div class="relative">
-                        <input type="text" id="acl-link-input" class="w-full border border-gray-200 rounded p-3 pr-10 mb-4 text-sm font-mono text-gray-600" placeholder="https://m.shein.com/ph/ark/11000">
-                        <button id="btn-clear-link" class="absolute right-3 top-3 text-gray-400 hover:text-black hidden">
-                            <i class="fas fa-times-circle"></i>
-                        </button>
-                    </div>
-                    
-                    <div class="flex justify-between items-center mb-6 bg-gray-50 p-2 rounded-lg">
-                        <span class="text-xs font-bold text-gray-500 px-2">Mode:</span>
-                        <div class="flex gap-2">
-                            <label class="flex items-center cursor-pointer">
-                                <input type="radio" name="acl-mode" value="inc" checked class="accent-blue-600 mr-1">
-                                <span class="text-xs font-bold">Increase</span>
-                            </label>
-                            <label class="flex items-center cursor-pointer">
-                                <input type="radio" name="acl-mode" value="dec" class="accent-red-600 mr-1">
-                                <span class="text-xs font-bold">Decrease</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <button onclick="openNextLink()" class="w-full bg-blue-600 text-white font-bold py-4 rounded-lg shadow-lg active:scale-95 transition-transform text-lg mb-6">
-                        OPEN LINK <i class="fas fa-external-link-alt ml-2"></i>
-                    </button>
-                    
-                    <!-- QR Code Area -->
-                    <div class="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-lg border border-gray-100">
-                        <div id="qrcode" class="mb-3"></div>
-                        <p class="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Scan for Mobile</p>
-                        <p id="acl-preview" class="text-xs font-mono text-gray-800 break-all text-center">Waiting for input...</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- RECEIPT MODAL -->
-        <div id="receipt-modal" class="modal-overlay">
-            <div class="modal-card">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="font-bold text-lg"><i class="fas fa-receipt mr-2"></i>Order Summary</h3>
-                    <button id="close-receipt" class="text-gray-400 hover:text-black"><i class="fas fa-times"></i></button>
-                </div>
-                
-                <!-- Use a DIV for the visual receipt (Clean HTML Style) -->
-                <div id="receipt-content">
-                    <!-- Dynamic HTML Content -->
-                </div>
-                
-                <button id="btn-copy-receipt" class="w-full bg-black text-white font-bold py-2 rounded text-sm mb-2 mt-4">
-                    <i class="far fa-copy mr-1"></i> Copy to Clipboard
-                </button>
-                <p class="text-[10px] text-gray-400 text-center">Ready to paste in Messenger/Viber</p>
-            </div>
-        </div>
-
-        <!-- HISTORY MODAL -->
-        <div id="history-modal" class="modal-overlay">
-            <div class="modal-card">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="font-bold text-lg"><i class="fas fa-history mr-2"></i>History</h3>
-                    <div class="flex gap-2">
-                        <button id="clear-history" class="text-xs text-red-500 hover:text-red-700 font-bold px-2">CLEAR</button>
-                        <button id="close-history" class="text-gray-400 hover:text-black"><i class="fas fa-times"></i></button>
-                    </div>
-                </div>
-                <div id="history-list" class="max-h-60 overflow-y-auto space-y-2">
-                    <p class="text-gray-400 text-center text-xs py-4">No recent calculations</p>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- Service Worker Script (Removed download button, kept logic for potential manual use) -->
-    <script>
-        if ('serviceWorker' in navigator) {
-             navigator.serviceWorker.register('sw.js').catch(err => console.log('SW Fail:', err));
-        }
-    </script>
-
-    <script>
-        // Constants
-        const USD_TO_PHP_RATE = 58.849557522; 
-        const POINTS_TO_USD_RATIO = 0.01; 
-        const MAX_POINTS_PERCENTAGE = 0.30; 
-        const SHIPPING_THRESHOLD = 249; 
-        const ACL_AUTH_CODE = "ACLGEN2026V1";
-
-        const TODAY = new Date().getDay();
-        const IS_WEEKEND = (TODAY === 0 || TODAY === 6);
-        
-        const PRESET_VOUCHERS = [
-            { percent: 60, cap: 428, min: 285 }, { percent: 60, cap: 255, min: 120 }, { percent: 60, cap: 170, min: 99 },
-            { percent: 60, cap: 150, min: 249 }, { percent: 60, cap: 100, min: 99 },
-            { percent: 50, cap: 325, min: 410 },
-            { percent: 50, cap: 250, min: 350 }, { percent: 50, cap: 200, min: 340 },
-            { percent: 40, cap: 360, min: 499 }, { percent: 40, cap: 360, min: 600 },
-            { percent: 30, cap: 720, min: 1199 }, { percent: 30, cap: 700, min: 1200 }
-        ];
-
-        // UI Elements
-        const sidebar = document.getElementById('sidebar');
-        const sidebarOverlay = document.getElementById('sidebar-overlay');
-        const viewCalc = document.getElementById('view-calculator');
-        const viewAcl = document.getElementById('view-acl');
-        const headerTitle = document.querySelector('header h1 span');
-
-        // ACL Elements
-        const aclAuthScreen = document.getElementById('acl-auth');
-        const aclMainScreen = document.getElementById('acl-main');
-        const aclInput = document.getElementById('acl-auth-input');
-        const aclError = document.getElementById('acl-error');
-        const aclLinkInput = document.getElementById('acl-link-input');
-        const aclPreview = document.getElementById('acl-preview');
-        const btnClearLink = document.getElementById('btn-clear-link');
-        const qrcodeContainer = document.getElementById("qrcode");
-        let qrCodeObj = null;
-
-        // Calculator Elements
-        const elPrice = document.getElementById('input-price');
-        const elBtnLockInputs = document.getElementById('btn-lock-inputs');
-        const elVoucherList = document.getElementById('voucher-list');
-        const elVoucherPercent = document.getElementById('input-voucher-percent');
-        const elVoucherCap = document.getElementById('input-voucher-cap');
-        const elPoints = document.getElementById('input-points');
-        const elTogglePoints = document.getElementById('toggle-points');
-        const elPointsContainer = document.getElementById('points-container');
-        const displaySubtotal = document.getElementById('display-subtotal');
-        const displayVoucher = document.getElementById('display-voucher-discount');
-        const displayPoints = document.getElementById('display-points-discount');
-        const displayTotal = document.getElementById('display-total');
-        const displayOriginalTotal = document.getElementById('display-original-total');
-        const displaySavings = document.getElementById('total-savings-badge');
-        const elPointsWarning = document.getElementById('points-warning');
-        const elReset = document.getElementById('btn-reset');
-        const elToggleShipping = document.getElementById('toggle-shipping');
-        const elInputShipping = document.getElementById('input-shipping');
-        const elShippingContainer = document.getElementById('shipping-input-container');
-        const displayShipping = document.getElementById('display-shipping');
-        const elShippingNoticeBadge = document.getElementById('shipping-notice-badge');
-        const elShippingAddMoreContainer = document.getElementById('shipping-add-more-container');
-        const elShippingAddMoreText = document.getElementById('shipping-add-more-text');
-        const elShippingProgressBar = document.getElementById('shipping-progress-bar');
-        const elShippingManualHelp = document.getElementById('shipping-manual-help');
-        const elShippingManualNotice = document.getElementById('shipping-manual-notice');
-        const elToggleBulk = document.getElementById('toggle-bulk');
-        const elSingleInputWrapper = document.getElementById('single-input-wrapper');
-        const elBulkInputWrapper = document.getElementById('bulk-input-wrapper');
-        const elBulkList = document.getElementById('bulk-items-list');
-        const elBtnAddBulk = document.getElementById('btn-add-item');
-        const elBulkTotalDisplay = document.getElementById('bulk-total-display');
-        const elShippingHelpIcon = document.getElementById('shipping-help-icon');
-        const elShippingTooltip = document.getElementById('shipping-tooltip');
-        const elToggleBooker = document.getElementById('toggle-booker');
-        const elBookerContainer = document.getElementById('booker-input-container');
-        const elInputServiceFee = document.getElementById('input-service-fee');
-        const elRowServiceFee = document.getElementById('row-service-fee');
-        const displayServiceFee = document.getElementById('display-service-fee');
-        const btnGenerateReceipt = document.getElementById('btn-generate-receipt');
-        const btnCheckout = document.getElementById('btn-checkout');
-        const receiptModal = document.getElementById('receipt-modal');
-        const closeReceipt = document.getElementById('close-receipt');
-        const btnCopyReceipt = document.getElementById('btn-copy-receipt');
-        const receiptContent = document.getElementById('receipt-content');
-        const btnHistory = document.getElementById('btn-history');
-        const historyModal = document.getElementById('history-modal');
-        const closeHistory = document.getElementById('close-history');
-        const clearHistory = document.getElementById('clear-history');
-        const historyList = document.getElementById('history-list');
-        const elStatusBar = document.getElementById('status-bar');
-
-        // State
-        let state = {
-            price: 0, voucherPercent: 0, voucherCap: Infinity, pointsInput: 0, usePoints: true, selectedVoucherIndex: -1,
-            freeShipping: true, shippingFee: 245, isBulk: false, bulkItemCount: 1, userManuallyToggledShipping: false,
-            inputsLocked: false, bookerMode: false, serviceFee: 0, lastCalc: {},
-            aclAuthenticated: false, bulkItems: [] 
-        };
-        let historyLog = [];
-
-        // --- Initialization ---
-        if (IS_WEEKEND) {
-            elStatusBar.innerText = "WEEKEND MODE: AUTO FREE SHIPPING ACTIVE";
-            elStatusBar.className = "status-bar status-weekend";
-        } else {
-            elStatusBar.innerText = `WEEKDAY MODE: FREE SHIPPING ORDERS > ₱${SHIPPING_THRESHOLD}`;
-            elStatusBar.className = "status-bar status-weekday";
-        }
-        document.getElementById('points-rate-display').innerText = `100 Pts ≈ ₱${USD_TO_PHP_RATE.toFixed(2)}`;
-        loadHistory();
-        updateState();
-
-        // --- Navigation ---
-        window.toggleMenu = function() {
-            sidebar.classList.toggle('open');
-            sidebarOverlay.classList.toggle('open');
-        }
-
-        window.switchView = function(view) {
-            toggleMenu(); 
-            if(view === 'calculator') {
-                viewCalc.classList.remove('hidden');
-                viewAcl.classList.add('hidden');
-                headerTitle.innerText = "PCheck";
-                elStatusBar.classList.remove('hidden');
-                elReset.classList.remove('hidden');
-                btnHistory.classList.remove('hidden');
-            } else if (view === 'acl') {
-                viewCalc.classList.add('hidden');
-                viewAcl.classList.remove('hidden');
-                viewAcl.classList.add('flex');
-                headerTitle.innerText = "ACL Gen";
-                elStatusBar.classList.add('hidden');
-                elReset.classList.add('hidden');
-                btnHistory.classList.add('hidden');
-
-                if(state.aclAuthenticated) {
-                    aclAuthScreen.classList.add('hidden');
-                    aclMainScreen.classList.remove('hidden');
-                } else {
-                    aclAuthScreen.classList.remove('hidden');
-                    aclMainScreen.classList.add('hidden');
-                }
-            }
-        }
-
-        // --- ACL Logic (FIXED) ---
-        // Direct string comparison to fix issues with crypto.subtle in non-secure contexts
-        window.checkAclAuth = function() {
-            if(aclInput.value === ACL_AUTH_CODE) {
-                state.aclAuthenticated = true;
-                aclAuthScreen.classList.add('hidden');
-                aclMainScreen.classList.remove('hidden');
-                aclError.classList.add('hidden');
-            } else {
-                aclError.classList.remove('hidden');
-            }
-        }
-
-        function updateQRCode(text) {
-            qrcodeContainer.innerHTML = ""; // Clear previous
-            if (!text) return;
-            
-            try {
-                new QRCode(qrcodeContainer, {
-                    text: text,
-                    width: 128,
-                    height: 128,
-                    colorDark : "#000000",
-                    colorLight : "#ffffff",
-                    correctLevel : QRCode.CorrectLevel.L
-                });
-            } catch(e) {
-                console.log("QR Gen Error", e);
-            }
-        }
-
-        aclLinkInput.addEventListener('input', () => {
-            const val = aclLinkInput.value;
-            aclPreview.innerText = val || "Waiting for input...";
-            if(val) {
-                btnClearLink.classList.remove('hidden');
-                updateQRCode(val);
-            } else {
-                btnClearLink.classList.add('hidden');
-                qrcodeContainer.innerHTML = "";
-            }
-        });
-
-        btnClearLink.addEventListener('click', () => {
-            aclLinkInput.value = '';
-            aclPreview.innerText = "Waiting for input...";
-            qrcodeContainer.innerHTML = "";
-            btnClearLink.classList.add('hidden');
-        });
-
-        window.openNextLink = function() {
-            let url = aclLinkInput.value.trim();
-            if(!url) return;
-
-            window.open(url, '_blank');
-
-            const match = url.match(/(\d+)(\/?)$/);
-            if(match) {
-                let numStr = match[1];
-                let num = parseInt(numStr);
-                const isInc = document.querySelector('input[name="acl-mode"]:checked').value === 'inc';
-                
-                if(isInc) num++; else num--;
-                
-                const newUrl = url.replace(numStr, num);
-                aclLinkInput.value = newUrl;
-                aclPreview.innerText = newUrl;
-                updateQRCode(newUrl);
-            }
-        }
-
-        // --- Download App Helper ---
-        window.downloadApp = function() {
-            const htmlContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
-            const blob = new Blob([htmlContent], { type: "text/html" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = "shein-pcheck.html";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-
-        // --- Event Listeners (Calculator) ---
-        const calcInputs = [elPrice, elPoints, elInputShipping, elInputServiceFee];
-        calcInputs.forEach(el => el.addEventListener('input', updateState));
-
-        elBtnLockInputs.addEventListener('click', toggleInputLock);
-        elShippingManualHelp.addEventListener('click', () => elShippingManualNotice.classList.toggle('hidden'));
-
-        elToggleShipping.addEventListener('change', (e) => {
-            state.freeShipping = e.target.checked;
-            state.userManuallyToggledShipping = true; 
-            elShippingContainer.classList.toggle('hidden', state.freeShipping);
-            calculate();
-        });
-        
-        [elVoucherPercent, elVoucherCap].forEach(el => {
-            el.addEventListener('input', () => {
-                state.selectedVoucherIndex = -1;
-                updateState();
-            });
-        });
-
-        elTogglePoints.addEventListener('change', (e) => {
-            state.usePoints = e.target.checked;
-            elPointsContainer.style.opacity = state.usePoints ? '1' : '0.4';
-            elPointsContainer.style.pointerEvents = state.usePoints ? 'auto' : 'none';
-            calculate();
-        });
-
-        elToggleBulk.addEventListener('change', (e) => {
-            state.isBulk = e.target.checked;
-            elSingleInputWrapper.classList.toggle('hidden', state.isBulk);
-            elBulkInputWrapper.classList.toggle('hidden', !state.isBulk);
-            if (state.isBulk && elBulkList.children.length === 0) addBulkItem();
-            updateState();
-        });
-        elBtnAddBulk.addEventListener('click', addBulkItem);
-
-        elToggleBooker.addEventListener('change', (e) => {
-            state.bookerMode = e.target.checked;
-            elBookerContainer.classList.toggle('hidden', !state.bookerMode);
-            calculate();
-        });
-
-        btnGenerateReceipt.addEventListener('click', () => {
-            if (state.lastCalc.total === undefined) return;
-            generateReceiptView();
-            receiptModal.classList.add('show');
-            addToHistory();
-        });
-        closeReceipt.addEventListener('click', () => receiptModal.classList.remove('show'));
-        btnCopyReceipt.addEventListener('click', copyReceiptToClipboard);
-
-        btnHistory.addEventListener('click', () => {
-            renderHistory();
-            historyModal.classList.add('show');
-        });
-        closeHistory.addEventListener('click', () => historyModal.classList.remove('show'));
-        
-        clearHistory.addEventListener('click', () => {
-            historyLog = [];
-            localStorage.removeItem('shein_pcal_history');
-            renderHistory();
-        });
-
-        btnCheckout.addEventListener('click', () => {
-            window.open("https://onelink.shein.com/", "_blank");
-        });
-
-        elReset.addEventListener('click', () => {
-            if(state.inputsLocked) toggleInputLock();
-            elPrice.value = ''; elVoucherPercent.value = ''; elVoucherCap.value = ''; elPoints.value = '';
-            state.freeShipping = true; elToggleShipping.checked = true;
-            state.userManuallyToggledShipping = false;
-            elShippingContainer.classList.add('hidden'); elShippingManualNotice.classList.add('hidden');
-            state.shippingFee = 245; elInputShipping.value = '245';
-            state.selectedVoucherIndex = -1;
-            state.isBulk = false; elToggleBulk.checked = false;
-            elSingleInputWrapper.classList.remove('hidden'); elBulkInputWrapper.classList.add('hidden'); elBulkList.innerHTML = ''; state.bulkItemCount = 0;
-            state.bookerMode = false; elToggleBooker.checked = false;
-            elBookerContainer.classList.add('hidden'); elInputServiceFee.value = ''; state.serviceFee = 0;
-            updateState();
-        });
-
-        // --- Logic Functions ---
-        function loadHistory() {
-            const stored = localStorage.getItem('shein_pcal_history');
-            if (stored) { try { historyLog = JSON.parse(stored); } catch (e) { historyLog = []; } }
-            renderHistory();
-        }
-
-        function toggleInputLock() {
-            state.inputsLocked = !state.inputsLocked;
-            const icon = elBtnLockInputs.querySelector('i');
-            const locked = state.inputsLocked;
-            icon.className = locked ? 'fas fa-lock text-red-500' : 'fas fa-unlock';
-            elPrice.disabled = locked; elBtnAddBulk.disabled = locked;
-            document.querySelectorAll('.bulk-price-input').forEach(el => el.disabled = locked);
-            document.querySelectorAll('.bulk-delete-btn').forEach(el => { el.disabled = locked; if(locked) el.classList.add('opacity-50'); else el.classList.remove('opacity-50'); });
-        }
-
-        function addBulkItem(value = null) {
-            if (state.inputsLocked) return;
-            state.bulkItemCount++;
-            const div = document.createElement('div');
-            div.className = 'bulk-item-row';
-            div.innerHTML = `
-                <div class="item-count-badge">${state.bulkItemCount}</div>
-                <div class="relative flex-1"><span class="absolute left-0 top-3 text-sm font-bold text-gray-400">₱</span><input type="number" class="shein-input pl-5 py-2 text-sm bulk-price-input" placeholder="Price" inputmode="decimal" oninput="updateState()" value="${value || ''}"></div>
-                <button class="bulk-delete-btn text-gray-400 hover:text-red-500 p-2" onclick="removeBulkItem(this)"><i class="fas fa-trash-alt text-sm"></i></button>
-            `;
-            elBulkList.appendChild(div);
-            updateBulkBadges();
-            updateState();
-        }
-
-        window.removeBulkItem = function(btn) {
-            if (state.inputsLocked) return;
-            btn.parentElement.remove();
-            updateBulkBadges();
-            updateState();
-        }
-
-        function updateBulkBadges() {
-            elBulkList.querySelectorAll('.item-count-badge').forEach((b, i) => b.innerText = i + 1);
-        }
-
-        function getBulkTotal() {
-            const inputs = document.querySelectorAll('.bulk-price-input');
-            let sum = 0;
-            inputs.forEach(input => sum += parseFloat(input.value) || 0);
-            return sum;
-        }
-
-        function updateState() {
-            if (state.isBulk) {
-                state.price = getBulkTotal();
-                state.bulkItems = [];
-                document.querySelectorAll('.bulk-price-input').forEach(input => {
-                     state.bulkItems.push(parseFloat(input.value) || 0);
-                });
-                elBulkTotalDisplay.innerText = formatMoney(state.price);
-            } else {
-                state.price = parseFloat(elPrice.value) || 0;
-            }
-            state.voucherPercent = parseFloat(elVoucherPercent.value) || 0;
-            const cap = parseFloat(elVoucherCap.value);
-            state.voucherCap = isNaN(cap) ? Infinity : cap;
-            state.pointsInput = parseFloat(elPoints.value) || 0;
-            state.shippingFee = parseFloat(elInputShipping.value) || 0;
-            state.serviceFee = parseFloat(elInputServiceFee.value) || 0;
-            calculate();
-        }
-
-        function renderVouchers(eligiblePrice) {
-            elVoucherList.innerHTML = PRESET_VOUCHERS.map((v, i) => {
-                const active = state.selectedVoucherIndex === i;
-                const eligible = eligiblePrice >= v.min;
-                return `
-                    <div class="voucher-ticket ${active?'active':''} ${!eligible?'disabled':''}" onclick="selectVoucher(${i},${eligible})">
-                        <div class="voucher-cutout-top"></div><div class="voucher-cutout-bottom"></div>
-                        <div class="voucher-left"><div class="voucher-amount">${v.percent}<span class="voucher-percent-symbol">%</span></div><span class="voucher-off-text">OFF</span></div>
-                        <div class="voucher-right"><div class="voucher-selected-badge"><i class="fas fa-check"></i></div><div class="voucher-title">Cap ₱${v.cap}</div><div class="voucher-sub">Min Spend ₱${v.min}</div></div>
-                    </div>`;
-            }).join('');
-        }
-
-        window.selectVoucher = function(index, isEligible) {
-            if (!isEligible) return;
-            if (state.selectedVoucherIndex === index) {
-                state.selectedVoucherIndex = -1; elVoucherPercent.value = ''; elVoucherCap.value = '';
-            } else {
-                state.selectedVoucherIndex = index; elVoucherPercent.value = PRESET_VOUCHERS[index].percent; elVoucherCap.value = PRESET_VOUCHERS[index].cap;
-            }
-            updateState();
-        }
-
-        function calculate() {
-            let currentBase = state.price;
-            let priceAfterNue = currentBase;
-
-            renderVouchers(priceAfterNue);
-
-            let voucherDiscount = Math.round(priceAfterNue * (state.voucherPercent / 100));
-            if (state.voucherCap !== Infinity && voucherDiscount > state.voucherCap) voucherDiscount = state.voucherCap;
-            let priceAfterVoucher = Math.max(0, priceAfterNue - voucherDiscount);
-
-            const maxPointsPhp = Math.round(priceAfterVoucher * MAX_POINTS_PERCENTAGE);
-            let pointsValPhp = state.pointsInput * POINTS_TO_USD_RATIO * USD_TO_PHP_RATE;
-            let pointsDed = 0;
-            if (state.usePoints) pointsDed = Math.round(Math.min(pointsValPhp, maxPointsPhp, priceAfterVoucher));
-
-            if (state.usePoints && pointsValPhp > maxPointsPhp && priceAfterVoucher > 0) {
-                const maxPts = maxPointsPhp / USD_TO_PHP_RATE / POINTS_TO_USD_RATIO;
-                elPointsWarning.innerText = `Max: ${Math.floor(maxPts)} pts (₱${maxPointsPhp})`;
-                elPointsWarning.classList.add('font-bold');
-            } else {
-                elPointsWarning.innerText = "Max 30% usage allowed";
-                elPointsWarning.classList.remove('font-bold');
-            }
-
-            let payableBeforeShipping = Math.max(0, priceAfterVoucher - pointsDed);
-
-            let systemFreeShipping = false;
-            let badgeText = "";
-            let showAddMore = false;
-            let remaining = 0;
-
-            if (IS_WEEKEND) {
-                systemFreeShipping = true; badgeText = "WEEKEND PROMO";
-            } else if (payableBeforeShipping >= SHIPPING_THRESHOLD) {
-                systemFreeShipping = true; badgeText = `ORDER > ₱${SHIPPING_THRESHOLD}`;
-            } else {
-                if (payableBeforeShipping > 0) {
-                    showAddMore = true; remaining = SHIPPING_THRESHOLD - payableBeforeShipping;
-                }
-            }
-
-            if (systemFreeShipping) {
-                state.freeShipping = true; elToggleShipping.checked = true; elToggleShipping.disabled = true;
-                elShippingNoticeBadge.innerText = badgeText; elShippingNoticeBadge.classList.remove('hidden');
-                elShippingContainer.classList.add('hidden'); elShippingManualHelp.classList.add('hidden'); elShippingManualNotice.classList.add('hidden');
-            } else {
-                elToggleShipping.disabled = false; elShippingNoticeBadge.classList.add('hidden'); elShippingManualHelp.classList.remove('hidden');
-                if (!state.userManuallyToggledShipping) {
-                    state.freeShipping = false; elToggleShipping.checked = false; elShippingContainer.classList.remove('hidden');
-                } else { elShippingContainer.classList.toggle('hidden', state.freeShipping); }
-            }
-
-            if (showAddMore && !state.freeShipping) {
-                elShippingAddMoreContainer.classList.remove('hidden');
-                elShippingAddMoreText.innerText = `Add ₱${remaining.toFixed(2)} more for Free Shipping`;
-                let percent = Math.min(100, (payableBeforeShipping / SHIPPING_THRESHOLD) * 100);
-                elShippingProgressBar.style.width = `${percent}%`;
-                elShippingHelpIcon.classList.remove('hidden');
-                elShippingTooltip.innerText = `Add ₱${remaining.toFixed(2)} for Free Shipping`;
-                elShippingTooltip.innerHTML += '<div class="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>';
-            } else {
-                elShippingAddMoreContainer.classList.add('hidden'); elShippingHelpIcon.classList.add('hidden');
-            }
-
-            let finalShipping = state.freeShipping ? 0 : state.shippingFee;
-            let totalServiceFee = (state.bookerMode && state.serviceFee > 0) ? state.serviceFee : 0;
-            if (totalServiceFee > 0) {
-                elRowServiceFee.classList.remove('hidden'); displayServiceFee.innerText = `+${formatMoney(totalServiceFee)}`;
-            } else { elRowServiceFee.classList.add('hidden'); }
-
-            const finalTotal = payableBeforeShipping + finalShipping + totalServiceFee;
-            const totalSavings = voucherDiscount + pointsDed;
-            const savingsPercent = state.price > 0 ? ((totalSavings / state.price) * 100).toFixed(0) : 0;
-
-            displaySubtotal.innerText = formatMoney(state.price);
-            displayVoucher.innerText = `-${formatMoney(voucherDiscount)}`;
-            displayPoints.innerText = `-${formatMoney(pointsDed)}`;
-            if (state.freeShipping) {
-                displayShipping.innerText = "Free"; displayShipping.className = "text-green-600 font-bold";
-            } else {
-                displayShipping.innerText = `+${formatMoney(finalShipping)}`; displayShipping.className = "text-black font-bold";
-            }
-            displayTotal.innerText = formatMoney(finalTotal);
-
-            const originalPriceForDisplay = state.price + finalShipping;
-            if (finalTotal < originalPriceForDisplay) {
-                displayOriginalTotal.innerText = formatMoney(originalPriceForDisplay);
-                displayOriginalTotal.classList.remove('hidden');
-            } else {
-                displayOriginalTotal.classList.add('hidden');
-            }
-            
-            if (totalSavings > 0) {
-                displaySavings.style.visibility = 'visible'; displaySavings.innerText = `You Save: ${formatMoney(totalSavings)} (${savingsPercent}%)`;
-            } else { displaySavings.style.visibility = 'hidden'; }
-
-            state.lastCalc = {
-                items: state.isBulk ? getBulkItemsData() : [{price: state.price}],
-                subtotal: state.price,
-                discounts: { voucher: voucherDiscount, points: pointsDed },
-                shipping: finalShipping, serviceFee: totalServiceFee, total: finalTotal,
-                date: new Date().toLocaleString('en-PH'),
-                savedState: JSON.parse(JSON.stringify(state))
-            };
-        }
-
-        function getBulkItemsData() {
-            let items = [];
-            document.querySelectorAll('.bulk-price-input').forEach((input, index) => {
-                const val = parseFloat(input.value) || 0;
-                if(val > 0) items.push({ id: index+1, price: val });
-            });
-            return items;
-        }
-
-        function formatMoney(amount) {
-            return '₱' + amount.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        }
-
-        // --- Receipt Functions ---
-        function getReceiptText() {
-            const c = state.lastCalc;
-            const now = new Date();
-            const dateStr = `${now.getMonth()+1}/${now.getDate()}/${now.getFullYear().toString().slice(-2)} • ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
-            let t = `『 ☁︎ 𝗦𝗛𝗘𝗜𝗡 𝗥𝗘𝗖𝗘𝗜𝗣𝗧 ☁︎ 』\n\n  ${dateStr}\n  ── ☁︎ ── ☁︎ ── ☁︎ ──\n\n`;
-            t += `  [+] SUB    > ${formatMoney(c.subtotal)}\n`;
-            if(c.discounts.voucher > 0) t += `  [-] VCH    > ₱${c.discounts.voucher}\n`; 
-            if(c.discounts.points > 0)  t += `  [-] PTS    > ₱${c.discounts.points}\n`;
-            const shipVal = c.shipping === 0 ? " 0" : formatMoney(c.shipping);
-            t += `  [+] SHP    > ${shipVal}\n`;
-            if (c.serviceFee > 0) t += `  [+] FEE    > ${formatMoney(c.serviceFee)}\n`;
-            t += `\n  ══════════════\n  ➥  PAY    :  ${formatMoney(c.total)}\n  ══════════════`;
-            return t;
-        }
-
-        function generateReceiptView() {
-            const c = state.lastCalc;
-            // Clean HTML Design (Restored)
-            let html = `
-                <div class="text-center mb-4 border-b border-dashed border-gray-300 pb-2">
-                    <h2 class="font-bold text-lg text-gray-800">SHEIN CHECK</h2>
-                    <p class="text-xs text-gray-500">${c.date}</p>
-                </div>
-            `;
-            if (state.isBulk && c.items.length > 0) {
-                 c.items.forEach(item => { html += `<div class="receipt-line"><span>Item #${item.id}</span><span>${formatMoney(item.price)}</span></div>`; });
-                 html += `<div class="receipt-divider"></div>`;
-            }
-            html += `<div class="receipt-line"><span>Subtotal</span><span>${formatMoney(c.subtotal)}</span></div>`;
-            if (c.discounts.voucher > 0) html += `<div class="receipt-line text-red-600"><span>Voucher</span><span>-${formatMoney(c.discounts.voucher)}</span></div>`;
-            if (c.discounts.points > 0) html += `<div class="receipt-line text-yellow-600"><span>Points</span><span>-${formatMoney(c.discounts.points)}</span></div>`;
-            const shippingText = c.shipping === 0 ? "FREE" : formatMoney(c.shipping);
-            const shippingClass = c.shipping === 0 ? "text-green-600 font-bold" : "";
-            html += `<div class="receipt-line"><span>Shipping</span><span class="${shippingClass}">${shippingText}</span></div>`;
-            if (c.serviceFee > 0) html += `<div class="receipt-line text-purple-600"><span>Service Fee</span><span>+${formatMoney(c.serviceFee)}</span></div>`;
-            html += `<div class="receipt-divider"></div>`;
-            html += `<div class="flex justify-between items-center mt-2"><span class="font-bold text-lg">TOTAL</span><span class="font-black text-xl">${formatMoney(c.total)}</span></div>`;
-            
-            receiptContent.innerHTML = html;
-        }
-
-        function copyReceiptToClipboard() {
-            const text = getReceiptText();
-            const textArea = document.createElement("textarea");
-            textArea.value = text;
-            textArea.style.position = "fixed"; textArea.style.left = "-9999px"; textArea.style.top = "0";
-            document.body.appendChild(textArea);
-            textArea.focus(); textArea.select();
-            try {
-                document.execCommand('copy');
-                btnCopyReceipt.innerHTML = '<i class="fas fa-check mr-1"></i> Copied!';
-                setTimeout(() => btnCopyReceipt.innerHTML = '<i class="far fa-copy mr-1"></i> Copy to Clipboard', 2000);
-            } catch (err) {
-                btnCopyReceipt.innerHTML = '<i class="fas fa-times mr-1"></i> Error';
-                setTimeout(() => btnCopyReceipt.innerHTML = '<i class="far fa-copy mr-1"></i> Copy to Clipboard', 2000);
-            }
-            document.body.removeChild(textArea);
-        }
-
-        function addToHistory() {
-            if (state.lastCalc.total === undefined) return;
-            if (historyLog.length > 0 && historyLog[0].date === state.lastCalc.date) return;
-            historyLog.unshift({...state.lastCalc});
-            if (historyLog.length > 10) historyLog.pop();
-            localStorage.setItem('shein_pcal_history', JSON.stringify(historyLog));
-            renderHistory();
-        }
-
-        function renderHistory() {
-            if (historyLog.length === 0) { historyList.innerHTML = '<p class="text-gray-400 text-center text-xs py-4">No recent calculations</p>'; return; }
-            historyList.innerHTML = historyLog.map((h, i) => `
-                <div onclick="restoreHistory(${i})" class="bg-gray-50 p-3 rounded border border-gray-100 flex justify-between items-center cursor-pointer hover:bg-gray-100 transition-colors">
-                    <div>
-                        <div class="font-bold text-sm">₱${h.total.toFixed(2)}</div>
-                        <div class="text-[10px] text-gray-400">${h.items.length} item(s) • ${h.date.split(',')[1]}</div>
-                    </div>
-                    <div class="text-right text-[10px] text-gray-500">${h.serviceFee > 0 ? '<span class="text-purple-500">w/ Fee</span>' : ''}</div>
-                </div>`).join('');
-        }
-
-        window.restoreHistory = function(index) {
-            const h = historyLog[index];
-            const saved = h.savedState;
-            if (!saved) return;
-            
-            // Restore Values
-            elPrice.value = saved.price || '';
-            elVoucherPercent.value = saved.voucherPercent || '';
-            elVoucherCap.value = saved.voucherCap === Infinity ? '' : saved.voucherCap;
-            elPoints.value = saved.pointsInput || '';
-            elInputShipping.value = saved.shippingFee;
-            elInputServiceFee.value = saved.serviceFee || '';
-            
-            // Restore Toggles
-            elToggleShipping.checked = saved.freeShipping;
-            elShippingContainer.classList.toggle('hidden', saved.freeShipping);
-            
-            elToggleBooker.checked = saved.bookerMode;
-            elBookerContainer.classList.toggle('hidden', !saved.bookerMode);
-            
-            // Restore Bulk
-            elToggleBulk.checked = saved.isBulk;
-            elSingleInputWrapper.classList.toggle('hidden', saved.isBulk);
-            elBulkInputWrapper.classList.toggle('hidden', !saved.isBulk);
-            
-            // Restore Bulk Items
-            elBulkList.innerHTML = '';
-            state.bulkItemCount = 0;
-            if (saved.isBulk && saved.bulkItems && saved.bulkItems.length > 0) {
-                 saved.bulkItems.forEach(val => addBulkItem(val));
-            } else if (saved.isBulk) {
-                 addBulkItem(); 
-            }
-
-            historyModal.classList.remove('show');
-            updateState();
-        }
-
-        // Initialize
-        document.getElementById('points-rate-display').innerText = `100 Points ≈ ₱${USD_TO_PHP_RATE.toFixed(2)}`;
-        updateState();
-
-    </script>
+<body class="bg-gray-100 min-h-screen pb-24">
+
+    <!-- Smart Status Bar -->
+    <div id="status-bar" class="status-bar">Detecting Date...</div>
+
+    <!-- SIDEBAR -->
+    <div id="sidebar-overlay" onclick="toggleMenu()"></div>
+    <div id="sidebar">
+        <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-black text-white">
+            <h2 class="text-xl font-black italic">SHEIN PCheck</h2>
+            <button onclick="toggleMenu()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="flex flex-col">
+            <div class="menu-item" onclick="switchView('calculator')">
+                <i class="fas fa-calculator"></i> Calculator
+            </div>
+            <div class="menu-item" onclick="switchView('acl')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-3 w-5 h-5 text-blue-500"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> ACL Gen 
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="ml-2 w-3 h-3 text-gray-400"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <!-- OFFLINE INSTALLER -->
+            <div class="mt-4 px-5">
+                <button onclick="downloadApp()" class="w-full bg-gray-100 border border-gray-300 text-gray-600 font-bold text-xs py-2 rounded flex items-center justify-center gap-2 hover:bg-gray-200">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download App (HTML)
+                </button>
+                <p class="text-[9px] text-gray-400 mt-1 text-center">Save file and open to use offline.</p>
+            </div>
+        </div>
+        <div class="absolute bottom-4 left-0 w-full text-center text-[10px] text-gray-400 p-4">
+            v1.0.0 • Made with <span class="text-red-500">❤</span> by Joven Campomanes
+        </div>
+    </div>
+
+    <div class="max-w-md mx-auto min-h-screen relative bg-gray-50 shadow-2xl overflow-hidden flex flex-col">
+        
+        <!-- HEADER -->
+        <header class="bg-white sticky top-0 z-50 px-4 py-3 shadow-sm flex items-center justify-between border-b border-gray-100">
+            <div class="flex items-center gap-2">
+                <button class="text-xl text-gray-800" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+                <h1 class="text-lg font-black italic tracking-tighter">SHEIN <span class="text-black font-normal not-italic text-sm">PCheck</span></h1>
+            </div>
+            <div class="flex items-center gap-3">
+                 <button class="text-gray-600 hover:text-black" id="btn-history" title="History"><i class="fas fa-history"></i></button>
+                 <button class="text-sm text-black font-medium" id="btn-reset">Reset</button>
+            </div>
+        </header>
+
+        <!-- VIEW: CALCULATOR -->
+        <div id="view-calculator">
+            <!-- MAIN FORM -->
+            <main class="pt-2">
+
+                <!-- 1. ITEM PRICE (Bulk or Single) -->
+                <div class="shein-input-group">
+                    <div class="flex justify-between items-center mb-2">
+                        <div class="flex items-center gap-2">
+                            <label class="shein-label mb-0">Item Price</label>
+                            <button id="btn-lock-inputs" class="text-gray-400 hover:text-black transition-colors px-2" title="Lock Inputs">
+                                <i class="fas fa-unlock"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] text-gray-400 font-medium">Multiple Items</span>
+                            <label class="points-switch scale-75 origin-right">
+                                <input type="checkbox" id="toggle-bulk">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- SINGLE MODE INPUT -->
+                    <div id="single-input-wrapper" class="relative">
+                        <span class="absolute left-0 top-3 text-lg font-bold text-gray-400">₱</span>
+                        <input type="number" id="input-price" class="shein-input pl-6" placeholder="0.00" inputmode="decimal">
+                    </div>
+
+                    <!-- BULK MODE INPUT -->
+                    <div id="bulk-input-wrapper" class="hidden">
+                        <div id="bulk-items-list" class="space-y-3 mb-4">
+                            <!-- Items injected here -->
+                        </div>
+                        
+                        <button id="btn-add-item" class="text-xs font-bold flex items-center gap-2 text-black border border-gray-200 rounded-full px-4 py-2 hover:bg-gray-50 active:scale-95 transition-transform w-full justify-center disabled:opacity-50 disabled:cursor-not-allowed">
+                            <i class="fas fa-plus"></i> Add Another Item
+                        </button>
+
+                        <div class="border-t border-dashed border-gray-200 mt-4 pt-3 flex justify-between items-end">
+                            <span class="text-xs font-bold text-gray-400 uppercase">Total Order Value</span>
+                            <span class="text-xl font-bold text-black" id="bulk-total-display">₱0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. VOUCHER / COUPON -->
+                <div class="shein-input-group">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="shein-label"><i class="fas fa-ticket-alt mr-1"></i> Apply Coupon</label>
+                    </div>
+
+                    <!-- Quick Select Vouchers -->
+                    <div class="voucher-scroll" id="voucher-list">
+                        <!-- Vouchers injected via JS -->
+                    </div>
+                    
+                    <div class="flex gap-3">
+                        <div class="w-1/2">
+                            <label class="text-[10px] text-gray-400">Discount %</label>
+                            <div class="relative">
+                                <input type="number" id="input-voucher-percent" class="shein-input" placeholder="15" inputmode="numeric">
+                                <span class="absolute right-0 top-3 text-gray-400 text-sm">%</span>
+                            </div>
+                        </div>
+                        <div class="w-1/2">
+                            <label class="text-[10px] text-gray-400">Cap Limit (₱)</label>
+                            <input type="number" id="input-voucher-cap" class="shein-input" placeholder="Optional" inputmode="decimal">
+                        </div>
+                    </div>
+                    <div class="mt-2 text-[10px] text-gray-400">
+                        Enter manually or select a voucher above.
+                    </div>
+                </div>
+
+                <!-- 3. POINTS -->
+                <div class="shein-input-group">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="shein-label"><i class="fas fa-coins mr-1 text-yellow-500"></i> Points</label>
+                        <label class="points-switch">
+                            <input type="checkbox" id="toggle-points" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div id="points-container" class="transition-all duration-300">
+                        <div class="flex items-end gap-2">
+                            <input type="number" id="input-points" class="shein-input text-yellow-600" placeholder="0" inputmode="numeric">
+                            <span class="text-sm font-medium mb-3 text-gray-500">pts</span>
+                        </div>
+                        
+                        <div class="flex justify-between mt-2 text-xs">
+                            <span class="text-gray-500" id="points-rate-display">Rate Loading...</span>
+                            <span class="text-red-500" id="points-warning">Max 30%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. SHIPPING -->
+                <div class="shein-input-group">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <div class="flex items-center">
+                                <label class="shein-label mb-0"><i class="fas fa-truck mr-1 text-green-500"></i> Free Shipping</label>
+                                <!-- Smart Notice Banner / Help Button -->
+                                <div id="shipping-notice-badge" class="hidden ml-2 text-[10px] font-bold px-2 py-0.5 rounded-full w-fit bg-green-100 text-green-700">
+                                    <!-- Injected JS -->
+                                </div>
+                                <button id="shipping-manual-help" class="ml-2 text-gray-400 hover:text-black hidden" title="Force Enable Free Shipping">
+                                    <i class="fas fa-question-circle text-[12px]"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <label class="points-switch">
+                            <input type="checkbox" id="toggle-shipping" checked>
+                            <span class="slider green-slider"></span>
+                        </label>
+                    </div>
+
+                    <div id="shipping-manual-notice" class="hidden mt-2 p-3 bg-gray-50 rounded-lg border border-gray-100 relative">
+                        <div class="absolute -top-1.5 left-20 w-3 h-3 bg-gray-50 border-t border-l border-gray-100 transform rotate-45"></div>
+                        <p class="text-[10px] text-gray-500 leading-snug">
+                            <strong>Manual Override:</strong> You can force enable free shipping if you have a voucher.
+                        </p>
+                    </div>
+                    
+                    <div id="shipping-input-container" class="mt-2 hidden">
+                         <label class="text-[10px] text-gray-400">Shipping Fee (₱)</label>
+                         <input type="number" id="input-shipping" class="shein-input" placeholder="245" value="245" inputmode="decimal">
+                    </div>
+
+                    <div id="shipping-add-more-container" class="hidden mt-3 bg-orange-50 p-2 rounded border border-orange-100">
+                        <div class="flex items-center text-orange-600 text-xs mb-1">
+                            <i class="fas fa-exclamation-circle mr-1"></i>
+                            <span id="shipping-add-more-text">Add ₱50.00 more for Free Shipping</span>
+                        </div>
+                        <div class="w-full bg-orange-200 h-1.5 rounded-full overflow-hidden">
+                            <div id="shipping-progress-bar" class="bg-orange-500 h-full rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. SERVICE FEE -->
+                <div class="shein-input-group">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <label class="shein-label mb-0 text-purple-600"><i class="fas fa-hand-holding-usd mr-1"></i> Booker/Seller Mode</label>
+                            <p class="text-[10px] text-gray-400">Account Price/Check Out Fee</p>
+                        </div>
+                        <label class="points-switch">
+                            <input type="checkbox" id="toggle-booker">
+                            <span class="slider purple-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div id="booker-input-container" class="mt-2 hidden">
+                         <div class="relative">
+                            <label class="text-[10px] text-gray-400">Total Fee Amount</label>
+                            <input type="number" id="input-service-fee" class="shein-input text-purple-600" placeholder="50" inputmode="decimal">
+                         </div>
+                    </div>
+                </div>
+
+                <!-- BREAKDOWN -->
+                <div class="px-4 py-4">
+                    <h3 class="font-bold text-sm mb-3">Price Details</h3>
+                    
+                    <div class="summary-row">
+                        <span>Retail Price</span>
+                        <span class="font-bold" id="display-subtotal">₱0.00</span>
+                    </div>
+                    
+                    <div class="summary-row">
+                        <span class="flex items-center gap-1"><i class="fas fa-ticket-alt text-xs text-gray-400"></i> Coupon</span>
+                        <span class="discount-text" id="display-voucher-discount">-₱0.00</span>
+                    </div>
+                    
+                    <div class="summary-row">
+                        <span class="flex items-center gap-1"><i class="fas fa-coins text-xs text-yellow-500"></i> Points</span>
+                        <span class="discount-text" id="display-points-discount">-₱0.00</span>
+                    </div>
+
+                    <div class="summary-row">
+                        <span class="flex items-center gap-1"><i class="fas fa-truck text-xs text-green-500"></i> Shipping Fee</span>
+                        <div class="flex items-center">
+                             <div class="relative group mr-2">
+                                <i id="shipping-help-icon" class="fas fa-question-circle text-gray-400 text-[10px] hidden cursor-help"></i>
+                                <div id="shipping-tooltip" class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 hidden group-hover:block bg-gray-800 text-white text-[10px] px-2 py-1 rounded whitespace-nowrap z-10 shadow-lg"></div>
+                            </div>
+                            <span class="text-green-600 font-bold" id="display-shipping">Free</span>
+                        </div>
+                    </div>
+
+                     <!-- Service Fee Row -->
+                    <div class="summary-row hidden" id="row-service-fee">
+                        <span class="flex items-center gap-1"><i class="fas fa-hand-holding-usd text-xs text-purple-500"></i> Service Fee</span>
+                        <span class="text-purple-600 font-bold" id="display-service-fee">+₱0.00</span>
+                    </div>
+                    
+                    <hr class="border-dashed border-gray-300 my-3">
+                    
+                    <div class="flex justify-between items-end">
+                        <span class="font-bold text-lg">Total Payable</span>
+                        <div class="flex flex-col items-end">
+                            <span class="text-xs text-gray-400 line-through mb-[-2px] hidden" id="display-original-total">₱0.00</span>
+                            <span class="text-2xl font-black text-black" id="display-total">₱0.00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-2 text-right">
+                        <span class="text-[10px] bg-red-100 text-red-600 px-2 py-1 rounded font-bold" id="total-savings-badge">
+                            You Save: ₱0.00 (0%)
+                        </span>
+                    </div>
+                </div>
+
+                <!-- DISCLAIMER -->
+                <div class="mt-8 px-6 text-center opacity-70 mb-20">
+                    <p class="text-[10px] text-gray-400 leading-tight">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        <strong>Disclaimer:</strong> This calculation is an estimate. Final costs may vary due to real-time currency fluctuations. Weekend free shipping is automatically detected.
+                    </p>
+                </div>
+
+            </main>
+
+            <!-- FOOTER ACTION -->
+            <!-- Fixed footer style to remove border/shadow/gap -->
+            <div class="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-gray-50 p-4 z-50 flex gap-3">
+                 <button id="btn-generate-receipt" class="flex-1 bg-white text-black border-2 border-black font-bold py-3.5 rounded-sm uppercase tracking-widest text-sm hover:bg-gray-50 active:scale-[0.99] transition-all flex items-center justify-center gap-2">
+                    <i class="fas fa-receipt"></i> Receipt
+                </button>
+                <button id="btn-checkout" class="flex-1 bg-black text-white font-bold py-3.5 rounded-sm uppercase tracking-widest text-sm hover:opacity-90 active:scale-[0.99] transition-all">
+                    Checkout
+                </button>
+            </div>
+        </div> 
+        <!-- END VIEW: CALCULATOR -->
+
+        <!-- VIEW: ACL GEN -->
+        <div id="view-acl" class="hidden h-full flex-col">
+            <!-- ACL AUTH SCREEN -->
+            <div id="acl-auth" class="flex-1 flex flex-col justify-center items-center p-6 text-center">
+                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 text-2xl">
+                    <i class="fas fa-lock text-3xl text-gray-400"></i>
+                </div>
+                <h2 class="font-bold text-lg mb-2">Restricted Feature</h2>
+                <p class="text-sm text-gray-500 mb-6">Enter the authentication code to access the ACL Generator.</p>
+                
+                <input type="password" id="acl-auth-input" class="w-full max-w-xs border border-gray-300 rounded px-4 py-3 mb-3 text-center tracking-widest" placeholder="ENTER CODE">
+                <button onclick="checkAclAuth()" class="w-full max-w-xs bg-black text-white font-bold py-3 rounded">UNLOCK</button>
+                <p id="acl-error" class="text-red-500 text-xs mt-3 hidden">Invalid Code. Please try again.</p>
+            </div>
+
+            <!-- ACL MAIN INTERFACE -->
+            <div id="acl-main" class="hidden flex-1 p-4">
+                <div class="bg-white rounded-xl shadow-sm p-6 mb-4">
+                    <h2 class="font-black italic text-xl mb-4 text-blue-600">ACL <span class="text-black not-italic font-normal">Generator</span></h2>
+                    
+                    <label class="shein-label">Base Link (Ark)</label>
+                    <div class="relative">
+                        <input type="text" id="acl-link-input" class="w-full border border-gray-200 rounded p-3 pr-10 mb-4 text-sm font-mono text-gray-600" placeholder="https://m.shein.com/ph/ark/11000">
+                        <button id="btn-clear-link" class="absolute right-3 top-3 text-gray-400 hover:text-black hidden">
+                            <i class="fas fa-times-circle"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="flex justify-between items-center mb-6 bg-gray-50 p-2 rounded-lg">
+                        <span class="text-xs font-bold text-gray-500 px-2">Mode:</span>
+                        <div class="flex gap-2">
+                            <label class="flex items-center cursor-pointer">
+                                <input type="radio" name="acl-mode" value="inc" checked class="accent-blue-600 mr-1">
+                                <span class="text-xs font-bold">Increase</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer">
+                                <input type="radio" name="acl-mode" value="dec" class="accent-red-600 mr-1">
+                                <span class="text-xs font-bold">Decrease</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button onclick="openNextLink()" class="w-full bg-blue-600 text-white font-bold py-4 rounded-lg shadow-lg active:scale-95 transition-transform text-lg mb-4">
+                        OPEN LINK <i class="fas fa-external-link-alt ml-2"></i>
+                    </button>
+                    
+                    <div class="text-center">
+                        <p class="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Next Link Preview</p>
+                        <p id="acl-preview" class="text-xs font-mono text-gray-800 break-all">Waiting for input...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RECEIPT MODAL -->
+        <div id="receipt-modal" class="modal-overlay">
+            <div class="modal-card">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-lg"><i class="fas fa-receipt mr-2"></i>Order Summary</h3>
+                    <button id="close-receipt" class="text-gray-400 hover:text-black"><i class="fas fa-times"></i></button>
+                </div>
+                
+                <!-- Use a DIV for the visual receipt (Clean HTML Style) -->
+                <div id="receipt-content">
+                    <!-- Dynamic HTML Content -->
+                </div>
+                
+                <button id="btn-copy-receipt" class="w-full bg-black text-white font-bold py-2 rounded text-sm mb-2 mt-4">
+                    <i class="far fa-copy mr-1"></i> Copy to Clipboard
+                </button>
+                <p class="text-[10px] text-gray-400 text-center">Ready to paste in Messenger/Viber</p>
+            </div>
+        </div>
+
+        <!-- HISTORY MODAL -->
+        <div id="history-modal" class="modal-overlay">
+            <div class="modal-card">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-lg"><i class="fas fa-history mr-2"></i>History</h3>
+                    <div class="flex gap-2">
+                        <button id="clear-history" class="text-xs text-red-500 hover:text-red-700 font-bold px-2">CLEAR</button>
+                        <button id="close-history" class="text-gray-400 hover:text-black"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+                <div id="history-list" class="max-h-60 overflow-y-auto space-y-2">
+                    <p class="text-gray-400 text-center text-xs py-4">No recent calculations</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Service Worker Script (Removed download button, kept logic for potential manual use) -->
+    <script>
+        if ('serviceWorker' in navigator) {
+             navigator.serviceWorker.register('sw.js').catch(err => console.log('SW Fail:', err));
+        }
+    </script>
+
+    <script>
+        // Constants
+        const USD_TO_PHP_RATE = 58.849557522; 
+        const POINTS_TO_USD_RATIO = 0.01; 
+        const MAX_POINTS_PERCENTAGE = 0.30; 
+        const SHIPPING_THRESHOLD = 249; 
+        const ACL_AUTH_CODE = "ACLGEN2026V1";
+        const CORRECT_HASH = "97982a5b14141679093074052328701042308064227914108868661603504381";
+
+        const TODAY = new Date().getDay();
+        const IS_WEEKEND = (TODAY === 0 || TODAY === 6);
+        
+        const PRESET_VOUCHERS = [
+            { percent: 60, cap: 428, min: 285 }, { percent: 60, cap: 255, min: 120 }, { percent: 60, cap: 170, min: 99 },
+            { percent: 60, cap: 150, min: 249 }, { percent: 60, cap: 100, min: 99 },
+            { percent: 50, cap: 250, min: 350 }, { percent: 50, cap: 200, min: 340 },
+            { percent: 40, cap: 360, min: 499 }, { percent: 40, cap: 360, min: 600 },
+            { percent: 30, cap: 720, min: 1199 }, { percent: 30, cap: 700, min: 1200 }
+        ];
+
+        // UI Elements
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        const viewCalc = document.getElementById('view-calculator');
+        const viewAcl = document.getElementById('view-acl');
+        const headerTitle = document.querySelector('header h1 span');
+
+        // ACL Elements
+        const aclAuthScreen = document.getElementById('acl-auth');
+        const aclMainScreen = document.getElementById('acl-main');
+        const aclInput = document.getElementById('acl-auth-input');
+        const aclError = document.getElementById('acl-error');
+        const aclLinkInput = document.getElementById('acl-link-input');
+        const aclPreview = document.getElementById('acl-preview');
+        const btnClearLink = document.getElementById('btn-clear-link');
+
+        // Calculator Elements
+        const elPrice = document.getElementById('input-price');
+        const elBtnLockInputs = document.getElementById('btn-lock-inputs');
+        const elVoucherList = document.getElementById('voucher-list');
+        const elVoucherPercent = document.getElementById('input-voucher-percent');
+        const elVoucherCap = document.getElementById('input-voucher-cap');
+        const elPoints = document.getElementById('input-points');
+        const elTogglePoints = document.getElementById('toggle-points');
+        const elPointsContainer = document.getElementById('points-container');
+        const displaySubtotal = document.getElementById('display-subtotal');
+        const displayVoucher = document.getElementById('display-voucher-discount');
+        const displayPoints = document.getElementById('display-points-discount');
+        const displayTotal = document.getElementById('display-total');
+        const displayOriginalTotal = document.getElementById('display-original-total');
+        const displaySavings = document.getElementById('total-savings-badge');
+        const elPointsWarning = document.getElementById('points-warning');
+        const elReset = document.getElementById('btn-reset');
+        const elToggleShipping = document.getElementById('toggle-shipping');
+        const elInputShipping = document.getElementById('input-shipping');
+        const elShippingContainer = document.getElementById('shipping-input-container');
+        const displayShipping = document.getElementById('display-shipping');
+        const elShippingNoticeBadge = document.getElementById('shipping-notice-badge');
+        const elShippingAddMoreContainer = document.getElementById('shipping-add-more-container');
+        const elShippingAddMoreText = document.getElementById('shipping-add-more-text');
+        const elShippingProgressBar = document.getElementById('shipping-progress-bar');
+        const elShippingManualHelp = document.getElementById('shipping-manual-help');
+        const elShippingManualNotice = document.getElementById('shipping-manual-notice');
+        const elToggleBulk = document.getElementById('toggle-bulk');
+        const elSingleInputWrapper = document.getElementById('single-input-wrapper');
+        const elBulkInputWrapper = document.getElementById('bulk-input-wrapper');
+        const elBulkList = document.getElementById('bulk-items-list');
+        const elBtnAddBulk = document.getElementById('btn-add-item');
+        const elBulkTotalDisplay = document.getElementById('bulk-total-display');
+        const elShippingHelpIcon = document.getElementById('shipping-help-icon');
+        const elShippingTooltip = document.getElementById('shipping-tooltip');
+        const elToggleBooker = document.getElementById('toggle-booker');
+        const elBookerContainer = document.getElementById('booker-input-container');
+        const elInputServiceFee = document.getElementById('input-service-fee');
+        const elRowServiceFee = document.getElementById('row-service-fee');
+        const displayServiceFee = document.getElementById('display-service-fee');
+        const btnGenerateReceipt = document.getElementById('btn-generate-receipt');
+        const btnCheckout = document.getElementById('btn-checkout');
+        const receiptModal = document.getElementById('receipt-modal');
+        const closeReceipt = document.getElementById('close-receipt');
+        const btnCopyReceipt = document.getElementById('btn-copy-receipt');
+        const receiptContent = document.getElementById('receipt-content');
+        const btnHistory = document.getElementById('btn-history');
+        const historyModal = document.getElementById('history-modal');
+        const closeHistory = document.getElementById('close-history');
+        const clearHistory = document.getElementById('clear-history');
+        const historyList = document.getElementById('history-list');
+        const elStatusBar = document.getElementById('status-bar');
+
+        // State
+        let state = {
+            price: 0, voucherPercent: 0, voucherCap: Infinity, pointsInput: 0, usePoints: true, selectedVoucherIndex: -1,
+            freeShipping: true, shippingFee: 245, isBulk: false, bulkItemCount: 1, userManuallyToggledShipping: false,
+            inputsLocked: false, bookerMode: false, serviceFee: 0, lastCalc: {},
+            aclAuthenticated: false, bulkItems: [] 
+        };
+        let historyLog = [];
+
+        // --- Initialization ---
+        if (IS_WEEKEND) {
+            elStatusBar.innerText = "WEEKEND MODE: AUTO FREE SHIPPING ACTIVE";
+            elStatusBar.className = "status-bar status-weekend";
+        } else {
+            elStatusBar.innerText = `WEEKDAY MODE: FREE SHIPPING ORDERS > ₱${SHIPPING_THRESHOLD}`;
+            elStatusBar.className = "status-bar status-weekday";
+        }
+        document.getElementById('points-rate-display').innerText = `100 Pts ≈ ₱${USD_TO_PHP_RATE.toFixed(2)}`;
+        loadHistory();
+        updateState();
+
+        // --- Navigation ---
+        window.toggleMenu = function() {
+            sidebar.classList.toggle('open');
+            sidebarOverlay.classList.toggle('open');
+        }
+
+        window.switchView = function(view) {
+            toggleMenu(); 
+            if(view === 'calculator') {
+                viewCalc.classList.remove('hidden');
+                viewAcl.classList.add('hidden');
+                headerTitle.innerText = "PCheck";
+                elStatusBar.classList.remove('hidden');
+                elReset.classList.remove('hidden');
+                btnHistory.classList.remove('hidden');
+            } else if (view === 'acl') {
+                viewCalc.classList.add('hidden');
+                viewAcl.classList.remove('hidden');
+                viewAcl.classList.add('flex');
+                headerTitle.innerText = "ACL Gen";
+                elStatusBar.classList.add('hidden');
+                elReset.classList.add('hidden');
+                btnHistory.classList.add('hidden');
+
+                if(state.aclAuthenticated) {
+                    aclAuthScreen.classList.add('hidden');
+                    aclMainScreen.classList.remove('hidden');
+                } else {
+                    aclAuthScreen.classList.remove('hidden');
+                    aclMainScreen.classList.add('hidden');
+                }
+            }
+        }
+
+        // --- ACL Logic ---
+        window.checkAclAuth = async function() {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(aclInput.value);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            
+            if(hashHex === CORRECT_HASH) {
+                state.aclAuthenticated = true;
+                aclAuthScreen.classList.add('hidden');
+                aclMainScreen.classList.remove('hidden');
+                aclError.classList.add('hidden');
+            } else {
+                aclError.classList.remove('hidden');
+            }
+        }
+
+        aclLinkInput.addEventListener('input', () => {
+            aclPreview.innerText = aclLinkInput.value || "Waiting for input...";
+            if(aclLinkInput.value) btnClearLink.classList.remove('hidden');
+            else btnClearLink.classList.add('hidden');
+        });
+
+        btnClearLink.addEventListener('click', () => {
+            aclLinkInput.value = '';
+            aclPreview.innerText = "Waiting for input...";
+            btnClearLink.classList.add('hidden');
+        });
+
+        window.openNextLink = function() {
+            let url = aclLinkInput.value.trim();
+            if(!url) return;
+
+            window.open(url, '_blank');
+
+            const match = url.match(/(\d+)(\/?)$/);
+            if(match) {
+                let numStr = match[1];
+                let num = parseInt(numStr);
+                const isInc = document.querySelector('input[name="acl-mode"]:checked').value === 'inc';
+                
+                if(isInc) num++; else num--;
+                
+                const newUrl = url.replace(numStr, num);
+                aclLinkInput.value = newUrl;
+                aclPreview.innerText = newUrl;
+            }
+        }
+
+        // --- Download App Helper ---
+        window.downloadApp = function() {
+            const htmlContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+            const blob = new Blob([htmlContent], { type: "text/html" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "shein-pcheck.html";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        // --- Event Listeners (Calculator) ---
+        const calcInputs = [elPrice, elPoints, elInputShipping, elInputServiceFee];
+        calcInputs.forEach(el => el.addEventListener('input', updateState));
+
+        elBtnLockInputs.addEventListener('click', toggleInputLock);
+        elShippingManualHelp.addEventListener('click', () => elShippingManualNotice.classList.toggle('hidden'));
+
+        elToggleShipping.addEventListener('change', (e) => {
+            state.freeShipping = e.target.checked;
+            state.userManuallyToggledShipping = true; 
+            elShippingContainer.classList.toggle('hidden', state.freeShipping);
+            calculate();
+        });
+        
+        [elVoucherPercent, elVoucherCap].forEach(el => {
+            el.addEventListener('input', () => {
+                state.selectedVoucherIndex = -1;
+                updateState();
+            });
+        });
+
+        elTogglePoints.addEventListener('change', (e) => {
+            state.usePoints = e.target.checked;
+            elPointsContainer.style.opacity = state.usePoints ? '1' : '0.4';
+            elPointsContainer.style.pointerEvents = state.usePoints ? 'auto' : 'none';
+            calculate();
+        });
+
+        elToggleBulk.addEventListener('change', (e) => {
+            state.isBulk = e.target.checked;
+            elSingleInputWrapper.classList.toggle('hidden', state.isBulk);
+            elBulkInputWrapper.classList.toggle('hidden', !state.isBulk);
+            if (state.isBulk && elBulkList.children.length === 0) addBulkItem();
+            updateState();
+        });
+        elBtnAddBulk.addEventListener('click', addBulkItem);
+
+        elToggleBooker.addEventListener('change', (e) => {
+            state.bookerMode = e.target.checked;
+            elBookerContainer.classList.toggle('hidden', !state.bookerMode);
+            calculate();
+        });
+
+        btnGenerateReceipt.addEventListener('click', () => {
+            if (state.lastCalc.total === undefined) return;
+            generateReceiptView();
+            receiptModal.classList.add('show');
+            addToHistory();
+        });
+        closeReceipt.addEventListener('click', () => receiptModal.classList.remove('show'));
+        btnCopyReceipt.addEventListener('click', copyReceiptToClipboard);
+
+        btnHistory.addEventListener('click', () => {
+            renderHistory();
+            historyModal.classList.add('show');
+        });
+        closeHistory.addEventListener('click', () => historyModal.classList.remove('show'));
+        
+        clearHistory.addEventListener('click', () => {
+            historyLog = [];
+            localStorage.removeItem('shein_pcal_history');
+            renderHistory();
+        });
+
+        btnCheckout.addEventListener('click', () => {
+            window.open("https://ph.shein.com/", "_blank");
+        });
+
+        elReset.addEventListener('click', () => {
+            if(state.inputsLocked) toggleInputLock();
+            elPrice.value = ''; elVoucherPercent.value = ''; elVoucherCap.value = ''; elPoints.value = '';
+            state.freeShipping = true; elToggleShipping.checked = true;
+            state.userManuallyToggledShipping = false;
+            elShippingContainer.classList.add('hidden'); elShippingManualNotice.classList.add('hidden');
+            state.shippingFee = 245; elInputShipping.value = '245';
+            state.selectedVoucherIndex = -1;
+            state.isBulk = false; elToggleBulk.checked = false;
+            elSingleInputWrapper.classList.remove('hidden'); elBulkInputWrapper.classList.add('hidden'); elBulkList.innerHTML = ''; state.bulkItemCount = 0;
+            state.bookerMode = false; elToggleBooker.checked = false;
+            elBookerContainer.classList.add('hidden'); elInputServiceFee.value = ''; state.serviceFee = 0;
+            updateState();
+        });
+
+        // --- Logic Functions ---
+        function loadHistory() {
+            const stored = localStorage.getItem('shein_pcal_history');
+            if (stored) { try { historyLog = JSON.parse(stored); } catch (e) { historyLog = []; } }
+            renderHistory();
+        }
+
+        function toggleInputLock() {
+            state.inputsLocked = !state.inputsLocked;
+            const icon = elBtnLockInputs.querySelector('i');
+            const locked = state.inputsLocked;
+            icon.className = locked ? 'fas fa-lock text-red-500' : 'fas fa-unlock';
+            elPrice.disabled = locked; elBtnAddBulk.disabled = locked;
+            document.querySelectorAll('.bulk-price-input').forEach(el => el.disabled = locked);
+            document.querySelectorAll('.bulk-delete-btn').forEach(el => { el.disabled = locked; if(locked) el.classList.add('opacity-50'); else el.classList.remove('opacity-50'); });
+        }
+
+        function addBulkItem(value = null) {
+            if (state.inputsLocked) return;
+            state.bulkItemCount++;
+            const div = document.createElement('div');
+            div.className = 'bulk-item-row';
+            div.innerHTML = `
+                <div class="item-count-badge">${state.bulkItemCount}</div>
+                <div class="relative flex-1"><span class="absolute left-0 top-3 text-sm font-bold text-gray-400">₱</span><input type="number" class="shein-input pl-5 py-2 text-sm bulk-price-input" placeholder="Price" inputmode="decimal" oninput="updateState()" value="${value || ''}"></div>
+                <button class="bulk-delete-btn text-gray-400 hover:text-red-500 p-2" onclick="removeBulkItem(this)"><i class="fas fa-trash-alt text-sm"></i></button>
+            `;
+            elBulkList.appendChild(div);
+            updateBulkBadges();
+            updateState();
+        }
+
+        window.removeBulkItem = function(btn) {
+            if (state.inputsLocked) return;
+            btn.parentElement.remove();
+            updateBulkBadges();
+            updateState();
+        }
+
+        function updateBulkBadges() {
+            elBulkList.querySelectorAll('.item-count-badge').forEach((b, i) => b.innerText = i + 1);
+        }
+
+        function getBulkTotal() {
+            const inputs = document.querySelectorAll('.bulk-price-input');
+            let sum = 0;
+            inputs.forEach(input => sum += parseFloat(input.value) || 0);
+            return sum;
+        }
+
+        function updateState() {
+            if (state.isBulk) {
+                state.price = getBulkTotal();
+                state.bulkItems = [];
+                document.querySelectorAll('.bulk-price-input').forEach(input => {
+                     state.bulkItems.push(parseFloat(input.value) || 0);
+                });
+                elBulkTotalDisplay.innerText = formatMoney(state.price);
+            } else {
+                state.price = parseFloat(elPrice.value) || 0;
+            }
+            state.voucherPercent = parseFloat(elVoucherPercent.value) || 0;
+            const cap = parseFloat(elVoucherCap.value);
+            state.voucherCap = isNaN(cap) ? Infinity : cap;
+            state.pointsInput = parseFloat(elPoints.value) || 0;
+            state.shippingFee = parseFloat(elInputShipping.value) || 0;
+            state.serviceFee = parseFloat(elInputServiceFee.value) || 0;
+            calculate();
+        }
+
+        function renderVouchers(eligiblePrice) {
+            elVoucherList.innerHTML = PRESET_VOUCHERS.map((v, i) => {
+                const active = state.selectedVoucherIndex === i;
+                const eligible = eligiblePrice >= v.min;
+                return `
+                    <div class="voucher-ticket ${active?'active':''} ${!eligible?'disabled':''}" onclick="selectVoucher(${i},${eligible})">
+                        <div class="voucher-cutout-top"></div><div class="voucher-cutout-bottom"></div>
+                        <div class="voucher-left"><div class="voucher-amount">${v.percent}<span class="voucher-percent-symbol">%</span></div><span class="voucher-off-text">OFF</span></div>
+                        <div class="voucher-right"><div class="voucher-selected-badge"><i class="fas fa-check"></i></div><div class="voucher-title">Cap ₱${v.cap}</div><div class="voucher-sub">Min Spend ₱${v.min}</div></div>
+                    </div>`;
+            }).join('');
+        }
+
+        window.selectVoucher = function(index, isEligible) {
+            if (!isEligible) return;
+            if (state.selectedVoucherIndex === index) {
+                state.selectedVoucherIndex = -1; elVoucherPercent.value = ''; elVoucherCap.value = '';
+            } else {
+                state.selectedVoucherIndex = index; elVoucherPercent.value = PRESET_VOUCHERS[index].percent; elVoucherCap.value = PRESET_VOUCHERS[index].cap;
+            }
+            updateState();
+        }
+
+        function calculate() {
+            let currentBase = state.price;
+            let priceAfterNue = currentBase;
+
+            renderVouchers(priceAfterNue);
+
+            let voucherDiscount = Math.round(priceAfterNue * (state.voucherPercent / 100));
+            if (state.voucherCap !== Infinity && voucherDiscount > state.voucherCap) voucherDiscount = state.voucherCap;
+            let priceAfterVoucher = Math.max(0, priceAfterNue - voucherDiscount);
+
+            const maxPointsPhp = Math.round(priceAfterVoucher * MAX_POINTS_PERCENTAGE);
+            let pointsValPhp = state.pointsInput * POINTS_TO_USD_RATIO * USD_TO_PHP_RATE;
+            let pointsDed = 0;
+            if (state.usePoints) pointsDed = Math.round(Math.min(pointsValPhp, maxPointsPhp, priceAfterVoucher));
+
+            if (state.usePoints && pointsValPhp > maxPointsPhp && priceAfterVoucher > 0) {
+                const maxPts = maxPointsPhp / USD_TO_PHP_RATE / POINTS_TO_USD_RATIO;
+                elPointsWarning.innerText = `Max: ${Math.floor(maxPts)} pts (₱${maxPointsPhp})`;
+                elPointsWarning.classList.add('font-bold');
+            } else {
+                elPointsWarning.innerText = "Max 30% usage allowed";
+                elPointsWarning.classList.remove('font-bold');
+            }
+
+            let payableBeforeShipping = Math.max(0, priceAfterVoucher - pointsDed);
+
+            let systemFreeShipping = false;
+            let badgeText = "";
+            let showAddMore = false;
+            let remaining = 0;
+
+            if (IS_WEEKEND) {
+                systemFreeShipping = true; badgeText = "WEEKEND PROMO";
+            } else if (payableBeforeShipping >= SHIPPING_THRESHOLD) {
+                systemFreeShipping = true; badgeText = `ORDER > ₱${SHIPPING_THRESHOLD}`;
+            } else {
+                if (payableBeforeShipping > 0) {
+                    showAddMore = true; remaining = SHIPPING_THRESHOLD - payableBeforeShipping;
+                }
+            }
+
+            if (systemFreeShipping) {
+                state.freeShipping = true; elToggleShipping.checked = true; elToggleShipping.disabled = true;
+                elShippingNoticeBadge.innerText = badgeText; elShippingNoticeBadge.classList.remove('hidden');
+                elShippingContainer.classList.add('hidden'); elShippingManualHelp.classList.add('hidden'); elShippingManualNotice.classList.add('hidden');
+            } else {
+                elToggleShipping.disabled = false; elShippingNoticeBadge.classList.add('hidden'); elShippingManualHelp.classList.remove('hidden');
+                if (!state.userManuallyToggledShipping) {
+                    state.freeShipping = false; elToggleShipping.checked = false; elShippingContainer.classList.remove('hidden');
+                } else { elShippingContainer.classList.toggle('hidden', state.freeShipping); }
+            }
+
+            if (showAddMore && !state.freeShipping) {
+                elShippingAddMoreContainer.classList.remove('hidden');
+                elShippingAddMoreText.innerText = `Add ₱${remaining.toFixed(2)} more for Free Shipping`;
+                let percent = Math.min(100, (payableBeforeShipping / SHIPPING_THRESHOLD) * 100);
+                elShippingProgressBar.style.width = `${percent}%`;
+                elShippingHelpIcon.classList.remove('hidden');
+                elShippingTooltip.innerText = `Add ₱${remaining.toFixed(2)} for Free Shipping`;
+                elShippingTooltip.innerHTML += '<div class="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>';
+            } else {
+                elShippingAddMoreContainer.classList.add('hidden'); elShippingHelpIcon.classList.add('hidden');
+            }
+
+            let finalShipping = state.freeShipping ? 0 : state.shippingFee;
+            let totalServiceFee = (state.bookerMode && state.serviceFee > 0) ? state.serviceFee : 0;
+            if (totalServiceFee > 0) {
+                elRowServiceFee.classList.remove('hidden'); displayServiceFee.innerText = `+${formatMoney(totalServiceFee)}`;
+            } else { elRowServiceFee.classList.add('hidden'); }
+
+            const finalTotal = payableBeforeShipping + finalShipping + totalServiceFee;
+            const totalSavings = voucherDiscount + pointsDed;
+            const savingsPercent = state.price > 0 ? ((totalSavings / state.price) * 100).toFixed(0) : 0;
+
+            displaySubtotal.innerText = formatMoney(state.price);
+            displayVoucher.innerText = `-${formatMoney(voucherDiscount)}`;
+            displayPoints.innerText = `-${formatMoney(pointsDed)}`;
+            if (state.freeShipping) {
+                displayShipping.innerText = "Free"; displayShipping.className = "text-green-600 font-bold";
+            } else {
+                displayShipping.innerText = `+${formatMoney(finalShipping)}`; displayShipping.className = "text-black font-bold";
+            }
+            displayTotal.innerText = formatMoney(finalTotal);
+
+            const originalPriceForDisplay = state.price + finalShipping;
+            if (finalTotal < originalPriceForDisplay) {
+                displayOriginalTotal.innerText = formatMoney(originalPriceForDisplay);
+                displayOriginalTotal.classList.remove('hidden');
+            } else {
+                displayOriginalTotal.classList.add('hidden');
+            }
+            
+            if (totalSavings > 0) {
+                displaySavings.style.visibility = 'visible'; displaySavings.innerText = `You Save: ${formatMoney(totalSavings)} (${savingsPercent}%)`;
+            } else { displaySavings.style.visibility = 'hidden'; }
+
+            state.lastCalc = {
+                items: state.isBulk ? getBulkItemsData() : [{price: state.price}],
+                subtotal: state.price,
+                discounts: { voucher: voucherDiscount, points: pointsDed },
+                shipping: finalShipping, serviceFee: totalServiceFee, total: finalTotal,
+                date: new Date().toLocaleString('en-PH'),
+                savedState: JSON.parse(JSON.stringify(state))
+            };
+        }
+
+        function getBulkItemsData() {
+            let items = [];
+            document.querySelectorAll('.bulk-price-input').forEach((input, index) => {
+                const val = parseFloat(input.value) || 0;
+                if(val > 0) items.push({ id: index+1, price: val });
+            });
+            return items;
+        }
+
+        function formatMoney(amount) {
+            return '₱' + amount.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        // --- Receipt Functions ---
+        function getReceiptText() {
+            const c = state.lastCalc;
+            const now = new Date();
+            const dateStr = `${now.getMonth()+1}/${now.getDate()}/${now.getFullYear().toString().slice(-2)} • ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
+            let t = `『 ☁︎ 𝗦𝗛𝗘𝗜𝗡 𝗥𝗘𝗖𝗘𝗜𝗣𝗧 ☁︎ 』\n\n  ${dateStr}\n  ── ☁︎ ── ☁︎ ── ☁︎ ──\n\n`;
+            t += `  [+] SUB    > ${formatMoney(c.subtotal)}\n`;
+            if(c.discounts.voucher > 0) t += `  [-] VCH    > ₱${c.discounts.voucher}\n`; 
+            if(c.discounts.points > 0)  t += `  [-] PTS    > ₱${c.discounts.points}\n`;
+            const shipVal = c.shipping === 0 ? " 0" : formatMoney(c.shipping);
+            t += `  [+] SHP    > ${shipVal}\n`;
+            if (c.serviceFee > 0) t += `  [+] FEE    > ${formatMoney(c.serviceFee)}\n`;
+            t += `\n  ══════════════\n  ➥  PAY    :  ${formatMoney(c.total)}\n  ══════════════`;
+            return t;
+        }
+
+        function generateReceiptView() {
+            const c = state.lastCalc;
+            // Clean HTML Design (Restored)
+            let html = `
+                <div class="text-center mb-4 border-b border-dashed border-gray-300 pb-2">
+                    <h2 class="font-bold text-lg text-gray-800">SHEIN CHECK</h2>
+                    <p class="text-xs text-gray-500">${c.date}</p>
+                </div>
+            `;
+            if (state.isBulk && c.items.length > 0) {
+                 c.items.forEach(item => { html += `<div class="receipt-line"><span>Item #${item.id}</span><span>${formatMoney(item.price)}</span></div>`; });
+                 html += `<div class="receipt-divider"></div>`;
+            }
+            html += `<div class="receipt-line"><span>Subtotal</span><span>${formatMoney(c.subtotal)}</span></div>`;
+            if (c.discounts.voucher > 0) html += `<div class="receipt-line text-red-600"><span>Voucher</span><span>-${formatMoney(c.discounts.voucher)}</span></div>`;
+            if (c.discounts.points > 0) html += `<div class="receipt-line text-yellow-600"><span>Points</span><span>-${formatMoney(c.discounts.points)}</span></div>`;
+            const shippingText = c.shipping === 0 ? "FREE" : formatMoney(c.shipping);
+            const shippingClass = c.shipping === 0 ? "text-green-600 font-bold" : "";
+            html += `<div class="receipt-line"><span>Shipping</span><span class="${shippingClass}">${shippingText}</span></div>`;
+            if (c.serviceFee > 0) html += `<div class="receipt-line text-purple-600"><span>Service Fee</span><span>+${formatMoney(c.serviceFee)}</span></div>`;
+            html += `<div class="receipt-divider"></div>`;
+            html += `<div class="flex justify-between items-center mt-2"><span class="font-bold text-lg">TOTAL</span><span class="font-black text-xl">${formatMoney(c.total)}</span></div>`;
+            
+            receiptContent.innerHTML = html;
+        }
+
+        function copyReceiptToClipboard() {
+            const text = getReceiptText();
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed"; textArea.style.left = "-9999px"; textArea.style.top = "0";
+            document.body.appendChild(textArea);
+            textArea.focus(); textArea.select();
+            try {
+                document.execCommand('copy');
+                btnCopyReceipt.innerHTML = '<i class="fas fa-check mr-1"></i> Copied!';
+                setTimeout(() => btnCopyReceipt.innerHTML = '<i class="far fa-copy mr-1"></i> Copy to Clipboard', 2000);
+            } catch (err) {
+                btnCopyReceipt.innerHTML = '<i class="fas fa-times mr-1"></i> Error';
+                setTimeout(() => btnCopyReceipt.innerHTML = '<i class="far fa-copy mr-1"></i> Copy to Clipboard', 2000);
+            }
+            document.body.removeChild(textArea);
+        }
+
+        function addToHistory() {
+            if (state.lastCalc.total === undefined) return;
+            if (historyLog.length > 0 && historyLog[0].date === state.lastCalc.date) return;
+            historyLog.unshift({...state.lastCalc});
+            if (historyLog.length > 10) historyLog.pop();
+            localStorage.setItem('shein_pcal_history', JSON.stringify(historyLog));
+            renderHistory();
+        }
+
+        function renderHistory() {
+            if (historyLog.length === 0) { historyList.innerHTML = '<p class="text-gray-400 text-center text-xs py-4">No recent calculations</p>'; return; }
+            historyList.innerHTML = historyLog.map((h, i) => `
+                <div onclick="restoreHistory(${i})" class="bg-gray-50 p-3 rounded border border-gray-100 flex justify-between items-center cursor-pointer hover:bg-gray-100 transition-colors">
+                    <div>
+                        <div class="font-bold text-sm">₱${h.total.toFixed(2)}</div>
+                        <div class="text-[10px] text-gray-400">${h.items.length} item(s) • ${h.date.split(',')[1]}</div>
+                    </div>
+                    <div class="text-right text-[10px] text-gray-500">${h.serviceFee > 0 ? '<span class="text-purple-500">w/ Fee</span>' : ''}</div>
+                </div>`).join('');
+        }
+
+        window.restoreHistory = function(index) {
+            const h = historyLog[index];
+            const saved = h.savedState;
+            if (!saved) return;
+            
+            // Restore Values
+            elPrice.value = saved.price || '';
+            elVoucherPercent.value = saved.voucherPercent || '';
+            elVoucherCap.value = saved.voucherCap === Infinity ? '' : saved.voucherCap;
+            elPoints.value = saved.pointsInput || '';
+            elInputShipping.value = saved.shippingFee;
+            elInputServiceFee.value = saved.serviceFee || '';
+            
+            // Restore Toggles
+            elToggleShipping.checked = saved.freeShipping;
+            elShippingContainer.classList.toggle('hidden', saved.freeShipping);
+            
+            elToggleBooker.checked = saved.bookerMode;
+            elBookerContainer.classList.toggle('hidden', !saved.bookerMode);
+            
+            // Restore Bulk
+            elToggleBulk.checked = saved.isBulk;
+            elSingleInputWrapper.classList.toggle('hidden', saved.isBulk);
+            elBulkInputWrapper.classList.toggle('hidden', !saved.isBulk);
+            
+            // Restore Bulk Items
+            elBulkList.innerHTML = '';
+            state.bulkItemCount = 0;
+            if (saved.isBulk && saved.bulkItems && saved.bulkItems.length > 0) {
+                 saved.bulkItems.forEach(val => addBulkItem(val));
+            } else if (saved.isBulk) {
+                 addBulkItem(); 
+            }
+
+            historyModal.classList.remove('show');
+            updateState();
+        }
+
+        // Initialize
+        document.getElementById('points-rate-display').innerText = `100 Points ≈ ₱${USD_TO_PHP_RATE.toFixed(2)}`;
+        updateState();
+
+    </script>
 </body>
 </html>
