@@ -7,6 +7,8 @@
     <!-- Icons & Fonts (Cached by SW) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiU0hFSU4gUENoZWNrIiwiYmFja2dyb3VuZF9jb2xvciI6IiNmZmZmZmYiLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsInRoZW1lX2NvbG9yIjoiIzAwMDAwMCIsImljb25zIjpbeyJzcmMiOiJodHRwczovL2ltZy5pY29uczguY29tL2ZsYXNneS85Ni8wMDAwMDAvc2hvcHBpbmctYmFnLTIucG5nIiwic2l6ZXMiOiI5Nng5NiIsInR5cGUiOiJpbWFnZS9wbmcifV19">
@@ -615,10 +617,20 @@
                         OPEN LINK <i class="fas fa-external-link-alt ml-2"></i>
                     </button>
                     
-                    <div class="text-center">
+                    <div class="text-center mb-4">
                         <p class="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Next Link Preview</p>
                         <p id="acl-preview" class="text-xs font-mono text-gray-800 break-all">Waiting for input...</p>
                     </div>
+
+                    <!-- NEW QR CODE SECTION -->
+                    <div id="qr-container" class="hidden flex-col items-center bg-gray-50 p-4 rounded-xl border border-gray-100">
+                        <p class="text-[10px] text-gray-400 uppercase tracking-widest mb-2 font-bold"><i class="fas fa-qrcode mr-1"></i> Last Opened Link</p>
+                        <div class="p-2 bg-white rounded shadow-sm">
+                             <div id="qrcode"></div>
+                        </div>
+                        <p id="qr-link-text" class="text-[9px] text-gray-400 mt-2 font-mono text-center break-all leading-tight max-w-[200px]"></p>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -842,6 +854,31 @@
             if(!url) return;
 
             window.open(url, '_blank');
+
+            // --- QR Code Logic: Display for the link JUST opened ---
+            const qrContainer = document.getElementById('qr-container');
+            const qrcodeDiv = document.getElementById('qrcode');
+            const qrLinkText = document.getElementById('qr-link-text');
+            
+            qrContainer.classList.remove('hidden');
+            qrContainer.classList.add('flex');
+            qrcodeDiv.innerHTML = ""; // Clear previous
+            
+            // Check if QRCode lib loaded
+            if (typeof QRCode !== 'undefined') {
+                new QRCode(qrcodeDiv, {
+                    text: url,
+                    width: 128,
+                    height: 128,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+            } else {
+                qrcodeDiv.innerText = "QR Lib Error";
+            }
+            qrLinkText.innerText = url;
+            // ----------------------------------------------------
 
             const match = url.match(/(\d+)(\/?)$/);
             if(match) {
