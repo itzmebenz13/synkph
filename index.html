@@ -4,14 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SHEIN PCheck</title>
-    <!-- Icons & Fonts -->
+    <!-- Icons & Fonts (Cached by SW) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
     <!-- PWA Manifest -->
     <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiU0hFSU4gUENoZWNrIiwiYmFja2dyb3VuZF9jb2xvciI6IiNmZmZmZmYiLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsInRoZW1lX2NvbG9yIjoiIzAwMDAwMCIsImljb25zIjpbeyJzcmMiOiJodHRwczovL2ltZy5pY29uczguY29tL2ZsYXNneS85Ni8wMDAwMDAvc2hvcHBpbmctYmFnLTIucG5nIiwic2l6ZXMiOiI5Nng5NiIsInR5cGUiOiJpbWFnZS9wbmcifV19">
     <meta name="theme-color" content="#ffffff">
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Roboto+Mono:wght@400;500&display=swap');
+
+        /* --- CRITICAL CSS FALLBACKS (For Offline Safety) --- */
+        /* These ensure the app structure works even if Tailwind CDN fails to load offline */
+        .hidden { display: none !important; }
+        .block { display: block; }
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .justify-center { justify-content: center; }
+        .w-full { width: 100%; }
+        .h-full { height: 100%; }
+        .fixed { position: fixed; }
+        .absolute { position: absolute; }
+        .relative { position: relative; }
+        .top-0 { top: 0; }
+        .left-0 { left: 0; }
+        .bottom-0 { bottom: 0; }
+        .z-50 { z-index: 50; }
+        .bg-white { background-color: white; }
+        .text-center { text-align: center; }
+        /* --------------------------------------------------- */
 
         body {
             font-family: 'Inter', sans-serif;
@@ -36,11 +60,13 @@
             transition: border-color 0.2s;
             font-weight: 600;
             background: transparent;
+            border-radius: 0; /* Mobile fix */
         }
         
         .shein-input:disabled {
             color: #9ca3af;
             cursor: not-allowed;
+            background-color: transparent;
         }
 
         .shein-input:focus {
@@ -280,11 +306,11 @@
                 <button onclick="downloadSW()" class="w-full bg-gray-100 border border-gray-300 text-gray-600 font-bold text-xs py-2 rounded flex items-center justify-center gap-2 hover:bg-gray-200">
                     <i class="fas fa-download"></i> Download Offline Script
                 </button>
-                <p class="text-[9px] text-gray-400 mt-1 text-center">Required for Vercel/GitHub Offline Mode</p>
+                <p class="text-[9px] text-gray-400 mt-1 text-center">Click, save as 'sw.js', upload to Vercel root.</p>
             </div>
         </div>
         <div class="absolute bottom-4 left-0 w-full text-center text-[10px] text-gray-400 p-4">
-            v3.1.0 • Authorized Use Only
+            v3.2.0 • Authorized Use Only
         </div>
     </div>
 
@@ -604,9 +630,9 @@
                     <button id="close-receipt" class="text-gray-400 hover:text-black"><i class="fas fa-times"></i></button>
                 </div>
                 
-                <!-- Display Area -->
-                <div id="receipt-content" class="bg-gray-50 p-4 rounded border border-gray-200 mb-4 font-mono text-sm shadow-inner whitespace-pre-wrap text-center">
-                   <!-- Content injected here -->
+                <!-- Use a DIV for the visual receipt (Clean HTML Style) -->
+                <div id="receipt-content">
+                    <!-- Dynamic HTML Content -->
                 </div>
                 
                 <button id="btn-copy-receipt" class="w-full bg-black text-white font-bold py-2 rounded text-sm mb-2 mt-4">
@@ -634,6 +660,15 @@
 
     </div>
 
+    <!-- Service Worker Script -->
+    <script>
+        // Simple offline service worker check
+        if ('serviceWorker' in navigator) {
+             // If user downloaded sw.js to root
+             navigator.serviceWorker.register('sw.js').catch(err => console.log('SW Fail:', err));
+        }
+    </script>
+
     <script>
         // Constants
         const USD_TO_PHP_RATE = 58.849557522; 
@@ -648,19 +683,15 @@
         const IS_WEEKEND = (TODAY === 0 || TODAY === 6);
         
         const PRESET_VOUCHERS = [
-            // 60% Vouchers
             { percent: 60, cap: 428, min: 285 },
             { percent: 60, cap: 255, min: 120 },
             { percent: 60, cap: 170, min: 99 },
             { percent: 60, cap: 150, min: 249 },
             { percent: 60, cap: 100, min: 99 },
-            // 50%
             { percent: 50, cap: 250, min: 350 },
             { percent: 50, cap: 200, min: 340 },
-            // 40%
             { percent: 40, cap: 360, min: 499 },
             { percent: 40, cap: 360, min: 600 },
-            // 30%
             { percent: 30, cap: 720, min: 1199 },
             { percent: 30, cap: 700, min: 1200 }
         ];
@@ -752,18 +783,9 @@
             elStatusBar.className = "status-bar status-weekday";
         }
         document.getElementById('points-rate-display').innerText = `100 Pts ≈ ₱${USD_TO_PHP_RATE.toFixed(2)}`;
-        
-        // Initial load
         loadHistory();
         updateState();
 
-        // Register Service Worker Logic
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').catch(err => {
-                console.log("Service Worker registration failed:", err);
-            });
-        }
-        
         // --- Navigation ---
         window.toggleMenu = function() {
             sidebar.classList.toggle('open');
