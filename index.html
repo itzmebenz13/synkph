@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SHEIN PCheck</title>
+    <!-- Assets (Cached by Service Worker for Offline Use) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -205,8 +206,8 @@
             font-size: 13px; margin-bottom: 6px; color: #333;
         }
         .receipt-divider { border-top: 1px dashed #e5e7eb; margin: 12px 0; }
-
-        /* Restored Clean Receipt UI */
+        
+        /* Clean HTML Receipt View */
         #receipt-content {
              background-color: #f9fafb;
              border: 1px solid #e5e7eb;
@@ -275,7 +276,7 @@
             </div>
         </div>
         <div class="absolute bottom-4 left-0 w-full text-center text-[10px] text-gray-400 p-4">
-            v2.9.5 • Authorized Use Only
+            v3.0.0 • Authorized Use Only
         </div>
     </div>
 
@@ -625,13 +626,47 @@
 
     </div>
 
+    <!-- Service Worker Script -->
+    <script>
+        // Simple offline service worker
+        if ('serviceWorker' in navigator) {
+            const swContent = `
+                self.addEventListener('install', e => {
+                    e.waitUntil(
+                        caches.open('shein-pcheck-v3').then(cache => {
+                            return cache.addAll([
+                                location.href,
+                                'https://cdn.tailwindcss.com',
+                                'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css'
+                            ]).catch(err => console.log('Caching failed', err));
+                        })
+                    );
+                });
+                self.addEventListener('fetch', e => {
+                    e.respondWith(
+                        caches.match(e.request).then(response => {
+                            return response || fetch(e.request);
+                        })
+                    );
+                });
+            `;
+            const blob = new Blob([swContent], {type: 'application/javascript'});
+            const url = URL.createObjectURL(blob);
+            navigator.serviceWorker.register(url)
+                .then(reg => console.log('SW Registered'))
+                .catch(err => console.log('SW Error:', err));
+        }
+    </script>
+
     <script>
         // Constants
         const USD_TO_PHP_RATE = 58.849557522; 
         const POINTS_TO_USD_RATIO = 0.01; 
         const MAX_POINTS_PERCENTAGE = 0.30; 
         const SHIPPING_THRESHOLD = 249; 
-        const ACL_AUTH_CODE = "ACLGEN2026V1";
+        
+        // Obfuscated Code Check: "ACLGEN2026V1" -> "MVY2MjAyTkVHTENB" (Reversed + Base64)
+        const ENCRYPTED_CODE = "MVY2MjAyTkVHTENB";
 
         const TODAY = new Date().getDay();
         const IS_WEEKEND = (TODAY === 0 || TODAY === 6);
@@ -728,7 +763,7 @@
             price: 0, voucherPercent: 0, voucherCap: Infinity, pointsInput: 0, usePoints: true, selectedVoucherIndex: -1,
             freeShipping: true, shippingFee: 245, isBulk: false, bulkItemCount: 1, userManuallyToggledShipping: false,
             inputsLocked: false, bookerMode: false, serviceFee: 0, lastCalc: {},
-            aclAuthenticated: false, bulkItems: [] // Added bulkItems storage
+            aclAuthenticated: false, bulkItems: [] 
         };
         let historyLog = [];
 
@@ -780,10 +815,14 @@
 
         // --- ACL Logic ---
         window.checkAclAuth = function() {
-            if(aclInput.value === ACL_AUTH_CODE) {
+            // Obfuscation check: Reverse input -> Base64
+            const inputEnc = btoa(aclInput.value.split('').reverse().join(''));
+            
+            if(inputEnc === ENCRYPTED_CODE) {
                 state.aclAuthenticated = true;
                 aclAuthScreen.classList.add('hidden');
                 aclMainScreen.classList.remove('hidden');
+                aclError.classList.add('hidden');
             } else {
                 aclError.classList.remove('hidden');
             }
@@ -820,7 +859,7 @@
                 aclPreview.innerText = newUrl;
             }
         }
-        
+
         // --- Event Listeners (Calculator) ---
         const calcInputs = [elPrice, elPoints, elInputShipping, elInputServiceFee];
         calcInputs.forEach(el => el.addEventListener('input', updateState));
