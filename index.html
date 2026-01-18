@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Roboto+Mono:wght@400;500&display=swap');
 
         body {
             font-family: 'Inter', sans-serif;
@@ -506,11 +506,12 @@
                     <button id="close-receipt" class="text-gray-400 hover:text-black"><i class="fas fa-times"></i></button>
                 </div>
                 
-                <div id="receipt-content" class="bg-gray-50 p-4 rounded border border-gray-200 mb-4 font-mono text-sm shadow-inner">
-                    <!-- Dynamic Content -->
+                <!-- Use a DIV for the visual receipt -->
+                <div id="receipt-view" class="bg-gray-50 p-4 rounded border border-gray-200 mb-4 font-mono text-sm shadow-inner">
+                    <!-- Dynamic HTML Content -->
                 </div>
                 
-                <button id="btn-copy-receipt" class="w-full bg-black text-white font-bold py-2 rounded text-sm mb-2">
+                <button id="btn-copy-receipt" class="w-full bg-black text-white font-bold py-2 rounded text-sm mb-2 mt-4">
                     <i class="far fa-copy mr-1"></i> Copy to Clipboard
                 </button>
                 <p class="text-[10px] text-gray-400 text-center">Ready to paste in Messenger/Viber</p>
@@ -612,7 +613,7 @@
         const receiptModal = document.getElementById('receipt-modal');
         const closeReceipt = document.getElementById('close-receipt');
         const btnCopyReceipt = document.getElementById('btn-copy-receipt');
-        const receiptContent = document.getElementById('receipt-content');
+        const receiptView = document.getElementById('receipt-view');
         
         const btnHistory = document.getElementById('btn-history');
         const historyModal = document.getElementById('history-modal');
@@ -1062,7 +1063,7 @@
             const c = state.lastCalc;
             let html = `
                 <div class="text-center mb-4 border-b border-dashed border-gray-300 pb-2">
-                    <h2 class="font-bold text-lg">SHEIN CHECK</h2>
+                    <h2 class="font-bold text-lg">SHEIN ORDER</h2>
                     <p class="text-[10px] text-gray-500">${c.date}</p>
                 </div>
             `;
@@ -1075,40 +1076,61 @@
             }
 
             html += `<div class="receipt-line"><span>Subtotal</span><span>${formatMoney(c.subtotal)}</span></div>`;
-            
             if (c.discounts.voucher > 0) html += `<div class="receipt-line text-red-600"><span>Voucher</span><span>-${formatMoney(c.discounts.voucher)}</span></div>`;
             if (c.discounts.points > 0) html += `<div class="receipt-line text-yellow-600"><span>Points</span><span>-${formatMoney(c.discounts.points)}</span></div>`;
-            
             const shippingText = c.shipping === 0 ? "FREE" : formatMoney(c.shipping);
             html += `<div class="receipt-line"><span>Shipping</span><span>${shippingText}</span></div>`;
-
-            if (c.serviceFee > 0) {
-                html += `<div class="receipt-line text-purple-600"><span>Service Fee</span><span>+${formatMoney(c.serviceFee)}</span></div>`;
-            }
-
+            if (c.serviceFee > 0) html += `<div class="receipt-line text-purple-600"><span>Service Fee</span><span>+${formatMoney(c.serviceFee)}</span></div>`;
             html += `<div class="receipt-divider"></div>`;
             html += `<div class="receipt-line font-bold text-lg"><span>TOTAL</span><span>${formatMoney(c.total)}</span></div>`;
+            receiptView.innerHTML = html;
+        }
 
-            receiptContent.innerHTML = html;
+        // Text Generator for Clipboard
+        function getReceiptText() {
+            const c = state.lastCalc;
+            const now = new Date();
+            // Format: M/D/YY • HH:MM
+            const dateStr = `${now.getMonth()+1}/${now.getDate()}/${now.getFullYear().toString().slice(-2)} • ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+            let t = `『 ☁︎ 𝗦𝗛𝗘𝗜𝗡 𝗥𝗘𝗖𝗘𝗜𝗣𝗧 ☁︎ 』\n\n`;
+            t += `  ${dateStr}\n`;
+            t += `  ── ☁︎ ── ☁︎ ── ☁︎ ──\n\n`;
+
+            // If you want items list in text copy, uncomment below. The requested format didn't have it explicitly but "Receipt" implies it. 
+            // I'll stick to the summary format requested by user.
+            /*
+            if (state.isBulk) {
+                 c.items.forEach(item => {
+                     t += `  [+] ITEM #${item.id} > ₱${item.price}\n`;
+                 });
+                 t += `\n`;
+            }
+            */
+
+            t += `  [+] SUB    > ${formatMoney(c.subtotal)}\n`;
+            
+            // Logic to determine if we show negative
+            if(c.discounts.voucher > 0) t += `  [-] VCH    > ₱${c.discounts.voucher}\n`; // Intentionally no cents if whole number? formatMoney adds cents. User sample had whole numbers. formatMoney is safer.
+            if(c.discounts.points > 0)  t += `  [-] PTS    > ₱${c.discounts.points}\n`;
+            
+            const shipVal = c.shipping === 0 ? " 0" : formatMoney(c.shipping);
+            t += `  [+] SHP    > ${shipVal}\n`;
+
+            if (c.serviceFee > 0) {
+                t += `  [+] FEE    > ${formatMoney(c.serviceFee)}\n`;
+            }
+
+            t += `\n  ══════════════\n`;
+            t += `  ➥  PAY    :  ${formatMoney(c.total)}\n`;
+            t += `  ══════════════`;
+            
+            return t;
         }
 
         function copyReceiptToClipboard() {
-            // Generate clean text version
-            const c = state.lastCalc;
-            let text = `SHEIN ORDER ESTIMATE\nDate: ${c.date}\n------------------\n`;
+            const text = getReceiptText();
             
-            if (state.isBulk) {
-                 c.items.forEach(item => text += `Item #${item.id}: ₱${item.price}\n`);
-                 text += `------------------\n`;
-            }
-            
-            text += `Subtotal: ₱${c.subtotal.toFixed(2)}\n`;
-            if(c.discounts.voucher > 0) text += `Voucher: -₱${c.discounts.voucher.toFixed(2)}\n`;
-            if(c.discounts.points > 0) text += `Points: -₱${c.discounts.points.toFixed(2)}\n`;
-            text += `Shipping: ${c.shipping === 0 ? 'FREE' : '₱'+c.shipping.toFixed(2)}\n`;
-            if(c.serviceFee > 0) text += `Service Fee: ₱${c.serviceFee.toFixed(2)}\n`;
-            text += `------------------\nTOTAL: ₱${c.total.toFixed(2)}`;
-
             // Legacy copy method for restricted iframes
             const textArea = document.createElement("textarea");
             textArea.value = text;
