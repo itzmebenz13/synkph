@@ -101,89 +101,25 @@
         /* --- VIEW MODES --- */
 
         /* LIST MODE */
-        #tools-grid.view-list { 
-            grid-template-columns: 1fr; 
-            max-width: 650px; 
-            margin: 0 auto; 
-        }
-        #tools-grid.view-list .glass-card { 
-            flex-direction: row; 
-            align-items: center; 
-            padding: 16px 20px; 
-            border-radius: 20px; 
-            min-height: 80px;
-        }
+        #tools-grid.view-list { grid-template-columns: 1fr; max-width: 650px; margin: 0 auto; }
+        #tools-grid.view-list .glass-card { flex-direction: row; align-items: center; padding: 16px 20px; border-radius: 20px; }
         #tools-grid.view-list .tool-bg-icon { display: none; }
-        #tools-grid.view-list .tool-icon-wrapper { 
-            width: 48px; 
-            height: 48px; 
-            margin-bottom: 0; 
-            margin-right: 20px; 
-            border-radius: 12px; 
-            flex-shrink: 0; 
-        }
+        #tools-grid.view-list .tool-icon-wrapper { width: 48px; height: 48px; margin-bottom: 0; margin-right: 20px; border-radius: 12px; flex-shrink: 0; }
         #tools-grid.view-list .tool-content { flex: 1; }
         #tools-grid.view-list .tool-title { font-size: 1.1rem; margin-bottom: 2px; }
-        #tools-grid.view-list .tool-desc { 
-            font-size: 0.8rem; 
-            margin: 0; 
-            display: -webkit-box; 
-            -webkit-line-clamp: 1; 
-            -webkit-box-orient: vertical; 
-            overflow: hidden; 
-        }
-        #tools-grid.view-list .tool-tags { display: flex; margin-top: 0; margin-left: auto; }
+        #tools-grid.view-list .tool-desc { font-size: 0.8rem; margin: 0; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+        #tools-grid.view-list .tool-tags { display: flex; margin-top: 0; margin-left: auto; } /* Tags to right */
+        #tools-grid.view-list .tool-arrow { display: none; }
 
-        /* COMPACT MODE (3 Columns) */
-        #tools-grid.view-compact { 
-            grid-template-columns: repeat(3, 1fr); 
-            gap: 16px; 
-        }
-        
-        /* Responsive adjustments for Compact Mode */
-        @media (max-width: 1024px) {
-            #tools-grid.view-compact { grid-template-columns: repeat(2, 1fr); }
-        }
-        @media (max-width: 640px) {
-            #tools-grid.view-compact { grid-template-columns: 1fr; }
-        }
-
-        #tools-grid.view-compact .glass-card { 
-            padding: 20px; 
-            border-radius: 20px; 
-        }
-        #tools-grid.view-compact .tool-bg-icon { 
-            right: -10px; bottom: -10px; opacity: 0.04; 
-        }
-        #tools-grid.view-compact .tool-icon-wrapper { 
-            width: 42px; 
-            height: 42px; 
-            margin-bottom: 12px; 
-            border-radius: 12px; 
-        }
-        #tools-grid.view-compact .tool-title { 
-            font-size: 1rem; 
-            margin-bottom: 6px; 
-        }
-        #tools-grid.view-compact .tool-desc { 
-            font-size: 0.75rem; 
-            line-height: 1.4; 
-            display: -webkit-box; 
-            -webkit-line-clamp: 2; 
-            -webkit-box-orient: vertical; 
-            overflow: hidden; 
-            margin-bottom: 12px;
-        }
-        #tools-grid.view-compact .tool-tags { 
-            display: flex; /* Kept tags visible but smaller */
-            gap: 4px;
-        } 
-        #tools-grid.view-compact .tool-tags span {
-            font-size: 9px;
-            padding: 2px 6px;
-        }
-        #tools-grid.view-compact .glass-card:hover { transform: translateY(-4px); }
-
+        /* DENSE MODE */
+        #tools-grid.view-dense { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        #tools-grid.view-dense .glass-card { padding: 14px; border-radius: 16px; }
+        #tools-grid.view-dense .tool-bg-icon { display: none; }
+        #tools-grid.view-dense .tool-icon-wrapper { width: 36px; height: 36px; margin-bottom: 10px; border-radius: 10px; }
+        #tools-grid.view-dense .tool-title { font-size: 0.9rem; margin-bottom: 4px; }
+        #tools-grid.view-dense .tool-desc { font-size: 0.7rem; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        #tools-grid.view-dense .tool-tags { display: none; } /* Hide tags in dense */
+        #tools-grid.view-dense .glass-card:hover { transform: translateY(-3px); }
 
         /* TYPING EFFECT CURSOR */
         .typing-cursor::after {
@@ -232,7 +168,7 @@
         }
 
         .bg-blob-1 { background-color: #bfdbfe; }
-        .bg-blob-2 { background-color: #fbcfe8; }
+        .bg-blob-2 { background-color: #fbcfe8; } /* Added pinkish blob */
         
         html.dark .bg-blob-1 { background-color: #1e3a8a; opacity: 0.3; }
         html.dark .bg-blob-2 { background-color: #831843; opacity: 0.3; }
@@ -307,13 +243,13 @@
 
     <!-- Header -->
     <header class="w-full p-4 flex justify-between items-center z-50">
-        <!-- Logo -->
+        <!-- Logo (Visible only on mobile or small screens if needed, otherwise hidden to center main logo) -->
         <div class="text-sm font-bold tracking-tight text-slate-400 dark:text-slate-500 opacity-0 md:opacity-100 transition-opacity">v2.1</div>
 
         <div class="flex items-center gap-2">
             <!-- View Toggle -->
             <button id="btn-view" onclick="toggleView()" class="header-btn w-9 p-0 group" title="Switch View Mode">
-                <i data-lucide="layout-grid" class="w-4 h-4 group-hover:text-brand-600 dark:group-hover:text-brand-400"></i>
+                <i data-lucide="grid-2x2" class="w-4 h-4 group-hover:text-brand-600 dark:group-hover:text-brand-400"></i>
             </button>
 
             <!-- Donate Button -->
@@ -360,8 +296,7 @@
         </div>
 
         <!-- Cards Grid -->
-        <!-- Modified to support compact 3-col view as default -->
-        <div id="tools-grid" class="grid w-full max-w-5xl px-2 transition-all duration-300">
+        <div id="tools-grid" class="grid grid-cols-1 md:grid-cols-2 gap-5 w-full max-w-2xl px-2 transition-all duration-300">
             
             <!-- Tool 1: SHEIN PCheck -->
             <a href="pcheck.html" class="glass-card p-6 rounded-3xl group relative overflow-hidden tool-item" data-name="shein pcheck calculator">
@@ -430,34 +365,6 @@
                     </div>
                 </div>
             </a>
-            
-            <!-- Tool 3: Placeholder to show the 3rd column -->
-             <a href="#" class="glass-card p-6 rounded-3xl group relative overflow-hidden tool-item" data-name="placeholder tool">
-                <div class="tool-bg-icon absolute -bottom-4 -right-4 p-3 opacity-[0.03] dark:opacity-[0.05] group-hover:opacity-10 transition-all transform group-hover:scale-110 group-hover:-rotate-12 duration-500">
-                    <i data-lucide="wrench" class="w-32 h-32 text-slate-500"></i>
-                </div>
-                
-                <div class="relative z-10 flex flex-col h-full tool-content">
-                    <div class="tool-icon-wrapper w-12 h-12 bg-gradient-to-br from-slate-500 to-slate-600 text-white rounded-2xl flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300 ring-1 ring-black/5 dark:ring-white/10">
-                        <i data-lucide="wrench" class="w-6 h-6"></i>
-                    </div>
-                    
-                    <div class="flex-1 min-w-0">
-                        <h2 class="tool-title text-xl font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
-                            Coming Soon
-                        </h2>
-                        
-                        <p class="tool-desc text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-4">
-                            More tools are being developed. Check back later for updates.
-                        </p>
-
-                         <!-- Category Tags -->
-                         <div class="tool-tags flex flex-wrap gap-2 mt-auto">
-                            <span class="text-[10px] font-bold px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-600">Dev</span>
-                        </div>
-                    </div>
-                </div>
-            </a>
 
         </div>
 
@@ -466,7 +373,7 @@
     <!-- Fixed Footer -->
     <footer class="fixed bottom-6 w-full text-center z-40 pointer-events-none">
         <div class="inline-flex items-center gap-2 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/40 dark:border-white/5 shadow-lg pointer-events-auto transform hover:scale-105 transition-transform">
-            <!-- Removed Live Indicator Pulse -->
+            <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
             <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
                 © 2026 SynkPH
             </p>
@@ -532,10 +439,10 @@
         const donateModal = document.getElementById('donate-modal');
         const typewriterEl = document.getElementById('typewriter');
 
-        // View Modes: Compact (Default 3 cols) -> List (1 col)
-        const modes = ['compact', 'list'];
-        let currentModeIndex = modes.indexOf(localStorage.getItem('synkph_view_mode') || 'compact');
-        if (currentModeIndex === -1) currentModeIndex = 0;
+        // View Modes: Dense (Default) -> Grid -> List
+        const modes = ['dense', 'grid', 'list'];
+        let currentModeIndex = modes.indexOf(localStorage.getItem('synkph_view_mode') || 'dense');
+        if (currentModeIndex === -1) currentModeIndex = 0; // Default to dense if invalid
 
         // Update Theme Icon
         function updateThemeIcon() {
@@ -548,14 +455,18 @@
         // Apply View Mode
         function applyViewMode(mode) {
             // Remove all possible classes first
-            toolsGrid.classList.remove('view-list', 'view-compact');
+            toolsGrid.classList.remove('view-list', 'view-dense');
             
             // Add specific class
-            toolsGrid.classList.add(`view-${mode}`);
+            if (mode !== 'grid') {
+                toolsGrid.classList.add(`view-${mode}`);
+            }
             
-            // Update Icon
-            let icon = 'layout-grid'; // Default icon for compact
+            // Update Icon based on next available mode (for user feedback)
+            let icon = 'layout-grid'; // Default icon
+            if (mode === 'grid') icon = 'layout-grid'; 
             if (mode === 'list') icon = 'list'; 
+            if (mode === 'dense') icon = 'grid-2x2';
             
             btnView.innerHTML = `<i data-lucide="${icon}" class="w-4 h-4 text-slate-600 dark:text-slate-300 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors"></i>`;
             lucide.createIcons();
