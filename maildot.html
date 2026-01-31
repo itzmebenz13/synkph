@@ -60,7 +60,6 @@
             background-color: #ef4444; /* Red background for delete */
         }
         
-        /* The Delete Button Layer */
         .delete-layer {
             position: absolute;
             top: 0; bottom: 0; right: 0;
@@ -75,7 +74,6 @@
             cursor: pointer;
         }
 
-        /* The Content Card */
         .email-item {
             position: relative;
             z-index: 10; /* Above delete layer */
@@ -92,107 +90,61 @@
             border-color: #333;
         }
 
-        /* --- COMPACT MODE FIXES --- */
-        /* Force remove Tailwind gap when compact class is present */
-        #results-list.compact {
-            gap: 0 !important; 
-        }
+        /* --- COMPACT MODE OVERRIDES --- */
+        #results-list.compact { gap: 0 !important; }
+        #results-list.compact .swipe-outer { margin-bottom: 2px; border-radius: 4px; }
+        #results-list.compact .email-item { padding: 4px 8px; gap: 2px; border-radius: 4px; }
+        #results-list.compact .email-row { margin-bottom: 0; }
+        #results-list.compact .email-text { font-size: 11px; padding: 0; }
+        #results-list.compact .row-number { font-size: 9px; margin-right: 4px; min-width: 18px; }
+        #results-list.compact .item-controls { gap: 4px; margin-top: 2px; }
+        #results-list.compact .tiny-input { padding: 0 4px; font-size: 10px; height: 20px; }
+        #results-list.compact .status-btn { font-size: 9px; padding: 0; width: 40px; height: 20px; line-height: 20px; }
+        #results-list.compact .copy-btn-icon { padding: 2px; font-size: 11px; }
+        #results-list.compact .relative span.absolute { font-size: 9px; top: 3px; left: 4px; }
+        #results-list.compact .relative input.pl-4 { padding-left: 12px; }
 
-        #results-list.compact .swipe-outer {
-            margin-bottom: 2px;
-            border-radius: 4px;
+        /* --- BASIC MODE STYLES --- */
+        /* In basic mode, list items are simpler */
+        body.mode-basic .stats-grid,
+        body.mode-basic .chart-container,
+        body.mode-basic #batch-bar,
+        body.mode-basic .advanced-only {
+            display: none !important;
         }
         
-        #results-list.compact .email-item {
-            padding: 4px 8px;
-            gap: 2px;
-            border-radius: 4px;
+        body.mode-basic .email-item {
+            flex-direction: row; /* Horizontal layout */
+            align-items: center;
+            padding: 10px 12px;
+            gap: 0;
         }
         
-        #results-list.compact .email-row {
+        body.mode-basic .email-row {
+            flex: 1;
             margin-bottom: 0;
         }
         
-        #results-list.compact .email-text {
-            font-size: 11px;
-            padding: 0;
-        }
-        
-        #results-list.compact .row-number {
-            font-size: 9px;
-            margin-right: 4px;
-            min-width: 18px;
-        }
-        
-        #results-list.compact .item-controls {
-            gap: 4px;
-            margin-top: 2px;
-        }
-        
-        #results-list.compact .tiny-input {
-            padding: 0 4px;
-            font-size: 10px;
-            height: 20px;
-        }
-        
-        #results-list.compact .status-btn {
-            font-size: 9px;
-            padding: 0;
-            width: 40px;
-            height: 20px;
-            line-height: 20px;
-        }
-        
-        #results-list.compact .copy-btn-icon {
-            padding: 2px;
-            font-size: 11px;
-        }
-        
-        #results-list.compact .relative span.absolute {
-            font-size: 9px;
-            top: 3px;
-            left: 4px;
-        }
-        
-        #results-list.compact .relative input.pl-4 {
-            padding-left: 12px;
+        body.mode-basic .item-controls {
+            display: none; /* Hide advanced controls */
         }
 
         /* --- INNER ELEMENTS --- */
-        .email-row {
-            display: flex; justify-content: space-between; align-items: center;
-        }
-
-        .email-text {
-            font-family: 'Roboto Mono', monospace; font-size: 13px; font-weight: 500;
-            word-break: break-all; color: #333;
-            padding: 4px 0; display: block; flex: 1; transition: color 0.2s;
-        }
+        .email-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        .email-text { font-family: 'Roboto Mono', monospace; font-size: 13px; font-weight: 500; word-break: break-all; color: #333; padding: 4px 0; display: block; flex: 1; transition: color 0.2s; }
         html.dark-mode .email-text { color: #e5e5e5; }
-        
         .email-text.copied { color: #16a34a !important; }
         .email-text.sold { color: #ef4444 !important; text-decoration: line-through; opacity: 0.8; }
 
-        .copy-btn-icon {
-            padding: 4px 8px; color: #9ca3af; font-size: 14px;
-            cursor: pointer; transition: color 0.2s;
-        }
+        .copy-btn-icon { padding: 4px 8px; color: #9ca3af; font-size: 14px; cursor: pointer; transition: color 0.2s; }
         .copy-btn-icon:hover { color: #2563eb; }
         html.dark-mode .copy-btn-icon:hover { color: #60a5fa; }
-        
         .copy-btn-icon.locked { cursor: not-allowed; color: #ef4444 !important; }
 
         .item-controls { display: flex; gap: 8px; align-items: center; }
-        .tiny-input {
-            padding: 6px; border: 1px solid #e5e7eb; border-radius: 4px; font-size: 11px;
-            width: 80px; background: transparent;
-        }
+        .tiny-input { padding: 6px; border: 1px solid #e5e7eb; border-radius: 4px; font-size: 11px; width: 80px; background: transparent; }
         
-        .status-btn {
-            font-size: 10px; font-weight: 800; padding: 4px 0; border-radius: 4px;
-            text-transform: uppercase; cursor: pointer; border: 1px solid;
-            width: 60px; text-align: center; flex-shrink: 0;
-        }
+        .status-btn { font-size: 10px; font-weight: 800; padding: 4px 0; border-radius: 4px; text-transform: uppercase; cursor: pointer; border: 1px solid; width: 60px; text-align: center; flex-shrink: 0; }
         .status-unused { background-color: #f3f4f6; color: #6b7280; border-color: #d1d5db; }
         .status-active { background-color: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
         .status-sold { background-color: #f0fdf4; color: #16a34a; border-color: #bbf7d0; }
@@ -208,17 +160,9 @@
         .stat-lbl { font-size: 10px; text-transform: uppercase; color: #6b7280; font-weight: 600; }
 
         /* Modal */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;
-            z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.2s;
-        }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
         .modal-overlay.show { opacity: 1; pointer-events: auto; }
-        .modal-card {
-            background: white; width: 90%; max-width: 320px; border-radius: 12px;
-            padding: 20px; transform: translateY(20px); transition: transform 0.2s;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        }
+        .modal-card { background: white; width: 90%; max-width: 320px; border-radius: 12px; padding: 20px; transform: translateY(20px); transition: transform 0.2s; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         .modal-overlay.show .modal-card { transform: translateY(0); }
         html.dark-mode .modal-card { background-color: #1e1e1e; color: #ffffff; border: 1px solid #333; }
 
@@ -247,7 +191,10 @@
                 <h1 class="text-lg font-black italic tracking-tighter">Mail<span class="text-blue-600">Dot</span></h1>
             </div>
             <div class="flex items-center gap-4">
-                <button class="text-gray-600 hover:text-blue-600 transition-colors" id="btn-data" title="Backup/Restore">
+                <button class="text-gray-600 hover:text-purple-600 transition-colors" id="btn-mode" title="Switch Mode (Basic/Advanced)">
+                    <i class="fas fa-bolt"></i> <!-- Mode Icon -->
+                </button>
+                <button class="text-gray-600 hover:text-blue-600 transition-colors advanced-only" id="btn-data" title="Backup/Restore">
                     <i class="fas fa-database"></i>
                 </button>
                 <button class="text-gray-600 hover:text-black transition-colors" id="btn-theme">
@@ -329,12 +276,15 @@
             <div id="action-bar" class="flex justify-between items-center mb-3 hidden">
                 <div class="flex flex-col">
                     <span class="text-xs font-bold text-gray-500" id="result-count">0 Results</span>
-                    <select id="filter-status" class="filter-select mt-1" onchange="filterList()">
-                        <option value="all">Show All</option>
-                        <option value="unused">Unused Only</option>
-                        <option value="active">Active Only</option>
-                        <option value="sold">Sold Only</option>
-                    </select>
+                    <!-- Basic Mode hides this selector via CSS -->
+                    <div class="advanced-only">
+                        <select id="filter-status" class="filter-select mt-1" onchange="filterList()">
+                            <option value="all">Show All</option>
+                            <option value="unused">Unused Only</option>
+                            <option value="active">Active Only</option>
+                            <option value="sold">Sold Only</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="flex gap-2">
                     <button id="btn-view-mode" onclick="toggleViewMode()" class="text-xs font-bold text-gray-600 bg-gray-100 px-3 py-1.5 rounded hover:bg-gray-200" title="Toggle Compact Mode">
@@ -358,8 +308,6 @@
             </div>
 
             <!-- Results List -->
-            <!-- Note: 'flex flex-col' removed to allow 'block' for gap overrides in CSS if needed, 
-                 but we use flex gap utility. Will rely on JS viewMode class to override gap via CSS -->
             <div id="results-list" class="flex flex-col gap-2 pb-10">
                 <div class="text-center text-gray-400 text-xs mt-10">
                     Enter an email to generate combinations.
@@ -459,6 +407,7 @@
         const btnCopyAll = document.getElementById('btn-copy-all');
         const batchInput = document.getElementById('batch-input');
         const filterStatus = document.getElementById('filter-status');
+        const btnMode = document.getElementById('btn-mode');
         
         // Data/Settings
         const btnData = document.getElementById('btn-data');
@@ -483,6 +432,7 @@
         let currentEmails = []; 
         let currentTotal = 0;
         let viewMode = appSettings.viewMode || 'comfortable';
+        let appMode = appSettings.appMode || 'basic'; // Default to 'basic'
 
         // Stats UI
         const elStatToday = document.getElementById('stat-today');
@@ -491,18 +441,32 @@
         const elStatTotal = document.getElementById('stat-total');
 
         // --- Initialization ---
+        // Restore previous session
         if (session.email) {
             inputEmail.value = session.email;
             inputLimit.value = session.limit || "50";
             setTimeout(() => btnGenerate.click(), 100);
         }
+        
+        // Restore Settings
         if (appSettings.defaultPrice) {
             settingDefaultPrice.value = appSettings.defaultPrice;
         }
+        
         if (viewMode === 'compact') {
             resultsList.classList.add('compact');
             document.getElementById('btn-view-mode').innerHTML = '<i class="fas fa-expand"></i>';
         }
+        
+        // Initialize App Mode (Basic/Advanced)
+        if (appMode === 'basic') {
+            document.body.classList.add('mode-basic');
+            btnMode.innerHTML = '<i class="fas fa-magic"></i>'; // Wand for Basic
+        } else {
+            document.body.classList.remove('mode-basic');
+            btnMode.innerHTML = '<i class="fas fa-bolt"></i>'; // Bolt for Advanced
+        }
+
         updateStats();
 
         // --- Event Listeners ---
@@ -512,6 +476,24 @@
         settingDefaultPrice.addEventListener('change', () => {
             appSettings.defaultPrice = settingDefaultPrice.value;
             localStorage.setItem('maildot_settings', JSON.stringify(appSettings));
+        });
+
+        // Mode Toggle Listener
+        btnMode.addEventListener('click', () => {
+            appMode = appMode === 'advanced' ? 'basic' : 'advanced';
+            appSettings.appMode = appMode;
+            localStorage.setItem('maildot_settings', JSON.stringify(appSettings));
+            
+            if (appMode === 'basic') {
+                document.body.classList.add('mode-basic');
+                btnMode.innerHTML = '<i class="fas fa-magic"></i>';
+                // Switch off compact if in basic to look cleaner, or keep pref. Keeping pref.
+            } else {
+                document.body.classList.remove('mode-basic');
+                btnMode.innerHTML = '<i class="fas fa-bolt"></i>';
+            }
+            // Re-render list to show/hide controls
+            renderList(currentEmails, currentTotal);
         });
 
         btnGenerate.addEventListener('click', () => {
@@ -770,7 +752,12 @@
             if (emails.length === 0) return;
 
             actionBar.classList.remove('hidden');
-            batchBar.classList.remove('hidden');
+            // If advanced mode, show batchBar
+            if (appMode === 'advanced') {
+                document.getElementById('batch-bar').classList.remove('hidden');
+            } else {
+                document.getElementById('batch-bar').classList.add('hidden');
+            }
             
             if (totalCount && totalCount > emails.length) {
                 resultCount.innerText = `${emails.length} / ${totalCount.toLocaleString()}`;
@@ -783,11 +770,33 @@
                 const status = saved.status || 'unused'; 
                 
                 if (status === 'deleted') return; // Skip deleted items
-                if (filterVal !== 'all' && status !== filterVal) return;
+                if (filterVal !== 'all' && status !== filterVal && appMode === 'advanced') return;
 
                 const isCopied = saved.copied === true;
                 const isSold = status === 'sold';
 
+                // BASIC MODE SIMPLIFIED RENDER
+                if (appMode === 'basic') {
+                    const item = document.createElement('div');
+                    item.className = 'email-item'; // Simple container
+                    
+                    let textClass = 'email-text';
+                    if (isCopied) textClass += ' copied';
+
+                    item.innerHTML = `
+                        <div class="email-row">
+                            <span class="row-number">#${index + 1}</span>
+                            <span class="${textClass}" id="txt-${email}">${email}</span>
+                            <button class="copy-btn-icon" onclick="copyText(this, '${email}')" title="Copy Email">
+                                <i class="far fa-copy"></i>
+                            </button>
+                        </div>
+                    `;
+                    resultsList.appendChild(item);
+                    return; // Skip advanced rendering
+                }
+
+                // ADVANCED MODE (SWIPE & CONTROLS)
                 const wrapper = document.createElement('div');
                 wrapper.className = 'swipe-outer';
                 
@@ -795,7 +804,6 @@
                 const deleteLayer = document.createElement('div');
                 deleteLayer.className = 'delete-layer';
                 deleteLayer.innerHTML = '<span><i class="fas fa-trash-alt mr-1"></i></span>';
-                // Mouse/Touch click logic for the layer
                 deleteLayer.addEventListener('click', (e) => {
                     e.stopPropagation();
                     deleteItem(email);
@@ -809,35 +817,30 @@
                 let startY = 0;
                 let currentX = 0;
                 let isDragging = false;
-                let isScrolling = false; // New flag
+                let isScrolling = false; 
                 
                 const startDrag = (x, y) => {
                     startX = x;
                     startY = y;
                     isDragging = true;
-                    isScrolling = false; // Reset status
+                    isScrolling = false; 
                     item.style.transition = 'none'; 
                 };
                 
                 const moveDrag = (x, y) => {
-                    if (!isDragging || isScrolling) return; // Ignore if we determined it's a scroll
+                    if (!isDragging || isScrolling) return;
                     
                     const diffX = x - startX;
                     const diffY = y - startY;
 
-                    // 1. Check Scroll Intent: If vertical move > horizontal move, it's a scroll.
-                    // We add a small buffer (5px) to ignore noise.
                     if (Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > 5) {
                         isScrolling = true;
-                        isDragging = false; // Stop swipe tracking
+                        isDragging = false; 
                         return; 
                     }
 
-                    // 2. Deadzone for Swipe: Don't show red background until moved significantly (e.g. 20px)
-                    // unless we are already open (currentX < 0)
                     if (Math.abs(diffX) < 20 && currentX === 0) return;
 
-                    // 3. Move Logic
                     if (diffX < 0 && diffX > -100) {
                         currentX = diffX;
                         item.style.transform = `translateX(${diffX}px)`;
@@ -847,10 +850,10 @@
                 const endDrag = (x) => {
                     if (!isDragging) return;
                     isDragging = false;
-                    item.style.transition = 'transform 0.2s ease-out'; // Re-enable transition
+                    item.style.transition = 'transform 0.2s ease-out';
                     const diff = x - startX;
                     
-                    if (diff < -40) { // Threshold to snap open
+                    if (diff < -40) { 
                         currentX = -80;
                         item.style.transform = 'translateX(-80px)';
                     } else {
@@ -859,25 +862,21 @@
                     }
                 };
 
-                // Touch Events
                 item.addEventListener('touchstart', (e) => startDrag(e.touches[0].clientX, e.touches[0].clientY), {passive: true});
                 item.addEventListener('touchmove', (e) => moveDrag(e.touches[0].clientX, e.touches[0].clientY), {passive: true});
                 item.addEventListener('touchend', (e) => endDrag(e.changedTouches[0].clientX));
 
-                // Mouse Events (Desktop Support)
                 item.addEventListener('mousedown', (e) => {
-                    // Don't drag if clicking inputs or buttons
                     if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.closest('button')) return;
                     startDrag(e.clientX, e.clientY);
                 });
-                window.addEventListener('mousemove', (e) => { // Window listener for smooth drag out
+                window.addEventListener('mousemove', (e) => { 
                     if(isDragging) moveDrag(e.clientX, e.clientY);
                 }); 
                 window.addEventListener('mouseup', (e) => {
                     if(isDragging) endDrag(e.clientX);
                 });
                 
-                // Click to close if open
                 item.addEventListener('click', (e) => {
                     if (currentX < 0 && !e.target.closest('.delete-layer')) {
                         currentX = 0;
@@ -932,13 +931,11 @@
         
         window.deleteItem = function(email) {
             if(!confirm(`Hide ${email} from list?`)) return;
-            // Mark as deleted in DB so it persists as hidden
             if (!db[email]) db[email] = {};
             db[email].status = 'deleted';
             localStorage.setItem('maildot_db', JSON.stringify(db));
             updateStats();
             
-            // Re-render
             const total = (inputLimit.value === '0' || getCombinations(inputEmail.value).length <= parseInt(inputLimit.value)) 
                           ? currentEmails.length 
                           : getCombinations(inputEmail.value).length;
@@ -981,7 +978,7 @@
                 const textEl = document.getElementById(`txt-${text}`);
                 if(textEl) textEl.classList.add('copied');
                 
-                if (appSettings.defaultPrice) {
+                if (appMode === 'advanced' && appSettings.defaultPrice) {
                     const saved = db[text] || {};
                     if (!saved.price) {
                        saveData(text, 'price', appSettings.defaultPrice);
