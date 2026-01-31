@@ -8,6 +8,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <meta name="theme-color" content="#ffffff">
 
+    <!-- Theme Init (No Flash) -->
     <script>
         if (localStorage.getItem('shein_pcal_theme') === 'dark') {
             document.documentElement.classList.add('dark-mode');
@@ -32,7 +33,7 @@
         html.dark-mode .stat-card { background-color: #1e1e1e; border-color: #333; }
         html.dark-mode textarea { background-color: #262626; color: white; border-color: #444; }
         
-        /* Dark Mode Colors */
+        /* Dark Mode Red Button Fixes */
         html.dark-mode .border-red-200 { border-color: #7f1d1d !important; }
         html.dark-mode .hover\:bg-red-50:hover { background-color: #450a0a !important; }
         html.dark-mode .border-orange-200 { border-color: #7c2d12 !important; }
@@ -590,6 +591,7 @@
                 if (emailIndex >= 0 && emailIndex < currentEmails.length) {
                     const email = currentEmails[emailIndex];
                     saveData(email, 'status', 'sold');
+                    // Also Apply Price if exists
                     if (appSettings.defaultPrice && (!db[email].price || db[email].price === '')) {
                         saveData(email, 'price', appSettings.defaultPrice);
                     }
@@ -781,6 +783,7 @@
                 const saved = db[email] || { price: '', note: '', status: 'unused', copied: false };
                 const status = saved.status || 'unused'; 
                 
+                if (status === 'deleted') return; // Skip deleted items
                 if (filterVal !== 'all' && status !== filterVal) return;
 
                 const isCopied = saved.copied === true;
@@ -910,11 +913,14 @@
         }
         
         window.deleteItem = function(email) {
-            if(!confirm(`Permanently delete ${email} data?`)) return;
-            delete db[email];
+            if(!confirm(`Hide ${email} from list?`)) return;
+            // Mark as deleted in DB so it persists as hidden
+            if (!db[email]) db[email] = {};
+            db[email].status = 'deleted';
             localStorage.setItem('maildot_db', JSON.stringify(db));
             updateStats();
             
+            // Re-render
             const total = (inputLimit.value === '0' || getCombinations(inputEmail.value).length <= parseInt(inputLimit.value)) 
                           ? currentEmails.length 
                           : getCombinations(inputEmail.value).length;
@@ -1072,7 +1078,13 @@
         window.exportCSV = function() {
             if (currentEmails.length === 0) { alert("No emails to export"); return; }
             
-            const content = currentEmails.join("\n");
+            // Filter out deleted items from export
+            const validEmails = currentEmails.filter(email => {
+                const saved = db[email] || {};
+                return saved.status !== 'deleted';
+            });
+
+            const content = validEmails.join("\n");
             
             const blob = new Blob([content], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
