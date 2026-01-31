@@ -102,49 +102,7 @@
 
         /* --- VIEW MODES --- */
 
-        /* 1. LIST MODE (1 Column) */
-        #tools-grid.view-list { 
-            grid-template-columns: minmax(0, 1fr); 
-            max-width: 650px; 
-            margin: 0 auto; 
-        }
-        #tools-grid.view-list .glass-card { 
-            flex-direction: row; 
-            align-items: center; 
-            padding: 16px 20px; 
-            border-radius: 20px; 
-            min-height: 80px;
-        }
-        #tools-grid.view-list .tool-bg-icon { display: none; }
-        #tools-grid.view-list .tool-icon-wrapper { 
-            width: 48px; 
-            height: 48px; 
-            margin-bottom: 0; 
-            margin-right: 20px; 
-            border-radius: 12px; 
-            flex-shrink: 0; 
-        }
-        #tools-grid.view-list .tool-content { flex: 1; }
-        #tools-grid.view-list .tool-title { font-size: 1.1rem; margin-bottom: 2px; }
-        #tools-grid.view-list .tool-desc { 
-            font-size: 0.8rem; 
-            margin: 0; 
-            display: -webkit-box; 
-            -webkit-line-clamp: 1; 
-            -webkit-box-orient: vertical; 
-            overflow: hidden; 
-        }
-        #tools-grid.view-list .tool-tags { display: flex; margin-top: 0; margin-left: auto; }
-        /* List Mobile Fixes */
-        @media (max-width: 640px) {
-            #tools-grid.view-list .glass-card { padding: 14px; }
-            #tools-grid.view-list .tool-icon-wrapper { width: 42px; height: 42px; margin-right: 14px; }
-            #tools-grid.view-list .tool-title { font-size: 1rem; }
-            #tools-grid.view-list .tool-tags { margin-left: 10px; flex-wrap: wrap; justify-content: flex-end; }
-        }
-
-
-        /* 2. GRID MODE (Standard: 2 Cols Desktop, 1 Col Mobile) */
+        /* 1. GRID MODE (2 Cols ALWAYS - Desktop & Mobile) */
         #tools-grid.view-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 20px;
@@ -155,15 +113,23 @@
         #tools-grid.view-grid .tool-title { font-size: 1.25rem; margin-bottom: 8px; }
         #tools-grid.view-grid .tool-desc { font-size: 0.875rem; -webkit-line-clamp: 3; }
         
+        /* Grid Mobile Adjustments */
         @media (max-width: 640px) {
-            #tools-grid.view-grid { grid-template-columns: minmax(0, 1fr); }
-            #tools-grid.view-grid .tool-title { font-size: 1.1rem; }
+            #tools-grid.view-grid { 
+                gap: 12px;
+                grid-template-columns: repeat(2, minmax(0, 1fr)); /* Force 2 cols */
+            }
+            #tools-grid.view-grid .glass-card { padding: 16px; border-radius: 18px; }
+            #tools-grid.view-grid .tool-icon-wrapper { width: 40px; height: 40px; margin-bottom: 10px; }
+            #tools-grid.view-grid .tool-title { font-size: 0.95rem; margin-bottom: 4px; line-height: 1.2; }
+            #tools-grid.view-grid .tool-desc { font-size: 0.75rem; -webkit-line-clamp: 3; }
+            #tools-grid.view-grid .tool-bg-icon { right: -8px; bottom: -8px; opacity: 0.04; transform: scale(0.7); }
+             #tools-grid.view-grid .tool-tags { display: none; }
         }
 
 
-        /* 3. COMPACT MODE (3 Cols ALWAYS) */
+        /* 2. COMPACT MODE (3 Cols ALWAYS) */
         #tools-grid.view-compact { 
-            /* Force 3 columns on all screen sizes */
             grid-template-columns: repeat(3, minmax(0, 1fr)); 
             gap: 12px; 
         }
@@ -574,8 +540,9 @@
         const donateModal = document.getElementById('donate-modal');
         const typewriterEl = document.getElementById('typewriter');
 
-        // View Modes: Compact (3 col) -> Grid (2 col) -> List (1 col)
-        const modes = ['compact', 'grid', 'list'];
+        // View Modes: Compact (3 col) -> Grid (2 col)
+        // Removed 'list' mode from logic
+        const modes = ['compact', 'grid'];
         let currentModeIndex = modes.indexOf(localStorage.getItem('synkph_view_mode') || 'compact');
         if (currentModeIndex === -1) currentModeIndex = 0;
 
@@ -596,10 +563,9 @@
             toolsGrid.classList.add(`view-${mode}`);
             
             // Update Icon
-            let icon = 'grid-3x3'; // Default compact
-            if (mode === 'grid') icon = 'layout-grid'; // Standard 2x2
-            if (mode === 'list') icon = 'list'; 
-            if (mode === 'compact') icon = 'grid-2x2'; // Using 2x2/dense icon for compact 3-col
+            // Logic: Show the icon of the mode we are currently ON
+            let icon = 'grid-3x3'; // Icon for compact
+            if (mode === 'grid') icon = 'grid-2x2'; // Icon for standard grid
             
             btnView.innerHTML = `<i data-lucide="${icon}" class="w-4 h-4 text-slate-600 dark:text-slate-300 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors"></i>`;
             lucide.createIcons();
