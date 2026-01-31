@@ -313,8 +313,7 @@
         html.dark-mode .shein-input-group,
         html.dark-mode #sidebar,
         html.dark-mode .modal-card,
-        html.dark-mode #qr-container,
-        html.dark-mode #acl-main .bg-white {
+        html.dark-mode #view-whats-new .bg-white {
             background-color: #1e1e1e !important;
             color: #ffffff !important;
             border-color: #333;
@@ -435,13 +434,6 @@
             background-color: #064e3b;
             color: #a7f3d0;
         }
-
-        /* ACL */
-        html.dark-mode #acl-link-input {
-            background-color: #2d2d2d;
-            border-color: #444;
-            color: white;
-        }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen pb-24">
@@ -460,9 +452,8 @@
             <div class="menu-item" onclick="switchView('calculator')">
                 <i class="fas fa-calculator"></i> Calculator
             </div>
-            <div class="menu-item" onclick="switchView('acl')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-3 w-5 h-5 text-blue-500"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> ACL Gen 
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="ml-2 w-3 h-3 text-gray-400"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <div class="menu-item" onclick="switchView('whatsnew')">
+                <i class="fas fa-bullhorn text-blue-500"></i> What's New?
             </div>
             <!-- OFFLINE INSTALLER -->
             <div class="mt-4 px-5">
@@ -473,7 +464,7 @@
             </div>
         </div>
         <div class="absolute bottom-4 left-0 w-full text-center text-[10px] text-gray-400 p-4">
-            v1.0.2 • Made with <span class="text-red-500">❤</span> by Joven Campomanes
+            v1.0.3 • Made with <span class="text-red-500">❤</span> by Joven Campomanes
         </div>
     </div>
 
@@ -739,66 +730,32 @@
         </div> 
         <!-- END VIEW: CALCULATOR -->
 
-        <!-- VIEW: ACL GEN -->
-        <div id="view-acl" class="hidden h-full flex-col">
-            <!-- ACL AUTH SCREEN -->
-            <div id="acl-auth" class="flex-1 flex flex-col justify-center items-center p-6 text-center">
-                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 text-2xl">
-                    <i class="fas fa-lock text-3xl text-gray-400"></i>
-                </div>
-                <h2 class="font-bold text-lg mb-2">Restricted Feature</h2>
-                <p class="text-sm text-gray-500 mb-6">Enter the authentication code to access the ACL Generator.</p>
+        <!-- VIEW: WHAT'S NEW -->
+        <div id="view-whats-new" class="hidden h-full flex-col p-4 overflow-y-auto">
+            <div class="bg-white rounded-xl shadow-sm p-6 mb-4">
+                <h2 class="font-black italic text-xl mb-4 text-blue-600">Latest <span class="text-black not-italic font-normal">Updates</span></h2>
                 
-                <input type="password" id="acl-auth-input" class="w-full max-w-xs border border-gray-300 rounded px-4 py-3 mb-3 text-center tracking-widest" placeholder="ENTER CODE">
-                <button onclick="checkAclAuth()" class="w-full max-w-xs bg-black text-white font-bold py-3 rounded">UNLOCK</button>
-                <p id="acl-error" class="text-red-500 text-xs mt-3 hidden">Invalid Code. Please try again.</p>
-            </div>
-
-            <!-- ACL MAIN INTERFACE -->
-            <div id="acl-main" class="hidden flex-1 p-4">
-                <div class="bg-white rounded-xl shadow-sm p-6 mb-4">
-                    <h2 class="font-black italic text-xl mb-4 text-blue-600">ACL <span class="text-black not-italic font-normal">Generator</span></h2>
-                    
-                    <label class="shein-label">Base Link (Ark)</label>
-                    <div class="relative">
-                        <input type="text" id="acl-link-input" class="w-full border border-gray-200 rounded p-3 pr-10 mb-4 text-sm font-mono text-gray-600" placeholder="https://m.shein.com/ph/ark/11000">
-                        <button id="btn-clear-link" class="absolute right-3 top-3 text-gray-400 hover:text-black hidden">
-                            <i class="fas fa-times-circle"></i>
-                        </button>
-                    </div>
-                    
-                    <div class="flex justify-between items-center mb-6 bg-gray-50 p-2 rounded-lg">
-                        <span class="text-xs font-bold text-gray-500 px-2">Mode:</span>
-                        <div class="flex gap-2">
-                            <label class="flex items-center cursor-pointer">
-                                <input type="radio" name="acl-mode" value="inc" checked class="accent-blue-600 mr-1">
-                                <span class="text-xs font-bold">Increase</span>
-                            </label>
-                            <label class="flex items-center cursor-pointer">
-                                <input type="radio" name="acl-mode" value="dec" class="accent-red-600 mr-1">
-                                <span class="text-xs font-bold">Decrease</span>
-                            </label>
-                        </div>
+                <div class="space-y-6">
+                    <!-- Update Item -->
+                    <div>
+                        <h3 class="font-bold text-lg mb-2">📧 MailDot Gen (v2.0)</h3>
+                        <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
+                            <li><strong>New Modes:</strong> Switch between Basic (Simple) and Advanced (Pro) interfaces.</li>
+                            <li><strong>Earnings Tracker:</strong> Visual graph and daily/weekly stats for account sellers.</li>
+                            <li><strong>Smart Data:</strong> Export/Import backups, save source emails, and auto-pricing.</li>
+                            <li><strong>Gestures:</strong> Swipe left to delete emails (Mobile/Desktop supported).</li>
+                        </ul>
                     </div>
 
-                    <button onclick="openNextLink()" class="w-full bg-blue-600 text-white font-bold py-4 rounded-lg shadow-lg active:scale-95 transition-transform text-lg mb-4">
-                        OPEN LINK <i class="fas fa-external-link-alt ml-2"></i>
-                    </button>
-                    
-                    <div class="text-center mb-4">
-                        <p class="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Next Link Preview</p>
-                        <p id="acl-preview" class="text-xs font-mono text-gray-800 break-all">Waiting for input...</p>
+                    <!-- Update Item -->
+                    <div>
+                        <h3 class="font-bold text-lg mb-2">🛍️ SHEIN PCheck</h3>
+                        <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
+                            <li><strong>Dark Mode:</strong> Fully integrated dark theme across all pages.</li>
+                            <li><strong>New Vouchers:</strong> Added 73%, 70%, 67%, 66% discount tiers.</li>
+                            <li><strong>Compact Layout:</strong> Optimized viewing experience.</li>
+                        </ul>
                     </div>
-
-                    <!-- NEW QR CODE SECTION -->
-                    <div id="qr-container" class="hidden flex-col items-center bg-gray-50 p-4 rounded-xl border border-gray-100">
-                        <p class="text-[10px] text-gray-400 uppercase tracking-widest mb-2 font-bold"><i class="fas fa-qrcode mr-1"></i> Last Opened Link</p>
-                        <div class="p-2 bg-white rounded shadow-sm">
-                             <div id="qrcode"></div>
-                        </div>
-                        <p id="qr-link-text" class="text-[9px] text-gray-400 mt-2 font-mono text-center break-all leading-tight max-w-[200px]"></p>
-                    </div>
-
                 </div>
             </div>
         </div>
@@ -836,6 +793,36 @@
                 <div id="history-list" class="max-h-60 overflow-y-auto space-y-2">
                     <p class="text-gray-400 text-center text-xs py-4">No recent calculations</p>
                 </div>
+            </div>
+        </div>
+
+        <!-- WELCOME MODAL -->
+        <div id="welcome-modal" class="modal-overlay">
+            <div class="modal-card max-w-xs text-center">
+                <div class="mb-4">
+                    <img src="https://images.seeklogo.com/logo-png/34/1/shein-logo-png_seeklogo-344388.png" alt="SHEIN Logo" class="h-12 mx-auto mb-3">
+                    <h3 class="font-black text-xl mb-1 italic">SHEIN PCheck</h3>
+                    <p class="text-xs text-gray-500 font-medium">Created by <span class="text-blue-600 font-bold">Joven Campomanes</span></p>
+                </div>
+                
+                <div class="bg-gray-50 rounded-lg p-3 mb-4 text-xs text-gray-600 space-y-2 border border-gray-100 text-left">
+                    <p class="font-bold text-gray-800 border-b border-gray-200 pb-1 mb-2">Features:</p>
+                    <div class="flex items-start gap-2">
+                        <i class="fas fa-calculator text-black mt-0.5"></i>
+                        <span><strong>Smart Calculator:</strong> Auto-detects weekend free shipping & best vouchers.</span>
+                    </div>
+                    <div class="flex items-start gap-2">
+                        <i class="fas fa-at text-black mt-0.5"></i>
+                        <span><strong>MailDot Gen:</strong> Create alias emails with tracking.</span>
+                    </div>
+                </div>
+
+                <button id="btn-welcome-ok" class="w-full bg-black text-white font-bold py-3 rounded-lg text-xs hover:opacity-90 mb-3">
+                    Let's Start
+                </button>
+                <button id="btn-welcome-never" class="text-[10px] text-gray-400 hover:text-gray-600 font-medium">
+                    Don't show this again
+                </button>
             </div>
         </div>
 
@@ -905,17 +892,13 @@
         const sidebar = document.getElementById('sidebar');
         const sidebarOverlay = document.getElementById('sidebar-overlay');
         const viewCalc = document.getElementById('view-calculator');
-        const viewAcl = document.getElementById('view-acl');
+        const viewWhatsNew = document.getElementById('view-whats-new');
         const headerTitle = document.querySelector('header h1 span');
-
-        // ACL Elements
-        const aclAuthScreen = document.getElementById('acl-auth');
-        const aclMainScreen = document.getElementById('acl-main');
-        const aclInput = document.getElementById('acl-auth-input');
-        const aclError = document.getElementById('acl-error');
-        const aclLinkInput = document.getElementById('acl-link-input');
-        const aclPreview = document.getElementById('acl-preview');
-        const btnClearLink = document.getElementById('btn-clear-link');
+        
+        // Welcome Modal Elements
+        const welcomeModal = document.getElementById('welcome-modal');
+        const btnWelcomeOk = document.getElementById('btn-welcome-ok');
+        const btnWelcomeNever = document.getElementById('btn-welcome-never');
 
         // Calculator Elements
         const elPrice = document.getElementById('input-price');
@@ -992,9 +975,20 @@
         
         // Theme Init
         if (localStorage.getItem('shein_pcal_theme') === 'dark') {
-            document.documentElement.classList.add('dark-mode');
+            document.body.classList.add('dark-mode');
             btnTheme.innerHTML = '<i class="fas fa-sun"></i>';
         }
+
+        // Check Welcome Modal
+        if (!localStorage.getItem('shein_pcheck_welcome_seen')) {
+            setTimeout(() => { welcomeModal.classList.add('show'); }, 500);
+        }
+
+        btnWelcomeOk.addEventListener('click', () => { welcomeModal.classList.remove('show'); });
+        btnWelcomeNever.addEventListener('click', () => {
+            localStorage.setItem('shein_pcheck_welcome_seen', 'true');
+            welcomeModal.classList.remove('show');
+        });
 
         loadHistory();
         updateState();
@@ -1009,27 +1003,19 @@
             toggleMenu(); 
             if(view === 'calculator') {
                 viewCalc.classList.remove('hidden');
-                viewAcl.classList.add('hidden');
+                viewWhatsNew.classList.add('hidden');
                 headerTitle.innerText = "PCheck";
                 elStatusBar.classList.remove('hidden');
                 elReset.classList.remove('hidden');
                 btnHistory.classList.remove('hidden');
-            } else if (view === 'acl') {
+            } else if (view === 'whatsnew') {
                 viewCalc.classList.add('hidden');
-                viewAcl.classList.remove('hidden');
-                viewAcl.classList.add('flex');
-                headerTitle.innerText = "ACL Gen";
+                viewWhatsNew.classList.remove('hidden');
+                viewWhatsNew.classList.add('flex');
+                headerTitle.innerText = "Updates";
                 elStatusBar.classList.add('hidden');
                 elReset.classList.add('hidden');
                 btnHistory.classList.add('hidden');
-
-                if(state.aclAuthenticated) {
-                    aclAuthScreen.classList.add('hidden');
-                    aclMainScreen.classList.remove('hidden');
-                } else {
-                    aclAuthScreen.classList.remove('hidden');
-                    aclMainScreen.classList.add('hidden');
-                }
             }
         }
 
@@ -1040,76 +1026,6 @@
             localStorage.setItem('shein_pcal_theme', isDark ? 'dark' : 'light');
             btnTheme.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
         });
-
-        // --- ACL Logic ---
-        window.checkAclAuth = function() {
-            // Simplified Check to fix "Invalid Code" error
-            if(aclInput.value === ACL_AUTH_CODE) {
-                state.aclAuthenticated = true;
-                aclAuthScreen.classList.add('hidden');
-                aclMainScreen.classList.remove('hidden');
-                aclError.classList.add('hidden');
-            } else {
-                aclError.classList.remove('hidden');
-            }
-        }
-
-        aclLinkInput.addEventListener('input', () => {
-            aclPreview.innerText = aclLinkInput.value || "Waiting for input...";
-            if(aclLinkInput.value) btnClearLink.classList.remove('hidden');
-            else btnClearLink.classList.add('hidden');
-        });
-
-        btnClearLink.addEventListener('click', () => {
-            aclLinkInput.value = '';
-            aclPreview.innerText = "Waiting for input...";
-            btnClearLink.classList.add('hidden');
-        });
-
-        window.openNextLink = function() {
-            let url = aclLinkInput.value.trim();
-            if(!url) return;
-
-            window.open(url, '_blank');
-
-            // --- QR Code Logic: Display for the link JUST opened ---
-            const qrContainer = document.getElementById('qr-container');
-            const qrcodeDiv = document.getElementById('qrcode');
-            const qrLinkText = document.getElementById('qr-link-text');
-            
-            qrContainer.classList.remove('hidden');
-            qrContainer.classList.add('flex');
-            qrcodeDiv.innerHTML = ""; // Clear previous
-            
-            // Check if QRCode lib loaded
-            if (typeof QRCode !== 'undefined') {
-                new QRCode(qrcodeDiv, {
-                    text: url,
-                    width: 128,
-                    height: 128,
-                    colorDark : "#000000",
-                    colorLight : "#ffffff",
-                    correctLevel : QRCode.CorrectLevel.H
-                });
-            } else {
-                qrcodeDiv.innerText = "QR Lib Error";
-            }
-            qrLinkText.innerText = url;
-            // ----------------------------------------------------
-
-            const match = url.match(/(\d+)(\/?)$/);
-            if(match) {
-                let numStr = match[1];
-                let num = parseInt(numStr);
-                const isInc = document.querySelector('input[name="acl-mode"]:checked').value === 'inc';
-                
-                if(isInc) num++; else num--;
-                
-                const newUrl = url.replace(numStr, num);
-                aclLinkInput.value = newUrl;
-                aclPreview.innerText = newUrl;
-            }
-        }
 
         // --- Download App Helper ---
         window.downloadApp = function() {
