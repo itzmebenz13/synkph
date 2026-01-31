@@ -16,132 +16,139 @@
     </script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Roboto+Mono:wght@400;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f9fafb;
-            color: #1f2937;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
             transition: background-color 0.3s, color 0.3s;
+            overflow-x: hidden;
+        }
+
+        /* Subtle Grid Background */
+        .bg-grid-pattern {
+            background-size: 40px 40px;
+            background-image: linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+            mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
         }
 
         /* Dark Mode */
         html.dark body {
-            background-color: #121212;
-            color: #ffffff;
+            background-color: #0f172a;
+            color: #f1f5f9;
+        }
+
+        html.dark .bg-grid-pattern {
+            background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
         }
         
+        /* Enhanced Glass Card */
         .glass-card {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: flex;
             flex-direction: column;
             text-align: left;
             text-decoration: none;
             color: inherit;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
         }
 
         .glass-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.1);
-            background: rgba(255, 255, 255, 0.95);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            background: rgba(255, 255, 255, 0.9);
+            border-color: rgba(255, 255, 255, 1);
         }
+        
+        .glass-card:hover::before { opacity: 1; }
 
         /* Dark Mode Glass */
         html.dark .glass-card {
-            background: rgba(30, 41, 59, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
         }
         
         html.dark .glass-card:hover {
-            background: rgba(30, 41, 59, 0.9);
-            box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.5);
+            background: rgba(30, 41, 59, 0.8);
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.4);
+        }
+        
+        html.dark .glass-card::before {
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
         }
 
         /* --- VIEW MODES --- */
 
-        /* 1. LIST MODE (Horizontal Wide) */
-        #tools-grid.view-list {
-            grid-template-columns: 1fr;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        #tools-grid.view-list .glass-card {
-            flex-direction: row;
-            align-items: center;
-            padding: 12px 16px;
-            border-radius: 16px;
-        }
+        /* LIST MODE */
+        #tools-grid.view-list { grid-template-columns: 1fr; max-width: 650px; margin: 0 auto; }
+        #tools-grid.view-list .glass-card { flex-direction: row; align-items: center; padding: 16px 20px; border-radius: 20px; }
         #tools-grid.view-list .tool-bg-icon { display: none; }
-        #tools-grid.view-list .tool-icon-wrapper {
-            width: 40px; height: 40px;
-            margin-bottom: 0; margin-right: 16px;
-            border-radius: 10px; flex-shrink: 0;
-        }
+        #tools-grid.view-list .tool-icon-wrapper { width: 48px; height: 48px; margin-bottom: 0; margin-right: 20px; border-radius: 12px; flex-shrink: 0; }
         #tools-grid.view-list .tool-content { flex: 1; }
-        #tools-grid.view-list .tool-title { font-size: 1rem; margin-bottom: 2px; }
-        #tools-grid.view-list .tool-desc {
-            font-size: 0.75rem; margin: 0;
-            display: -webkit-box; -webkit-line-clamp: 1;
-            -webkit-box-orient: vertical; overflow: hidden;
-        }
+        #tools-grid.view-list .tool-title { font-size: 1.1rem; margin-bottom: 2px; }
+        #tools-grid.view-list .tool-desc { font-size: 0.8rem; margin: 0; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+        #tools-grid.view-list .tool-tags { display: flex; margin-top: 0; margin-left: auto; } /* Tags to right */
         #tools-grid.view-list .tool-arrow { display: none; }
 
-        /* 2. DENSE MODE (2-Col Grid Compact) */
-        #tools-grid.view-dense {
-            grid-template-columns: repeat(2, 1fr); /* Force 2 cols on mobile */
-            gap: 10px;
+        /* DENSE MODE */
+        #tools-grid.view-dense { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        #tools-grid.view-dense .glass-card { padding: 14px; border-radius: 16px; }
+        #tools-grid.view-dense .tool-bg-icon { display: none; }
+        #tools-grid.view-dense .tool-icon-wrapper { width: 36px; height: 36px; margin-bottom: 10px; border-radius: 10px; }
+        #tools-grid.view-dense .tool-title { font-size: 0.9rem; margin-bottom: 4px; }
+        #tools-grid.view-dense .tool-desc { font-size: 0.7rem; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        #tools-grid.view-dense .tool-tags { display: none; } /* Hide tags in dense */
+        #tools-grid.view-dense .glass-card:hover { transform: translateY(-3px); }
+
+        /* TYPING EFFECT CURSOR */
+        .typing-cursor::after {
+            content: '|';
+            animation: blink 1s step-start infinite;
+            color: #3b82f6;
         }
-        #tools-grid.view-dense .glass-card {
-            padding: 12px;
-            border-radius: 16px;
-        }
-        #tools-grid.view-dense .tool-bg-icon {
-            display: none; /* Hidden in dense mode */
-        }
-        #tools-grid.view-dense .tool-icon-wrapper {
-            width: 32px; height: 32px;
-            margin-bottom: 8px;
-            border-radius: 8px;
-        }
-        #tools-grid.view-dense .tool-title {
-            font-size: 0.85rem;
-            margin-bottom: 4px;
-        }
-        #tools-grid.view-dense .tool-desc {
-            font-size: 0.65rem;
-            line-height: 1.2;
-            display: -webkit-box; -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical; overflow: hidden;
-        }
-        #tools-grid.view-dense .glass-card:hover {
-            transform: translateY(-2px);
-        }
+        @keyframes blink { 50% { opacity: 0; } }
 
         /* Modal Styles */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;
-            z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.2s;
+            background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 100; opacity: 0; pointer-events: none; transition: all 0.3s;
         }
         .modal-overlay.show { opacity: 1; pointer-events: auto; }
         
         .modal-card {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            width: 90%; max-width: 320px; border-radius: 20px;
-            padding: 24px; transform: translateY(20px); transition: transform 0.2s;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-            border: 1px solid rgba(255,255,255,0.8);
+            background: rgba(255, 255, 255, 0.95);
+            width: 90%; max-width: 320px; border-radius: 24px;
+            padding: 24px; transform: scale(0.95) translateY(10px); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255,255,255,1);
         }
-        .modal-overlay.show .modal-card { transform: translateY(0); }
+        .modal-overlay.show .modal-card { transform: scale(1) translateY(0); }
         
         html.dark .modal-card {
-            background: rgba(30, 41, 59, 0.9);
+            background: #1e293b;
             border: 1px solid rgba(255, 255, 255, 0.1);
             color: #ffffff;
         }
@@ -150,18 +157,21 @@
             background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-image: linear-gradient(to right, #2563eb, #7c3aed);
+            background-image: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
+            background-size: 200% auto;
+            animation: gradientMove 5s linear infinite;
         }
+        @keyframes gradientMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
         
         html.dark .text-gradient {
-            background-image: linear-gradient(to right, #60a5fa, #c084fc);
+            background-image: linear-gradient(135deg, #60a5fa, #c084fc, #f472b6);
         }
 
         .bg-blob-1 { background-color: #bfdbfe; }
-        .bg-blob-2 { background-color: #e9d5ff; }
+        .bg-blob-2 { background-color: #fbcfe8; } /* Added pinkish blob */
         
-        html.dark .bg-blob-1 { background-color: #1e3a8a; opacity: 0.4; }
-        html.dark .bg-blob-2 { background-color: #581c87; opacity: 0.4; }
+        html.dark .bg-blob-1 { background-color: #1e3a8a; opacity: 0.3; }
+        html.dark .bg-blob-2 { background-color: #831843; opacity: 0.3; }
         
         /* Button Base Styles */
         .header-btn {
@@ -170,20 +180,22 @@
             align-items: center;
             justify-content: center;
             border-radius: 9999px;
-            background-color: rgba(255, 255, 255, 0.5);
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
+            background-color: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
             transition: all 0.2s;
             color: #475569;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
         }
-        .header-btn:hover { background-color: #ffffff; }
+        .header-btn:hover { background-color: #ffffff; transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .header-btn:active { transform: translateY(0); }
         
         html.dark .header-btn {
-            background-color: rgba(30, 41, 59, 0.5);
-            border-color: rgba(255, 255, 255, 0.1);
+            background-color: rgba(30, 41, 59, 0.6);
+            border-color: rgba(255, 255, 255, 0.08);
             color: #cbd5e1;
         }
-        html.dark .header-btn:hover { background-color: #1e293b; }
+        html.dark .header-btn:hover { background-color: #334155; }
     </style>
     
     <script>
@@ -198,13 +210,13 @@
                         }
                     },
                     animation: {
-                        'float': 'float 3s ease-in-out infinite',
-                        'blob': 'blob 7s infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'blob': 'blob 10s infinite',
                     },
                     keyframes: {
                         float: {
                             '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-5px)' },
+                            '50%': { transform: 'translateY(-8px)' },
                         },
                         blob: {
                             '0%': { transform: 'translate(0px, 0px) scale(1)' },
@@ -220,101 +232,136 @@
 </head>
 <body class="antialiased min-h-screen w-full overflow-x-hidden relative selection:bg-brand-200 selection:text-brand-900 text-slate-800 dark:text-slate-100 flex flex-col">
 
-    <!-- Decorative Background Blobs -->
+    <!-- Decorative Background -->
+    <div class="fixed inset-0 -z-20 bg-grid-pattern opacity-60"></div>
+    
     <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-        <div class="absolute top-[-10%] left-[-10%] w-80 h-80 bg-blob-1 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
-        <div class="absolute top-[-10%] right-[-10%] w-80 h-80 bg-blob-2 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
-        <div class="absolute bottom-[-20%] left-[20%] w-80 h-80 bg-blob-1 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-4000"></div>
+        <div class="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-blob-1 rounded-full mix-blend-multiply filter blur-[80px] opacity-70 animate-blob"></div>
+        <div class="absolute top-[20%] right-[-10%] w-[400px] h-[400px] bg-blob-2 rounded-full mix-blend-multiply filter blur-[80px] opacity-60 animate-blob animation-delay-2000"></div>
+        <div class="absolute bottom-[-10%] left-[20%] w-[600px] h-[600px] bg-blob-1 rounded-full mix-blend-multiply filter blur-[80px] opacity-60 animate-blob animation-delay-4000"></div>
     </div>
 
     <!-- Header -->
-    <header class="w-full p-4 flex justify-end items-center gap-2 z-50">
-        <!-- View Toggle -->
-        <button id="btn-view" onclick="toggleView()" class="header-btn w-9 p-0 group" title="Switch View Mode">
-            <i data-lucide="grid-2x2" class="w-4 h-4 group-hover:text-brand-600 dark:group-hover:text-brand-400"></i>
-        </button>
+    <header class="w-full p-4 flex justify-between items-center z-50">
+        <!-- Logo (Visible only on mobile or small screens if needed, otherwise hidden to center main logo) -->
+        <div class="text-sm font-bold tracking-tight text-slate-400 dark:text-slate-500 opacity-0 md:opacity-100 transition-opacity">v2.1</div>
 
-        <!-- Donate Button -->
-        <button onclick="openDonate()" class="header-btn px-4 text-[10px] font-bold uppercase tracking-wider hover:text-pink-500 dark:hover:text-pink-400 group">
-            <i data-lucide="heart" class="w-4 h-4 group-hover:fill-current mr-2"></i>
-            <span class="hidden sm:inline">Support</span>
-        </button>
+        <div class="flex items-center gap-2">
+            <!-- View Toggle -->
+            <button id="btn-view" onclick="toggleView()" class="header-btn w-9 p-0 group" title="Switch View Mode">
+                <i data-lucide="grid-2x2" class="w-4 h-4 group-hover:text-brand-600 dark:group-hover:text-brand-400"></i>
+            </button>
 
-        <!-- Theme Toggle -->
-        <button id="btn-theme" class="header-btn w-9 p-0 group" title="Toggle Theme">
-            <i data-lucide="moon" class="w-4 h-4 group-hover:text-brand-600 dark:group-hover:text-brand-400"></i>
-        </button>
+            <!-- Donate Button -->
+            <button onclick="openDonate()" class="header-btn px-4 text-[10px] font-bold uppercase tracking-wider hover:text-pink-500 dark:hover:text-pink-400 group">
+                <i data-lucide="heart" class="w-4 h-4 group-hover:fill-current mr-2 text-pink-400"></i>
+                <span class="hidden sm:inline">Support</span>
+            </button>
+
+            <!-- Theme Toggle -->
+            <button id="btn-theme" class="header-btn w-9 p-0 group" title="Toggle Theme">
+                <i data-lucide="moon" class="w-4 h-4 group-hover:text-brand-600 dark:group-hover:text-brand-400"></i>
+            </button>
+        </div>
     </header>
 
     <!-- Main Container -->
-    <div class="flex-grow flex flex-col items-center justify-start pt-10 px-4 w-full pb-20">
+    <div class="flex-grow flex flex-col items-center justify-start pt-6 px-4 w-full pb-20">
         
-        <!-- Header Section -->
-        <div class="text-center mb-8 relative w-full max-w-md">
-            <h1 class="text-5xl md:text-6xl font-extrabold tracking-tight mb-2 animate-float">
+        <!-- Hero Section -->
+        <div class="text-center mb-10 relative w-full max-w-lg">
+            <div class="inline-block mb-3 animate-float">
+                <span class="py-1 px-3 rounded-full bg-blue-50 dark:bg-blue-900/30 text-[10px] font-bold uppercase tracking-widest text-blue-600 dark:text-blue-300 border border-blue-100 dark:border-blue-800 shadow-sm">
+                    Beta Release
+                </span>
+            </div>
+            
+            <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight mb-3">
                 Synk<span class="text-gradient">PH</span>
             </h1>
-            <p class="text-slate-500 dark:text-slate-400 font-medium text-sm md:text-base mb-6">
-                Minimalist utilities for your daily digital needs.
+            
+            <!-- Dynamic Subtitle -->
+            <p class="text-slate-500 dark:text-slate-400 font-medium text-sm md:text-base mb-6 h-6">
+                Utilities for <span id="typewriter" class="typing-cursor text-slate-800 dark:text-slate-200 font-bold"></span>
             </p>
 
             <!-- Search Bar -->
-            <div class="relative group">
-                <div class="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full opacity-20 group-hover:opacity-40 transition duration-500 blur"></div>
-                <div class="relative flex items-center bg-white dark:bg-slate-800 rounded-full px-4 py-2.5 shadow-sm border border-slate-200 dark:border-slate-700">
+            <div class="relative group max-w-sm mx-auto">
+                <div class="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full opacity-20 group-hover:opacity-50 transition duration-500 blur"></div>
+                <div class="relative flex items-center bg-white dark:bg-slate-800 rounded-full px-4 py-3 shadow-lg border border-slate-100 dark:border-slate-700">
                     <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
-                    <input type="text" id="search-input" oninput="filterTools()" placeholder="Search tools..." class="flex-1 bg-transparent border-none outline-none text-sm ml-2 text-slate-700 dark:text-slate-200 placeholder-slate-400">
+                    <input type="text" id="search-input" oninput="filterTools()" placeholder="Find a tool..." class="flex-1 bg-transparent border-none outline-none text-sm ml-2 text-slate-700 dark:text-slate-200 placeholder-slate-400">
                 </div>
             </div>
         </div>
 
         <!-- Cards Grid -->
-        <div id="tools-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl px-2 transition-all duration-300">
+        <div id="tools-grid" class="grid grid-cols-1 md:grid-cols-2 gap-5 w-full max-w-2xl px-2 transition-all duration-300">
             
             <!-- Tool 1: SHEIN PCheck -->
-            <a href="pcheck.html" class="glass-card p-5 rounded-2xl group relative overflow-hidden tool-item" data-name="shein pcheck calculator">
-                <div class="tool-bg-icon absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity transform group-hover:scale-110 duration-500">
-                    <i data-lucide="shopping-bag" class="w-20 h-20 text-black dark:text-white"></i>
+            <a href="pcheck.html" class="glass-card p-6 rounded-3xl group relative overflow-hidden tool-item" data-name="shein pcheck calculator">
+                <!-- Status Badge -->
+                <div class="absolute top-4 right-4 z-20">
+                     <span class="px-2 py-0.5 rounded-full bg-orange-100 dark:bg-orange-900/50 text-[9px] font-bold text-orange-600 dark:text-orange-300 border border-orange-200 dark:border-orange-700">HOT</span>
+                </div>
+
+                <div class="tool-bg-icon absolute -bottom-4 -right-4 p-3 opacity-[0.03] dark:opacity-[0.05] group-hover:opacity-10 transition-all transform group-hover:scale-110 group-hover:rotate-12 duration-500">
+                    <i data-lucide="shopping-bag" class="w-32 h-32 text-black dark:text-white"></i>
                 </div>
                 
                 <div class="relative z-10 flex flex-col h-full tool-content">
-                    <div class="tool-icon-wrapper w-10 h-10 rounded-xl flex items-center justify-center mb-3 shadow-md group-hover:rotate-12 transition-transform duration-300 overflow-hidden bg-black">
+                    <div class="tool-icon-wrapper w-12 h-12 rounded-2xl flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300 overflow-hidden bg-black ring-1 ring-black/5 dark:ring-white/10">
                         <img src="https://pnghdpro.com/wp-content/themes/pnghdpro/download/social-media-and-brands/shein-app-icon.png" class="w-full h-full object-cover">
                     </div>
                     
                     <div class="flex-1 min-w-0">
-                        <h2 class="tool-title text-lg font-bold text-slate-900 dark:text-white mb-1 flex items-center gap-2">
+                        <h2 class="tool-title text-xl font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
                             SHEIN PCheck
-                            <i data-lucide="arrow-right" class="tool-arrow w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-brand-600"></i>
                         </h2>
                         
-                        <p class="tool-desc text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                            Smart calculator. Auto-detects free shipping & discounts.
+                        <p class="tool-desc text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-4">
+                            Smart calculator for orders. Auto-detects free shipping & discounts.
                         </p>
+
+                        <!-- Category Tags -->
+                        <div class="tool-tags flex flex-wrap gap-2 mt-auto">
+                            <span class="text-[10px] font-bold px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-600">Shopping</span>
+                            <span class="text-[10px] font-bold px-2 py-1 rounded-md bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 border border-blue-100 dark:border-blue-800">Finance</span>
+                        </div>
                     </div>
                 </div>
             </a>
 
             <!-- Tool 2: MailDot Gen -->
-            <a href="maildot.html" class="glass-card p-5 rounded-2xl group relative overflow-hidden tool-item" data-name="maildot gen email generator">
-                <div class="tool-bg-icon absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity transform group-hover:scale-110 duration-500">
-                    <i data-lucide="at-sign" class="w-20 h-20 text-brand-600"></i>
+            <a href="maildot.html" class="glass-card p-6 rounded-3xl group relative overflow-hidden tool-item" data-name="maildot gen email generator">
+                <!-- Status Badge -->
+                <div class="absolute top-4 right-4 z-20">
+                     <span class="px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/50 text-[9px] font-bold text-purple-600 dark:text-purple-300 border border-purple-200 dark:border-purple-700">NEW</span>
+                </div>
+
+                <div class="tool-bg-icon absolute -bottom-4 -right-4 p-3 opacity-[0.03] dark:opacity-[0.05] group-hover:opacity-10 transition-all transform group-hover:scale-110 group-hover:-rotate-12 duration-500">
+                    <i data-lucide="at-sign" class="w-32 h-32 text-brand-600"></i>
                 </div>
                 
                 <div class="relative z-10 flex flex-col h-full tool-content">
-                    <div class="tool-icon-wrapper w-10 h-10 bg-brand-600 text-white rounded-xl flex items-center justify-center mb-3 shadow-md group-hover:rotate-12 transition-transform duration-300 shadow-brand-200 dark:shadow-none">
-                        <i data-lucide="mail" class="w-5 h-5"></i>
+                    <div class="tool-icon-wrapper w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-2xl flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300 ring-1 ring-black/5 dark:ring-white/10">
+                        <i data-lucide="mail" class="w-6 h-6"></i>
                     </div>
                     
                     <div class="flex-1 min-w-0">
-                        <h2 class="tool-title text-lg font-bold text-slate-900 dark:text-white mb-1 flex items-center gap-2">
+                        <h2 class="tool-title text-xl font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
                             MailDot Gen
-                            <i data-lucide="arrow-right" class="tool-arrow w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-brand-600"></i>
                         </h2>
                         
-                        <p class="tool-desc text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                            Generate email aliases. Includes earnings tracker & auto-save.
+                        <p class="tool-desc text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-4">
+                            Generate email aliases instantly. Includes earnings tracker & auto-save.
                         </p>
+
+                         <!-- Category Tags -->
+                         <div class="tool-tags flex flex-wrap gap-2 mt-auto">
+                            <span class="text-[10px] font-bold px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-600">Utility</span>
+                            <span class="text-[10px] font-bold px-2 py-1 rounded-md bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-800">Productivity</span>
+                        </div>
                     </div>
                 </div>
             </a>
@@ -325,40 +372,55 @@
 
     <!-- Fixed Footer -->
     <footer class="fixed bottom-6 w-full text-center z-40 pointer-events-none">
-        <p class="text-[9px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest hover:text-brand-600 transition-colors cursor-default pointer-events-auto inline-block bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm px-3 py-1 rounded-full border border-white/20 dark:border-white/5 shadow-sm">
-            © 2026 SynkPH
-        </p>
+        <div class="inline-flex items-center gap-2 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/40 dark:border-white/5 shadow-lg pointer-events-auto transform hover:scale-105 transition-transform">
+            <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+            <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+                © 2026 SynkPH
+            </p>
+        </div>
     </footer>
 
     <!-- DONATE MODAL -->
     <div id="donate-modal" class="modal-overlay">
-        <div class="modal-card text-center">
-            <div class="mb-3">
-                <div class="w-10 h-10 bg-pink-100 text-pink-500 rounded-full flex items-center justify-center mx-auto mb-2 text-lg">
-                    <i data-lucide="coffee"></i>
+        <div class="modal-card text-center relative overflow-hidden">
+            <!-- Modal Decor -->
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-pink-500 to-violet-500"></div>
+            
+            <div class="mb-4">
+                <div class="w-12 h-12 bg-pink-50 dark:bg-pink-900/20 text-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-3 text-xl shadow-inner">
+                    <i data-lucide="coffee" class="stroke-[2.5px]"></i>
                 </div>
-                <h3 class="font-black text-lg mb-1 text-slate-900 dark:text-white">Support the Dev</h3>
-                <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Your support keeps these tools free.</p>
+                <h3 class="font-black text-xl mb-1 text-slate-900 dark:text-white">Buy me a Coffee</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 font-medium leading-relaxed px-4">
+                    If you find these tools useful, consider supporting the server costs!
+                </p>
             </div>
             
-            <div class="bg-slate-50 dark:bg-slate-800 rounded-xl p-3 mb-3 text-left border border-slate-200 dark:border-slate-700">
-                <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Bank</p>
-                <p class="text-xs font-bold text-slate-800 dark:text-white mb-2">MariBank</p>
-
-                <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Account Name</p>
-                <p class="text-xs font-bold text-slate-800 dark:text-white mb-2">Joven Campomanes</p>
+            <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4 mb-4 text-left border border-slate-200 dark:border-slate-700/50">
+                <div class="flex justify-between items-center mb-3">
+                    <div>
+                        <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Bank</p>
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-orange-500"></span>
+                            <p class="text-xs font-bold text-slate-800 dark:text-white">MariBank</p>
+                        </div>
+                    </div>
+                     <div class="text-right">
+                        <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Name</p>
+                        <p class="text-xs font-bold text-slate-800 dark:text-white">Joven Campomanes</p>
+                    </div>
+                </div>
                 
-                <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Account Number</p>
-                <div class="flex items-center justify-between">
-                    <p class="text-sm font-mono font-bold text-slate-900 dark:text-white tracking-widest">10527398950</p>
-                    <button onclick="copyAccount()" id="btn-copy-acc" class="text-brand-600 hover:text-brand-700 dark:text-brand-400 p-1.5 bg-slate-100 dark:bg-slate-700 rounded-md">
-                        <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                <div class="bg-white dark:bg-slate-900 rounded-lg p-2 border border-slate-200 dark:border-slate-700 flex justify-between items-center">
+                     <p class="text-sm font-mono font-bold text-slate-700 dark:text-slate-300 tracking-widest pl-2">10527398950</p>
+                     <button onclick="copyAccount()" id="btn-copy-acc" class="text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors">
+                        <i data-lucide="copy" class="w-4 h-4"></i>
                     </button>
                 </div>
             </div>
 
-            <button onclick="closeDonate()" class="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold py-2.5 rounded-lg text-xs hover:opacity-90 transition">
-                Close
+            <button onclick="closeDonate()" class="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold py-3 rounded-xl text-xs hover:opacity-90 hover:scale-[1.02] transition-all shadow-lg">
+                Maybe Later
             </button>
         </div>
     </div>
@@ -375,6 +437,7 @@
         const searchInput = document.getElementById('search-input');
         const html = document.documentElement;
         const donateModal = document.getElementById('donate-modal');
+        const typewriterEl = document.getElementById('typewriter');
 
         // View Modes: Dense (Default) -> Grid -> List
         const modes = ['dense', 'grid', 'list'];
@@ -416,9 +479,38 @@
             applyViewMode(newMode);
         }
 
+        // Typewriter Effect
+        const phrases = ["Daily Needs", "Productivity", "Business", "Efficiency"];
+        let phraseIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        
+        function typeEffect() {
+            const currentPhrase = phrases[phraseIndex];
+            
+            if (isDeleting) {
+                typewriterEl.textContent = currentPhrase.substring(0, charIndex - 1);
+                charIndex--;
+            } else {
+                typewriterEl.textContent = currentPhrase.substring(0, charIndex + 1);
+                charIndex++;
+            }
+
+            if (!isDeleting && charIndex === currentPhrase.length) {
+                setTimeout(() => isDeleting = true, 2000); // Pause before deleting
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                phraseIndex = (phraseIndex + 1) % phrases.length;
+            }
+
+            const speed = isDeleting ? 50 : 100;
+            setTimeout(typeEffect, speed);
+        }
+
         // Init
         updateThemeIcon();
         applyViewMode(modes[currentModeIndex]);
+        setTimeout(typeEffect, 1000); // Start typing after load
 
         // Theme Toggle Logic
         btnTheme.addEventListener('click', () => {
