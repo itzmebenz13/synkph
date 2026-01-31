@@ -36,6 +36,8 @@
         /* Dark Mode Red Button Fixes */
         html.dark-mode .border-red-200 { border-color: #7f1d1d !important; }
         html.dark-mode .hover\:bg-red-50:hover { background-color: #450a0a !important; }
+        html.dark-mode .border-orange-200 { border-color: #7c2d12 !important; }
+        html.dark-mode .hover\:bg-orange-50:hover { background-color: #431407 !important; }
 
         /* Custom Inputs */
         .md-input {
@@ -45,17 +47,65 @@
         .md-input:focus { border-color: #000; }
         html.dark-mode .md-input:focus { border-color: #fff; }
 
-        /* Scrollbar Cleanup (Fix scrollview appearance) */
+        /* Scrollbar Cleanup */
         ::-webkit-scrollbar { width: 0px; background: transparent; }
         html { scrollbar-width: none; }
         body { -ms-overflow-style: none; }
 
-        /* Email Item */
+        /* Email Item Standard */
         .email-item {
             display: flex; flex-direction: column; gap: 8px;
             padding: 12px; background: white; border-radius: 8px;
             border: 1px solid #e5e7eb; margin-bottom: 8px;
             transition: all 0.2s;
+        }
+        
+        /* Compact Mode Overrides */
+        .results-list.compact .email-item {
+            padding: 6px 8px;
+            gap: 4px;
+            margin-bottom: 4px;
+        }
+        .results-list.compact .email-row {
+            margin-bottom: 2px;
+        }
+        .results-list.compact .email-text {
+            font-size: 11px;
+            padding: 0;
+        }
+        .results-list.compact .row-number {
+            font-size: 9px;
+            margin-right: 4px;
+            min-width: 18px;
+        }
+        .results-list.compact .item-controls {
+            gap: 4px;
+        }
+        .results-list.compact .tiny-input {
+            padding: 2px 4px;
+            font-size: 10px;
+            height: 24px;
+        }
+        .results-list.compact .status-btn {
+            font-size: 9px;
+            padding: 2px 0;
+            width: 45px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .results-list.compact .copy-btn-icon {
+            padding: 2px 4px;
+            font-size: 12px;
+        }
+        .results-list.compact .relative span.absolute {
+            font-size: 9px;
+            top: 5px;
+            left: 4px;
+        }
+        .results-list.compact .relative input.pl-4 {
+            padding-left: 12px;
         }
         
         /* Dark Mode Fix for Email Item Background */
@@ -181,7 +231,7 @@
         html.dark-mode .filter-select { color: #a3a3a3; }
     </style>
 </head>
-<body class="min-h-screen"> <!-- Removed pb-24 to fix extra space -->
+<body class="min-h-screen">
 
     <div class="max-w-md mx-auto bg-gray-50 min-h-screen relative shadow-2xl">
         
@@ -285,8 +335,11 @@
                     </select>
                 </div>
                 <div class="flex gap-2">
-                    <button onclick="exportCSV()" class="text-xs font-bold text-green-600 bg-green-50 px-3 py-1.5 rounded hover:bg-green-100" title="Download CSV">
-                        <i class="fas fa-file-csv"></i>
+                    <button id="btn-view-mode" onclick="toggleViewMode()" class="text-xs font-bold text-gray-600 bg-gray-100 px-3 py-1.5 rounded hover:bg-gray-200" title="Toggle Compact Mode">
+                        <i class="fas fa-compress"></i>
+                    </button>
+                    <button onclick="exportCSV()" class="text-xs font-bold text-green-600 bg-green-50 px-3 py-1.5 rounded hover:bg-green-100" title="Download Email List">
+                        <i class="fas fa-file-alt"></i>
                     </button>
                     <button id="btn-copy-all" class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded hover:bg-blue-100">
                         <i class="far fa-copy mr-1"></i> All
@@ -351,7 +404,10 @@
                     </div>
 
                     <!-- Reset -->
-                    <div class="border-t border-gray-200 pt-3">
+                    <div class="border-t border-gray-200 pt-3 flex flex-col gap-2">
+                        <button onclick="deleteSoldData()" class="w-full text-orange-500 font-bold py-2 rounded text-xs border border-orange-200 hover:bg-orange-50">
+                            <i class="fas fa-trash mr-1"></i> Delete Sold Data
+                        </button>
                         <button onclick="resetData()" class="w-full text-red-500 font-bold py-2 rounded text-xs border border-red-200 hover:bg-red-50">
                             <i class="fas fa-trash-alt mr-1"></i> Reset All Data
                         </button>
@@ -423,6 +479,7 @@
         let appSettings = JSON.parse(localStorage.getItem('maildot_settings') || '{}');
         let currentEmails = []; 
         let currentTotal = 0;
+        let viewMode = appSettings.viewMode || 'comfortable';
 
         // Stats UI
         const elStatToday = document.getElementById('stat-today');
@@ -438,6 +495,10 @@
         }
         if (appSettings.defaultPrice) {
             settingDefaultPrice.value = appSettings.defaultPrice;
+        }
+        if (viewMode === 'compact') {
+            resultsList.classList.add('compact');
+            document.getElementById('btn-view-mode').innerHTML = '<i class="fas fa-expand"></i>';
         }
         updateStats();
 
@@ -466,6 +527,21 @@
             currentEmails = combos;
             renderList(combos, currentTotal);
         });
+
+        // View Mode Toggle
+        window.toggleViewMode = function() {
+            viewMode = viewMode === 'comfortable' ? 'compact' : 'comfortable';
+            appSettings.viewMode = viewMode;
+            localStorage.setItem('maildot_settings', JSON.stringify(appSettings));
+            
+            if(viewMode === 'compact') {
+                resultsList.classList.add('compact');
+                document.getElementById('btn-view-mode').innerHTML = '<i class="fas fa-expand"></i>';
+            } else {
+                resultsList.classList.remove('compact');
+                document.getElementById('btn-view-mode').innerHTML = '<i class="fas fa-compress"></i>';
+            }
+        }
 
         // Batch Action
         window.applyBatchSold = function() {
@@ -890,27 +966,44 @@
                 dataModal.classList.remove('show');
             }
         }
+        
+        window.deleteSoldData = function() {
+            if(!confirm("Delete all emails marked as SOLD? WARNING: This will reduce your earnings statistics for Today/Week/Total as the data will be removed permanently.")) return;
+            
+            let count = 0;
+            Object.keys(db).forEach(key => {
+                if(db[key].status === 'sold') {
+                    delete db[key];
+                    count++;
+                }
+            });
+            
+            localStorage.setItem('maildot_db', JSON.stringify(db));
+            updateStats();
+            
+            // Refresh list if currently generated
+            if(inputEmail.value) btnGenerate.click();
+            
+            alert(`Deleted ${count} sold records.`);
+            dataModal.classList.remove('show');
+        }
 
         window.exportCSV = function() {
             if (currentEmails.length === 0) { alert("No emails to export"); return; }
             
-            let csvContent = "data:text/csv;charset=utf-8,ID,Email,Status,Price,Note\n";
-            currentEmails.forEach((email, index) => {
-                const saved = db[email] || {};
-                const status = saved.status || 'unused';
-                const price = saved.price || '';
-                const note = saved.note || '';
-                // Simple CSV escaping
-                csvContent += `${index+1},${email},${status},${price},"${note}"\n`;
-            });
-
-            const encodedUri = encodeURI(csvContent);
+            // Join emails with newlines for a clean list
+            const content = currentEmails.join("\n");
+            
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            
             const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "maildot_export.csv");
+            link.href = url;
+            link.setAttribute("download", "maildot_emails.txt");
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+            URL.revokeObjectURL(url);
         }
 
         btnCopyAll.addEventListener('click', () => {
