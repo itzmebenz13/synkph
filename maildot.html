@@ -45,6 +45,11 @@
         .md-input:focus { border-color: #000; }
         html.dark-mode .md-input:focus { border-color: #fff; }
 
+        /* Scrollbar Cleanup (Fix scrollview appearance) */
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+        html { scrollbar-width: none; }
+        body { -ms-overflow-style: none; }
+
         /* Email Item */
         .email-item {
             display: flex; flex-direction: column; gap: 8px;
@@ -106,7 +111,7 @@
         html.dark-mode .status-sold { background-color: #052e16; color: #86efac; border-color: #14532d; }
 
         /* Stats Grid */
-        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 16px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 8px; }
         .stat-card { background: white; padding: 12px; border-radius: 8px; border: 1px solid #e5e7eb; position: relative; }
         .stat-val { font-size: 18px; font-weight: 900; }
         .stat-lbl { font-size: 10px; text-transform: uppercase; color: #6b7280; font-weight: 600; }
@@ -154,9 +159,29 @@
             padding: 8px; margin-bottom: 12px; display: flex; gap: 8px; align-items: center;
         }
         html.dark-mode .batch-container { background-color: #1e1e1e; border-color: #333; }
+
+        /* Graph */
+        .chart-container {
+            height: 60px; width: 100%; margin-bottom: 16px; position: relative;
+            background: white; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;
+        }
+        html.dark-mode .chart-container { background-color: #1e1e1e; border-color: #333; }
+        
+        .chart-tooltip {
+            position: absolute; top: 4px; right: 4px; font-size: 10px; 
+            background: rgba(0,0,0,0.7); color: white; padding: 2px 6px; 
+            border-radius: 4px; display: none; pointer-events: none;
+        }
+        
+        /* Filter Bar */
+        .filter-select {
+            background: transparent; border: none; font-size: 12px; font-weight: bold;
+            color: #6b7280; outline: none; cursor: pointer;
+        }
+        html.dark-mode .filter-select { color: #a3a3a3; }
     </style>
 </head>
-<body class="min-h-screen pb-24"> <!-- Added padding bottom for fixed elements if needed -->
+<body class="min-h-screen"> <!-- Removed pb-24 to fix extra space -->
 
     <div class="max-w-md mx-auto bg-gray-50 min-h-screen relative shadow-2xl">
         
@@ -195,13 +220,21 @@
                 <div class="stat-card">
                     <div class="flex justify-between items-start">
                         <div class="stat-lbl">All Time</div>
-                        <!-- VISIBLE RESET BUTTON -->
                         <button onclick="resetData()" class="text-gray-300 hover:text-red-500 transition-colors px-1 -mt-1 -mr-1" title="Reset Data">
                             <i class="fas fa-trash-alt text-xs"></i>
                         </button>
                     </div>
                     <div class="stat-val" id="stat-total">₱0.00</div>
                 </div>
+            </div>
+
+            <!-- Analytics Chart -->
+            <div class="chart-container" id="earnings-chart-container">
+                <div class="absolute top-2 left-2 text-[9px] text-gray-400 font-bold uppercase tracking-wider">Last 7 Days Trend</div>
+                <div class="chart-tooltip" id="chart-tooltip"></div>
+                <svg id="earnings-chart" width="100%" height="100%" preserveAspectRatio="none" class="w-full h-full">
+                    <!-- Path injected via JS -->
+                </svg>
             </div>
 
             <!-- Input Section -->
@@ -240,17 +273,30 @@
                 </div>
             </div>
 
-            <!-- Action Bar -->
+            <!-- Action Toolbar -->
             <div id="action-bar" class="flex justify-between items-center mb-3 hidden">
-                <span class="text-xs font-bold text-gray-500" id="result-count">0 Results</span>
-                <button id="btn-copy-all" class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded hover:bg-blue-100">
-                    <i class="far fa-copy mr-1"></i> Copy All
-                </button>
+                <div class="flex flex-col">
+                    <span class="text-xs font-bold text-gray-500" id="result-count">0 Results</span>
+                    <select id="filter-status" class="filter-select mt-1" onchange="filterList()">
+                        <option value="all">Show All</option>
+                        <option value="unused">Unused Only</option>
+                        <option value="active">Active Only</option>
+                        <option value="sold">Sold Only</option>
+                    </select>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="exportCSV()" class="text-xs font-bold text-green-600 bg-green-50 px-3 py-1.5 rounded hover:bg-green-100" title="Download CSV">
+                        <i class="fas fa-file-csv"></i>
+                    </button>
+                    <button id="btn-copy-all" class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded hover:bg-blue-100">
+                        <i class="far fa-copy mr-1"></i> All
+                    </button>
+                </div>
             </div>
 
-            <!-- BATCH ACTION BAR (New) -->
+            <!-- BATCH ACTION BAR -->
             <div id="batch-bar" class="hidden batch-container">
-                <input type="text" id="batch-input" class="md-input text-xs h-8 py-1 flex-1" placeholder="e.g. 1-5 (range) or 1-3-5-8 (list)">
+                <input type="text" id="batch-input" class="md-input text-xs h-8 py-1 flex-1" placeholder="e.g. 1-5 or 1,3,8">
                 <button onclick="applyBatchSold()" class="text-xs font-bold bg-red-100 text-red-600 px-3 py-2 rounded border border-red-200 hover:bg-red-200">
                     Mark SOLD
                 </button>
@@ -265,43 +311,46 @@
 
         </main>
 
-        <!-- DATA MODAL -->
+        <!-- DATA / SETTINGS MODAL -->
         <div id="data-modal" class="modal-overlay">
             <div class="modal-card">
                 <div class="flex justify-between items-center mb-4">
-                    <h3 class="font-bold text-lg">Smart Protection</h3>
+                    <h3 class="font-bold text-lg">Settings & Data</h3>
                     <button id="btn-close-data" class="text-gray-400 hover:text-black"><i class="fas fa-times"></i></button>
                 </div>
                 
-                <div class="space-y-3">
-                    <div class="text-xs text-gray-500 mb-2">
-                        Your data is automatically saved to this browser. Use Export/Import to move data to another device.
-                    </div>
-
-                    <button onclick="exportBackup()" class="w-full bg-black text-white font-bold py-3 rounded text-sm flex justify-center items-center gap-2">
-                        <i class="fas fa-download"></i> Export Data File
-                    </button>
-
-                    <div class="relative">
-                        <div class="absolute inset-0 flex items-center">
-                            <div class="w-full border-t border-gray-200"></div>
-                        </div>
-                        <div class="relative flex justify-center text-xs">
-                            <span class="px-2 bg-white text-gray-500">OR</span>
-                        </div>
-                    </div>
-
+                <div class="space-y-4">
+                    
+                    <!-- Preference -->
                     <div>
-                        <input type="file" id="file-import" class="hidden" accept=".txt,.json">
-                        <button onclick="document.getElementById('file-import').click()" class="w-full border border-gray-300 text-gray-700 font-bold py-2 rounded text-xs mb-2 hover:bg-gray-50">
-                            Select File to Import
-                        </button>
-                        <textarea id="import-text" class="w-full border p-2 text-[10px] rounded mb-2 font-mono h-20" placeholder="Paste import code here..."></textarea>
-                        <button onclick="processImport()" class="w-full bg-blue-600 text-white font-bold py-2 rounded text-xs mb-4">
-                            Import Data
-                        </button>
+                        <label class="text-[10px] font-bold text-gray-400 uppercase">Default Price (Auto-Fill)</label>
+                        <div class="relative mt-1">
+                            <span class="absolute left-2 top-2 text-gray-400 text-xs">₱</span>
+                            <input type="number" id="setting-default-price" class="w-full border border-gray-300 rounded p-2 pl-6 text-sm" placeholder="0.00">
+                        </div>
+                        <p class="text-[9px] text-gray-400 mt-1">Automatically applied when you mark an email as Active/Sold.</p>
                     </div>
 
+                    <div class="border-t border-gray-200 my-2"></div>
+
+                    <!-- Import/Export -->
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="exportBackup()" class="bg-gray-100 text-gray-700 font-bold py-2 rounded text-xs hover:bg-gray-200">
+                            <i class="fas fa-download mr-1"></i> Backup
+                        </button>
+                        <button onclick="document.getElementById('file-import').click()" class="bg-gray-100 text-gray-700 font-bold py-2 rounded text-xs hover:bg-gray-200">
+                            <i class="fas fa-upload mr-1"></i> Import
+                        </button>
+                    </div>
+                    <input type="file" id="file-import" class="hidden" accept=".txt,.json">
+                    
+                    <!-- Manual Import -->
+                    <div class="hidden" id="manual-import-box">
+                        <textarea id="import-text" class="w-full border p-2 text-[10px] rounded mb-2 font-mono h-20 mt-2" placeholder="Paste code here..."></textarea>
+                        <button onclick="processImport()" class="w-full bg-blue-600 text-white font-bold py-2 rounded text-xs">Confirm Import</button>
+                    </div>
+
+                    <!-- Reset -->
                     <div class="border-t border-gray-200 pt-3">
                         <button onclick="resetData()" class="w-full text-red-500 font-bold py-2 rounded text-xs border border-red-200 hover:bg-red-50">
                             <i class="fas fa-trash-alt mr-1"></i> Reset All Data
@@ -350,45 +399,56 @@
         const resultCount = document.getElementById('result-count');
         const btnCopyAll = document.getElementById('btn-copy-all');
         const batchInput = document.getElementById('batch-input');
+        const filterStatus = document.getElementById('filter-status');
         
-        // Data Modal
+        // Data/Settings
         const btnData = document.getElementById('btn-data');
         const dataModal = document.getElementById('data-modal');
         const btnCloseData = document.getElementById('btn-close-data');
         const fileImport = document.getElementById('file-import');
         const importTextArea = document.getElementById('import-text');
+        const settingDefaultPrice = document.getElementById('setting-default-price');
 
-        // Storage Modal
+        // Storage
         const btnOpenStorage = document.getElementById('btn-open-storage');
         const btnSaveEmail = document.getElementById('btn-save-email');
         const storageModal = document.getElementById('storage-modal');
         const btnCloseStorage = document.getElementById('btn-close-storage');
         const savedEmailsList = document.getElementById('saved-emails-list');
 
-        // Database & Session
+        // DB & State
         let db = JSON.parse(localStorage.getItem('maildot_db') || '{}');
         let session = JSON.parse(localStorage.getItem('maildot_session') || '{}');
         let savedEmails = JSON.parse(localStorage.getItem('maildot_saved_emails') || '[]');
-        let currentEmails = []; // Store current generated list for batch ops
+        let appSettings = JSON.parse(localStorage.getItem('maildot_settings') || '{}');
+        let currentEmails = []; 
+        let currentTotal = 0;
 
-        // Stats Elements
+        // Stats UI
         const elStatToday = document.getElementById('stat-today');
         const elStatAccounts = document.getElementById('stat-accounts');
         const elStatWeek = document.getElementById('stat-week');
         const elStatTotal = document.getElementById('stat-total');
 
         // --- Initialization ---
-        // Restore Session
         if (session.email) {
             inputEmail.value = session.email;
             inputLimit.value = session.limit || "50";
             setTimeout(() => btnGenerate.click(), 100);
+        }
+        if (appSettings.defaultPrice) {
+            settingDefaultPrice.value = appSettings.defaultPrice;
         }
         updateStats();
 
         // --- Event Listeners ---
         inputEmail.addEventListener('input', saveSession);
         inputLimit.addEventListener('change', saveSession);
+        
+        settingDefaultPrice.addEventListener('change', () => {
+            appSettings.defaultPrice = settingDefaultPrice.value;
+            localStorage.setItem('maildot_settings', JSON.stringify(appSettings));
+        });
 
         btnGenerate.addEventListener('click', () => {
             const email = inputEmail.value.trim();
@@ -397,14 +457,14 @@
             saveSession();
             const limitVal = parseInt(inputLimit.value);
             let combos = getCombinations(email);
-            const totalPossible = combos.length;
+            currentTotal = combos.length;
 
             if (limitVal > 0 && combos.length > limitVal) {
                 combos = combos.slice(0, limitVal);
             }
             
-            currentEmails = combos; // Save for batch access
-            renderList(combos, totalPossible);
+            currentEmails = combos;
+            renderList(combos, currentTotal);
         });
 
         // Batch Action
@@ -413,27 +473,18 @@
             if (!val) return;
             
             let indices = new Set();
-            
-            // Normalize dashes
             const normalized = val.replace(/-+/g, '-');
             
-            // Check heuristic: 
-            // If strictly numbers and dashes (no commas), we interpret based on count
             if (/^[\d-]+$/.test(normalized) && !normalized.includes(',')) {
                 const parts = normalized.split('-').filter(s => s);
                 if (parts.length === 2) {
-                    // Assume Range 1-5
                     const start = parseInt(parts[0]);
                     const end = parseInt(parts[1]);
-                    if (start <= end) {
-                        for(let i=start; i<=end; i++) indices.add(i);
-                    }
+                    if (start <= end) { for(let i=start; i<=end; i++) indices.add(i); }
                 } else {
-                    // Assume List 1-3-5-8
                     parts.forEach(p => indices.add(parseInt(p)));
                 }
             } else {
-                // Fallback to standard parsing (commas for list, dash for range)
                 const segments = val.split(/[,\s]+/);
                 segments.forEach(seg => {
                     if (seg.includes('-')) {
@@ -453,28 +504,25 @@
             }
             
             if (indices.size === 0) { alert("No valid numbers found."); return; }
-            
             if (!confirm(`Mark ${indices.size} emails as SOLD?`)) return;
             
             indices.forEach(idx => {
-                // 1-based index to 0-based
                 const emailIndex = idx - 1;
                 if (emailIndex >= 0 && emailIndex < currentEmails.length) {
                     const email = currentEmails[emailIndex];
                     saveData(email, 'status', 'sold');
+                    // Also Apply Price if exists
+                    if (appSettings.defaultPrice && (!db[email].price || db[email].price === '')) {
+                        saveData(email, 'price', appSettings.defaultPrice);
+                    }
                 }
             });
             
-            // Refresh view
-            const total = (inputLimit.value === '0' || getCombinations(inputEmail.value).length <= parseInt(inputLimit.value)) 
-                          ? currentEmails.length 
-                          : getCombinations(inputEmail.value).length;
-                          
-            renderList(currentEmails, total);
+            renderList(currentEmails, currentTotal);
             batchInput.value = '';
         }
 
-        // Data Management Events
+        // Modals
         btnData.addEventListener('click', () => dataModal.classList.add('show'));
         btnCloseData.addEventListener('click', () => dataModal.classList.remove('show'));
         
@@ -489,7 +537,6 @@
             reader.readAsText(file);
         });
 
-        // Storage Events
         btnOpenStorage.addEventListener('click', () => {
             renderSavedEmails();
             storageModal.classList.add('show');
@@ -506,13 +553,10 @@
             alert("Email saved to storage.");
         });
 
-        // --- Functions ---
+        // --- Core Functions ---
 
         function saveSession() {
-            const s = {
-                email: inputEmail.value,
-                limit: inputLimit.value
-            };
+            const s = { email: inputEmail.value, limit: inputLimit.value };
             localStorage.setItem('maildot_session', JSON.stringify(s));
         }
 
@@ -523,16 +567,26 @@
             const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).getTime();
 
             let today = 0, week = 0, month = 0, total = 0, count = 0;
+            // Chart Data Helpers
+            let dayCounts = {}; 
+            for(let i=0; i<7; i++) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                dayCounts[d.toISOString().slice(0,10)] = 0;
+            }
 
             Object.values(db).forEach(item => {
                 count++;
                 if (item.status === 'sold' && item.price) {
                     const price = parseFloat(item.price);
                     const ts = item.timestamp;
+                    const dateKey = new Date(ts).toISOString().slice(0,10);
+                    
                     if (ts >= todayStart) today += price;
                     if (ts >= weekStart) week += price;
-                    if (ts >= monthStart) month += price;
                     total += price;
+                    
+                    if (dayCounts[dateKey] !== undefined) dayCounts[dateKey] += price;
                 }
             });
 
@@ -540,23 +594,68 @@
             elStatWeek.innerText = '₱' + week.toLocaleString();
             elStatTotal.innerText = '₱' + total.toLocaleString();
             elStatAccounts.innerText = count;
+
+            drawChart(dayCounts);
+        }
+
+        function drawChart(data) {
+            const svg = document.getElementById('earnings-chart');
+            const keys = Object.keys(data).sort(); // Oldest to newest
+            const values = keys.map(k => data[k]);
+            
+            if (values.every(v => v === 0)) {
+                svg.innerHTML = ''; // Clear if empty
+                return; 
+            }
+
+            const max = Math.max(...values, 10); // Min height 10
+            const width = 100;
+            const height = 100;
+            const step = width / (values.length - 1);
+
+            let pathD = `M0,${height - (values[0] / max * height)} `;
+            values.forEach((val, i) => {
+                const x = i * step;
+                const y = height - (val / max * height);
+                pathD += `L${x},${y} `;
+            });
+
+            // Gradient Fill Area
+            const areaD = pathD + `L${width},${height} L0,${height} Z`;
+
+            svg.innerHTML = `
+                <defs>
+                    <linearGradient id="grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:rgba(34,197,94,0.5);stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:rgba(34,197,94,0);stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <path d="${areaD}" fill="url(#grad)" />
+                <path d="${pathD}" fill="none" stroke="#22c55e" stroke-width="2" vector-effect="non-scaling-stroke" />
+            `;
+            // Note: SVG viewBox is controlled by CSS width/height, simplified for sparkline
+            svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
         }
 
         function saveData(email, field, value) {
-            // Initialize with UNUSED as default
             if (!db[email]) {
                 db[email] = { price: '', note: '', status: 'unused', timestamp: Date.now(), copied: false };
             }
             db[email][field] = value;
+            
+            // Auto Active Logic
             if (field === 'price' && value !== '' && db[email].status === 'unused') {
                 db[email].status = 'active';
             }
+            
             if (field === 'status' && value === 'sold') {
                 db[email].timestamp = Date.now();
             }
+            
             localStorage.setItem('maildot_db', JSON.stringify(db));
             updateStats();
             
+            // Simple UI refresh for button if price triggered active
             if (field === 'price') {
                 const btn = document.querySelector(`button[data-email="${email}"]`);
                 if (btn && db[email].status === 'active') {
@@ -584,22 +683,33 @@
             return combos;
         }
 
+        // --- Filter Logic ---
+        window.filterList = function() {
+            renderList(currentEmails, currentTotal);
+        }
+
         function renderList(emails, totalCount) {
             resultsList.innerHTML = '';
+            const filterVal = filterStatus.value;
+            
             if (emails.length === 0) return;
 
             actionBar.classList.remove('hidden');
-            batchBar.classList.remove('hidden'); // Show batch bar
+            batchBar.classList.remove('hidden');
             
             if (totalCount && totalCount > emails.length) {
-                resultCount.innerText = `${emails.length} Shown / ${totalCount.toLocaleString()} Total`;
+                resultCount.innerText = `${emails.length} / ${totalCount.toLocaleString()}`;
             } else {
                 resultCount.innerText = `${emails.length.toLocaleString()} Results`;
             }
 
-            emails.forEach((email, index) => { // Added index
+            emails.forEach((email, index) => {
                 const saved = db[email] || { price: '', note: '', status: 'unused', copied: false };
                 const status = saved.status || 'unused'; 
+                
+                // Filtering
+                if (filterVal !== 'all' && status !== filterVal) return;
+
                 const isCopied = saved.copied === true;
                 const isSold = status === 'sold';
 
@@ -624,7 +734,7 @@
 
                 div.innerHTML = `
                     <div class="email-row">
-                        <span class="row-number">#${index + 1}</span> <!-- Added Number -->
+                        <span class="row-number">#${index + 1}</span>
                         <span class="${textClass}" id="txt-${email}">${email}</span>
                         ${iconButton}
                     </div>
@@ -664,7 +774,7 @@
         window.loadSavedEmail = function(email) {
             inputEmail.value = email;
             storageModal.classList.remove('show');
-            btnGenerate.click(); // Auto generate
+            btnGenerate.click(); 
         }
 
         window.deleteSavedEmail = function(email) {
@@ -681,6 +791,19 @@
                 btn.innerHTML = '<i class="fas fa-check text-green-500"></i>';
                 const textEl = document.getElementById(`txt-${text}`);
                 if(textEl) textEl.classList.add('copied');
+                
+                // Auto-fill price if set
+                if (appSettings.defaultPrice) {
+                    const saved = db[text] || {};
+                    if (!saved.price) {
+                       saveData(text, 'price', appSettings.defaultPrice);
+                       // Update input in DOM
+                       const row = btn.closest('.email-item');
+                       const inputPrice = row.querySelector('input[placeholder="Price"]');
+                       if(inputPrice) inputPrice.value = appSettings.defaultPrice;
+                    }
+                }
+
                 setTimeout(() => {
                     btn.innerHTML = originalHTML;
                 }, 1500);
@@ -700,6 +823,13 @@
 
             saveData(email, 'status', nextStatus);
             
+            // Auto-fill price on status change
+            if (appSettings.defaultPrice && (!db[email] || !db[email].price)) {
+                saveData(email, 'price', appSettings.defaultPrice);
+            }
+
+            // Re-render handled by logic inside toggleStatus in DOM update below
+            // Ideally call renderList to be clean, but for performance we toggle classes
             let nextClass = 'status-active';
             let nextLabel = 'ACTIVE';
             if (nextStatus === 'unused') { nextClass = 'status-unused'; nextLabel = 'UNUSED'; }
@@ -708,29 +838,36 @@
             btn.innerText = nextLabel;
             btn.className = `status-btn ${nextClass}`;
 
-            const row = btn.closest('.email-item').querySelector('.email-row');
+            // Check Price Input update
+            const row = btn.closest('.email-item');
+            if (appSettings.defaultPrice && row) {
+               const inputPrice = row.querySelector('input[placeholder="Price"]');
+               if(inputPrice && inputPrice.value === '') inputPrice.value = appSettings.defaultPrice;
+            }
+
             const textEl = row.querySelector('.email-text');
-            const iconContainer = row.querySelector('button');
+            const iconContainer = row.querySelector('.copy-btn-icon'); // simplified selector
 
             if (nextStatus === 'sold') {
                 textEl.classList.add('sold');
                 textEl.classList.remove('copied'); 
-                const newBtn = document.createElement('button');
-                newBtn.className = "copy-btn-icon locked";
-                newBtn.title = "Sold (Locked)";
-                newBtn.innerHTML = '<i class="fas fa-times"></i>';
-                row.replaceChild(newBtn, iconContainer);
+                // Swap Icon
+                if (iconContainer) {
+                    iconContainer.className = "copy-btn-icon locked";
+                    iconContainer.title = "Sold (Locked)";
+                    iconContainer.innerHTML = '<i class="fas fa-times"></i>';
+                    iconContainer.removeAttribute('onclick');
+                }
             } else {
                 textEl.classList.remove('sold');
                 const saved = db[email];
                 if (saved && saved.copied) textEl.classList.add('copied');
-                if (iconContainer.classList.contains('locked')) {
-                    const newBtn = document.createElement('button');
-                    newBtn.className = "copy-btn-icon";
-                    newBtn.title = "Copy Email";
-                    newBtn.onclick = function() { copyText(this, email) };
-                    newBtn.innerHTML = '<i class="far fa-copy"></i>';
-                    row.replaceChild(newBtn, iconContainer);
+                
+                if (iconContainer && iconContainer.classList.contains('locked')) {
+                    iconContainer.className = "copy-btn-icon";
+                    iconContainer.title = "Copy Email";
+                    iconContainer.onclick = function() { copyText(this, email) };
+                    iconContainer.innerHTML = '<i class="far fa-copy"></i>';
                 }
             }
         }
@@ -746,30 +883,52 @@
                 inputEmail.value = "";
                 resultsList.innerHTML = '<div class="text-center text-gray-400 text-xs mt-10">Enter an email to generate combinations.</div>';
                 actionBar.classList.add('hidden');
-                batchBar.classList.add('hidden'); // Hide batch bar on reset
-                
+                batchBar.classList.add('hidden');
+                drawChart({}); // Clear chart
                 updateStats();
                 alert("All data and settings have been reset.");
                 dataModal.classList.remove('show');
             }
         }
 
+        window.exportCSV = function() {
+            if (currentEmails.length === 0) { alert("No emails to export"); return; }
+            
+            let csvContent = "data:text/csv;charset=utf-8,ID,Email,Status,Price,Note\n";
+            currentEmails.forEach((email, index) => {
+                const saved = db[email] || {};
+                const status = saved.status || 'unused';
+                const price = saved.price || '';
+                const note = saved.note || '';
+                // Simple CSV escaping
+                csvContent += `${index+1},${email},${status},${price},"${note}"\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "maildot_export.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
         btnCopyAll.addEventListener('click', () => {
             const emails = Array.from(document.querySelectorAll('.email-text')).map(e => e.innerText).join('\n');
             navigator.clipboard.writeText(emails).then(() => {
                 btnCopyAll.innerHTML = '<i class="fas fa-check"></i> Copied';
-                setTimeout(() => btnCopyAll.innerHTML = '<i class="far fa-copy mr-1"></i> Copy All', 2000);
+                setTimeout(() => btnCopyAll.innerHTML = '<i class="far fa-copy mr-1"></i> All', 2000);
                 document.querySelectorAll('.email-text').forEach(el => el.classList.add('copied'));
             });
         });
 
-        // ... Export/Import functions same as before ...
+        // ... Export/Import functions ...
         function utf8_to_b64(str) { return window.btoa(unescape(encodeURIComponent(str))); }
         function b64_to_utf8(str) { return decodeURIComponent(escape(window.atob(str))); }
 
         window.exportBackup = function() {
             try {
-                const backup = { db: db, savedEmails: savedEmails };
+                const backup = { db: db, savedEmails: savedEmails, settings: appSettings };
                 const dataStr = utf8_to_b64(JSON.stringify(backup));
                 const blob = new Blob([dataStr], { type: 'text/plain' });
                 const url = URL.createObjectURL(blob);
@@ -798,6 +957,10 @@
                         const newSet = new Set([...savedEmails, ...importedData.savedEmails]);
                         savedEmails = Array.from(newSet);
                         localStorage.setItem('maildot_saved_emails', JSON.stringify(savedEmails));
+                    }
+                    if (importedData.settings) {
+                        appSettings = importedData.settings;
+                        localStorage.setItem('maildot_settings', JSON.stringify(appSettings));
                     }
                 } else {
                     db = { ...db, ...importedData };
