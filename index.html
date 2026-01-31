@@ -102,7 +102,7 @@
 
         /* --- VIEW MODES --- */
 
-        /* LIST MODE */
+        /* 1. LIST MODE (1 Column) */
         #tools-grid.view-list { 
             grid-template-columns: minmax(0, 1fr); 
             max-width: 650px; 
@@ -135,89 +135,81 @@
             overflow: hidden; 
         }
         #tools-grid.view-list .tool-tags { display: flex; margin-top: 0; margin-left: auto; }
+        /* List Mobile Fixes */
+        @media (max-width: 640px) {
+            #tools-grid.view-list .glass-card { padding: 14px; }
+            #tools-grid.view-list .tool-icon-wrapper { width: 42px; height: 42px; margin-right: 14px; }
+            #tools-grid.view-list .tool-title { font-size: 1rem; }
+            #tools-grid.view-list .tool-tags { margin-left: 10px; flex-wrap: wrap; justify-content: flex-end; }
+        }
 
-        /* COMPACT MODE (3 Columns Desktop, 2 Columns Mobile) */
+
+        /* 2. GRID MODE (Standard: 2 Cols Desktop, 1 Col Mobile) */
+        #tools-grid.view-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+        #tools-grid.view-grid .glass-card { padding: 24px; border-radius: 24px; }
+        #tools-grid.view-grid .tool-bg-icon { display: block; }
+        #tools-grid.view-grid .tool-icon-wrapper { width: 48px; height: 48px; margin-bottom: 16px; }
+        #tools-grid.view-grid .tool-title { font-size: 1.25rem; margin-bottom: 8px; }
+        #tools-grid.view-grid .tool-desc { font-size: 0.875rem; -webkit-line-clamp: 3; }
+        
+        @media (max-width: 640px) {
+            #tools-grid.view-grid { grid-template-columns: minmax(0, 1fr); }
+            #tools-grid.view-grid .tool-title { font-size: 1.1rem; }
+        }
+
+
+        /* 3. COMPACT MODE (3 Cols Desktop, 2 Cols Mobile) */
         #tools-grid.view-compact { 
             grid-template-columns: repeat(3, minmax(0, 1fr)); 
-            gap: 16px; 
+            gap: 12px; 
         }
-        
         #tools-grid.view-compact .glass-card { 
-            padding: 20px; 
-            border-radius: 20px; 
+            padding: 16px; 
+            border-radius: 16px; 
         }
         #tools-grid.view-compact .tool-bg-icon { 
-            right: -10px; bottom: -10px; opacity: 0.04; 
+            right: -10px; bottom: -10px; opacity: 0.03; transform: scale(0.8);
         }
         #tools-grid.view-compact .tool-icon-wrapper { 
-            width: 42px; 
-            height: 42px; 
-            margin-bottom: 12px; 
-            border-radius: 12px; 
+            width: 36px; 
+            height: 36px; 
+            margin-bottom: 10px; 
+            border-radius: 10px; 
         }
         #tools-grid.view-compact .tool-title { 
-            font-size: 1rem; 
-            margin-bottom: 6px; 
+            font-size: 0.95rem; 
+            margin-bottom: 4px; 
         }
         #tools-grid.view-compact .tool-desc { 
-            font-size: 0.75rem; 
-            line-height: 1.4; 
+            font-size: 0.7rem; 
+            line-height: 1.35; 
             display: -webkit-box; 
             -webkit-line-clamp: 2; 
             -webkit-box-orient: vertical; 
             overflow: hidden; 
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
         #tools-grid.view-compact .tool-tags { 
-            display: flex; 
-            gap: 4px;
+            display: flex; gap: 4px;
         } 
         #tools-grid.view-compact .tool-tags span {
-            font-size: 9px;
-            padding: 2px 6px;
+            font-size: 9px; padding: 2px 6px;
         }
-        #tools-grid.view-compact .glass-card:hover { transform: translateY(-4px); }
 
-        /* Tablet Responsive */
+        /* Compact Mobile (Strict 2-Col) */
         @media (max-width: 1024px) {
             #tools-grid.view-compact { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         }
-
-        /* Mobile Responsive (Strict 2-Col Compact) */
         @media (max-width: 640px) {
-            /* Fix List View on Mobile */
-            #tools-grid.view-list .glass-card { padding: 14px; }
-            #tools-grid.view-list .tool-icon-wrapper { width: 40px; height: 40px; margin-right: 12px; }
-            #tools-grid.view-list .tool-title { font-size: 1rem; }
-            #tools-grid.view-list .tool-tags { display: none; } /* Hide tags in list on mobile to save space */
-
-            /* Fix Compact View on Mobile (Force 2 columns with dense styling) */
-            #tools-grid.view-compact { 
-                grid-template-columns: repeat(2, minmax(0, 1fr)); 
-                gap: 10px;
-            }
-            #tools-grid.view-compact .glass-card { 
-                padding: 12px; 
-                border-radius: 16px;
-            }
-            #tools-grid.view-compact .tool-icon-wrapper { 
-                width: 32px; height: 32px; 
-                margin-bottom: 8px; 
-                border-radius: 10px;
-            }
-            #tools-grid.view-compact .tool-title { 
-                font-size: 0.85rem; 
-                margin-bottom: 4px; 
-                line-height: 1.2;
-            }
-            #tools-grid.view-compact .tool-desc { 
-                font-size: 0.7rem; 
-                margin-bottom: 0;
-                line-height: 1.3;
-                -webkit-line-clamp: 2; 
-            }
-            #tools-grid.view-compact .tool-tags { display: none; } /* Hide tags */
-            #tools-grid.view-compact .tool-bg-icon { display: none; } /* Hide bg icon */
+            #tools-grid.view-compact { gap: 10px; }
+            #tools-grid.view-compact .glass-card { padding: 12px; }
+            #tools-grid.view-compact .tool-icon-wrapper { width: 32px; height: 32px; margin-bottom: 8px; }
+            #tools-grid.view-compact .tool-title { font-size: 0.85rem; }
+            #tools-grid.view-compact .tool-tags { display: none; } /* Hide tags only in dense compact mobile to fit */
+            #tools-grid.view-compact .tool-bg-icon { display: none; }
         }
 
 
@@ -567,8 +559,8 @@
         const donateModal = document.getElementById('donate-modal');
         const typewriterEl = document.getElementById('typewriter');
 
-        // View Modes: Compact (Default 3 cols) -> List (1 col)
-        const modes = ['compact', 'list'];
+        // View Modes: Compact (3 col) -> Grid (2 col) -> List (1 col)
+        const modes = ['compact', 'grid', 'list'];
         let currentModeIndex = modes.indexOf(localStorage.getItem('synkph_view_mode') || 'compact');
         if (currentModeIndex === -1) currentModeIndex = 0;
 
@@ -583,14 +575,16 @@
         // Apply View Mode
         function applyViewMode(mode) {
             // Remove all possible classes first
-            toolsGrid.classList.remove('view-list', 'view-compact');
+            toolsGrid.classList.remove('view-list', 'view-compact', 'view-grid');
             
             // Add specific class
             toolsGrid.classList.add(`view-${mode}`);
             
             // Update Icon
-            let icon = 'layout-grid'; // Default icon for compact
+            let icon = 'grid-3x3'; // Default compact
+            if (mode === 'grid') icon = 'layout-grid'; // Standard 2x2
             if (mode === 'list') icon = 'list'; 
+            if (mode === 'compact') icon = 'grid-2x2'; // Using 2x2/dense icon for compact 3-col
             
             btnView.innerHTML = `<i data-lucide="${icon}" class="w-4 h-4 text-slate-600 dark:text-slate-300 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors"></i>`;
             lucide.createIcons();
