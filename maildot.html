@@ -114,6 +114,15 @@
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
         .modal-overlay.show .modal-card { transform: translateY(0); }
+
+        /* Saved Email Item */
+        .saved-email-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px; border-bottom: 1px solid #f3f4f6; cursor: pointer;
+        }
+        .saved-email-row:hover { background-color: #f9fafb; }
+        html.dark-mode .saved-email-row { border-color: #333; }
+        html.dark-mode .saved-email-row:hover { background-color: #262626; }
     </style>
 </head>
 <body class="min-h-screen pb-10">
@@ -161,7 +170,18 @@
             <!-- Input Section -->
             <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-4">
                 <label class="text-xs font-bold text-gray-500 uppercase mb-1 block">Email Address</label>
-                <input type="email" id="input-email" class="md-input mb-3" placeholder="example@gmail.com">
+                
+                <div class="flex gap-2 mb-3">
+                    <div class="relative flex-1">
+                        <input type="email" id="input-email" class="md-input w-full pr-10" placeholder="example@gmail.com">
+                        <button id="btn-open-storage" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-blue-500 p-2" title="Saved Emails">
+                            <i class="fas fa-folder"></i>
+                        </button>
+                    </div>
+                    <button id="btn-save-email" class="bg-gray-100 text-gray-600 border border-gray-200 rounded-lg px-3 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-100 transition-colors" title="Add to Storage">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
                 
                 <div class="flex gap-2 mb-3">
                     <div class="w-1/2">
@@ -246,6 +266,20 @@
             </div>
         </div>
 
+        <!-- EMAIL STORAGE MODAL -->
+        <div id="storage-modal" class="modal-overlay">
+            <div class="modal-card">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-lg"><i class="fas fa-folder mr-2 text-blue-500"></i>Saved Emails</h3>
+                    <button id="btn-close-storage" class="text-gray-400 hover:text-black"><i class="fas fa-times"></i></button>
+                </div>
+                <div id="saved-emails-list" class="max-h-60 overflow-y-auto border border-gray-100 rounded mb-2">
+                    <p class="text-center text-gray-400 text-xs py-4">No saved emails.</p>
+                </div>
+                <p class="text-[10px] text-gray-400 text-center">Click an email to load it</p>
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -277,9 +311,17 @@
         const fileImport = document.getElementById('file-import');
         const importTextArea = document.getElementById('import-text');
 
+        // Storage Modal
+        const btnOpenStorage = document.getElementById('btn-open-storage');
+        const btnSaveEmail = document.getElementById('btn-save-email');
+        const storageModal = document.getElementById('storage-modal');
+        const btnCloseStorage = document.getElementById('btn-close-storage');
+        const savedEmailsList = document.getElementById('saved-emails-list');
+
         // Database & Session
         let db = JSON.parse(localStorage.getItem('maildot_db') || '{}');
         let session = JSON.parse(localStorage.getItem('maildot_session') || '{}');
+        let savedEmails = JSON.parse(localStorage.getItem('maildot_saved_emails') || '[]');
 
         // Stats Elements
         const elStatToday = document.getElementById('stat-today');
@@ -329,6 +371,23 @@
                 processImport(); // Auto process on file select
             };
             reader.readAsText(file);
+        });
+
+        // Storage Events
+        btnOpenStorage.addEventListener('click', () => {
+            renderSavedEmails();
+            storageModal.classList.add('show');
+        });
+        btnCloseStorage.addEventListener('click', () => storageModal.classList.remove('show'));
+        
+        btnSaveEmail.addEventListener('click', () => {
+            const email = inputEmail.value.trim();
+            if (!email || !email.includes('@')) { alert("Please enter a valid email to save."); return; }
+            if (savedEmails.includes(email)) { alert("Email already saved."); return; }
+            
+            savedEmails.push(email);
+            localStorage.setItem('maildot_saved_emails', JSON.stringify(savedEmails));
+            alert("Email saved to storage.");
         });
 
         // --- Functions ---
@@ -387,11 +446,8 @@
             localStorage.setItem('maildot_db', JSON.stringify(db));
             updateStats();
             
-            // Re-render specifically this item button logic? 
-            // Simpler to just re-render list or let toggleStatus handle UI update
-            // But if we auto-changed status due to price, we need to update that button
+            // UI Update for status button if price change triggered status change
             if (field === 'price') {
-                // Find button and update if changed to active
                 const btn = document.querySelector(`button[data-email="${email}"]`);
                 if (btn && db[email].status === 'active') {
                     btn.innerText = 'ACTIVE';
@@ -466,6 +522,34 @@
             });
         }
 
+        function renderSavedEmails() {
+            if (savedEmails.length === 0) {
+                savedEmailsList.innerHTML = '<p class="text-center text-gray-400 text-xs py-4">No saved emails.</p>';
+                return;
+            }
+            savedEmailsList.innerHTML = savedEmails.map(email => `
+                <div class="saved-email-row" onclick="loadSavedEmail('${email}')">
+                    <span class="text-sm font-mono text-gray-600 truncate">${email}</span>
+                    <button onclick="event.stopPropagation(); deleteSavedEmail('${email}')" class="text-gray-400 hover:text-red-500 p-1">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        window.loadSavedEmail = function(email) {
+            inputEmail.value = email;
+            storageModal.classList.remove('show');
+            btnGenerate.click(); // Auto generate
+        }
+
+        window.deleteSavedEmail = function(email) {
+            if(!confirm(`Delete ${email} from storage?`)) return;
+            savedEmails = savedEmails.filter(e => e !== email);
+            localStorage.setItem('maildot_saved_emails', JSON.stringify(savedEmails));
+            renderSavedEmails();
+        }
+
         window.copyText = function(btn, text) {
             navigator.clipboard.writeText(text).then(() => {
                 // Visual feedback on the button icon
@@ -508,13 +592,19 @@
         }
 
         window.resetData = function() {
-            if (confirm("WARNING: Are you sure you want to delete ALL saved data (earnings, notes, statuses)? This action cannot be undone.")) {
+            if (confirm("WARNING: This will delete ALL generated email data (earnings, notes, statuses) and Saved Emails list. This action cannot be undone. Are you sure?")) {
                 localStorage.removeItem('maildot_db');
+                localStorage.removeItem('maildot_saved_emails');
+                localStorage.removeItem('maildot_session');
+                
                 db = {};
+                savedEmails = [];
+                inputEmail.value = "";
+                resultsList.innerHTML = '<div class="text-center text-gray-400 text-xs mt-10">Enter an email to generate combinations.</div>';
+                actionBar.classList.add('hidden');
+                
                 updateStats();
-                // Refresh current view
-                if (inputEmail.value) btnGenerate.click();
-                alert("All data has been reset.");
+                alert("All data and settings have been reset.");
                 dataModal.classList.remove('show');
             }
         }
@@ -534,7 +624,12 @@
 
         window.exportBackup = function() {
             try {
-                const dataStr = utf8_to_b64(JSON.stringify(db));
+                // Export both DB and Saved Emails
+                const backup = {
+                    db: db,
+                    savedEmails: savedEmails
+                };
+                const dataStr = utf8_to_b64(JSON.stringify(backup));
                 const blob = new Blob([dataStr], { type: 'text/plain' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -556,7 +651,20 @@
                 
                 if (typeof importedData !== 'object') throw new Error();
 
-                db = { ...db, ...importedData };
+                // Handle legacy format (just db) or new format (wrapper)
+                if (importedData.db) {
+                    db = { ...db, ...importedData.db };
+                    if (importedData.savedEmails) {
+                        // Merge unique emails
+                        const newSet = new Set([...savedEmails, ...importedData.savedEmails]);
+                        savedEmails = Array.from(newSet);
+                        localStorage.setItem('maildot_saved_emails', JSON.stringify(savedEmails));
+                    }
+                } else {
+                    // Fallback for legacy (if any existed previously)
+                    db = { ...db, ...importedData };
+                }
+
                 localStorage.setItem('maildot_db', JSON.stringify(db));
                 updateStats();
                 
