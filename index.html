@@ -111,10 +111,10 @@
         }
     </script>
 </head>
-<body class="antialiased h-screen w-screen overflow-hidden relative selection:bg-brand-200 selection:text-brand-900 text-slate-800 dark:text-slate-100">
+<body class="antialiased min-h-screen w-full overflow-x-hidden relative selection:bg-brand-200 selection:text-brand-900 text-slate-800 dark:text-slate-100 flex flex-col">
 
     <!-- Decorative Background Blobs -->
-    <div class="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+    <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
         <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blob-1 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
         <div class="absolute top-[-10%] right-[-10%] w-96 h-96 bg-blob-2 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
         <div class="absolute bottom-[-20%] left-[20%] w-96 h-96 bg-blob-1 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-4000"></div>
@@ -126,21 +126,21 @@
     </button>
 
     <!-- Main Container -->
-    <div class="h-full w-full flex flex-col items-center justify-center p-6">
+    <div class="flex-grow flex flex-col items-center justify-center p-6 w-full">
         
         <!-- Header Section -->
-        <div class="text-center mb-12 relative">
+        <div class="text-center mb-12 relative mt-12 md:mt-0">
             
-            <h1 class="text-6xl md:text-7xl font-extrabold tracking-tight mb-4 animate-float">
+            <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight mb-4 animate-float">
                 Synk<span class="text-gradient">PH</span>
             </h1>
-            <p class="text-slate-500 dark:text-slate-400 font-medium max-w-sm mx-auto text-lg">
+            <p class="text-slate-500 dark:text-slate-400 font-medium max-w-sm mx-auto text-base md:text-lg">
                 Minimalist utilities for your daily digital needs.
             </p>
         </div>
 
         <!-- Cards Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl px-2">
             
             <!-- Tool 1: SHEIN PCheck -->
             <a href="pcheck.html" class="glass-card p-6 rounded-3xl group relative overflow-hidden">
@@ -189,7 +189,7 @@
         </div>
 
         <!-- Footer -->
-        <div class="mt-16 text-center">
+        <div class="mt-16 text-center pb-6">
             <p class="text-[10px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest hover:text-brand-600 transition-colors cursor-default">
                 © 2026 SynkPH
             </p>
