@@ -6,12 +6,11 @@
     <title>SynkPH</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <!-- Initial Theme Color (Will be updated by script immediately) -->
+    <!-- Initial Theme Color -->
     <meta name="theme-color" content="#f8fafc">
 
-    <!-- CRITICAL: Theme & View Init in Head to prevent FOUC/Flash -->
+    <!-- Theme & View Init -->
     <script>
-        // 1. Immediate Theme Application
         const savedTheme = localStorage.getItem('shein_pcal_theme');
         const metaTheme = document.querySelector('meta[name="theme-color"]');
         
@@ -22,7 +21,6 @@
             metaTheme.setAttribute('content', '#f8fafc');
         }
 
-        // 2. Immediate View Application
         const savedView = localStorage.getItem('synkph_view_mode') || 'compact';
         document.documentElement.setAttribute('data-view', savedView);
     </script>
@@ -30,7 +28,6 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
-        /* Prevent transitions on load to stop "flashing". */
         .preload * {
             transition: none !important;
             -webkit-transition: none !important;
@@ -39,9 +36,8 @@
             -o-transition: none !important;
         }
 
-        /* Base Setup - Fixes Overscroll Background */
         html {
-            background-color: #f8fafc; /* Light mode bg */
+            background-color: #f8fafc;
             min-height: 100%; 
             height: 100%;
         }
@@ -51,7 +47,7 @@
         }
 
         html.dark {
-            background-color: #0f172a; /* Dark mode bg */
+            background-color: #0f172a;
         }
 
         body {
@@ -140,17 +136,13 @@
         /* --- VIEW MODES --- */
 
         /* 1. GRID MODE */
-        html[data-view="grid"] #tools-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 16px; 
-        }
+        html[data-view="grid"] #tools-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
         html[data-view="grid"] #tools-grid .glass-card { padding: 20px; border-radius: 20px; }
         html[data-view="grid"] #tools-grid .tool-bg-icon { display: none; }
         html[data-view="grid"] #tools-grid .tool-icon-wrapper { width: 44px; height: 44px; margin-bottom: 12px; }
         html[data-view="grid"] #tools-grid .tool-title { font-size: 1.1rem; margin-bottom: 6px; }
         html[data-view="grid"] #tools-grid .tool-desc { 
-            font-size: 0.8rem; line-height: 1.4; margin-bottom: 0;
-            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; opacity: 0.8;
+            font-size: 0.8rem; line-height: 1.4; margin-bottom: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; opacity: 0.8;
         }
         @media (max-width: 640px) {
             html[data-view="grid"] #tools-grid { gap: 10px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -216,7 +208,7 @@
         }
         @keyframes blink { 50% { opacity: 0; } }
 
-        /* Modal Styles - Fixed Blink Issue */
+        /* Modal Styles */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.4); 
@@ -224,8 +216,6 @@
             -webkit-backdrop-filter: blur(4px);
             display: flex; align-items: center; justify-content: center;
             z-index: 100; 
-            
-            /* Use visibility/opacity instead of pointer-events for smooth transition */
             opacity: 0; 
             visibility: hidden;
             transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -243,7 +233,7 @@
             transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             border: 1px solid rgba(255,255,255,1);
-            will-change: transform; /* Hint for smoother animation */
+            will-change: transform; 
         }
         .modal-overlay.show .modal-card { transform: scale(1) translateY(0); }
         
@@ -251,6 +241,14 @@
             background: #1e293b;
             border: 1px solid rgba(255, 255, 255, 0.1);
             color: #ffffff;
+        }
+
+        /* SPECIAL LOGO FILTERS */
+        .ownbank-filter {
+            filter: invert(1) hue-rotate(180deg);
+        }
+        html.dark .ownbank-filter {
+            filter: none;
         }
 
         .text-gradient {
@@ -353,8 +351,8 @@
             </button>
 
             <!-- Donate Button -->
-            <button onclick="openDonate()" class="header-btn px-4 text-[10px] font-bold uppercase tracking-wider hover:text-pink-500 dark:hover:text-pink-400 group">
-                <i data-lucide="heart" class="w-4 h-4 group-hover:fill-current mr-2 text-pink-400"></i>
+            <button onclick="openDonate()" class="header-btn px-4 text-[10px] font-bold uppercase tracking-wider hover:text-pink-500 dark:hover:text-pink-400 group gap-2">
+                <i data-lucide="heart" class="w-4 h-4 group-hover:fill-current text-pink-400"></i>
                 <span class="hidden sm:inline">Support</span>
             </button>
 
@@ -397,33 +395,21 @@
 
         <!-- Cards Grid -->
         <div id="tools-grid" class="grid w-full max-w-5xl px-2">
-            
             <!-- Tool 1: SHEIN PCheck -->
             <a href="pcheck.html" class="glass-card p-6 rounded-3xl group relative overflow-hidden tool-item" data-name="shein pcheck calculator">
-                <!-- Status Badge -->
                 <div class="status-badge absolute top-4 right-4 z-20">
                      <span class="px-2 py-0.5 rounded-full bg-orange-100 dark:bg-orange-900/50 text-[9px] font-bold text-orange-600 dark:text-orange-300 border border-orange-200 dark:border-orange-700">HOT</span>
                 </div>
-
                 <div class="tool-bg-icon absolute -bottom-4 -right-4 p-3 opacity-[0.03] dark:opacity-[0.05] group-hover:opacity-10 transition-all transform group-hover:scale-110 group-hover:rotate-12 duration-500">
                     <i data-lucide="shopping-bag" class="w-32 h-32 text-black dark:text-white"></i>
                 </div>
-                
                 <div class="relative z-10 flex flex-col h-full tool-content">
                     <div class="tool-icon-wrapper w-12 h-12 rounded-2xl flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300 overflow-hidden bg-black ring-1 ring-black/5 dark:ring-white/10">
                         <img src="https://pnghdpro.com/wp-content/themes/pnghdpro/download/social-media-and-brands/shein-app-icon.png" class="w-full h-full object-cover">
                     </div>
-                    
                     <div class="flex-1 min-w-0">
-                        <h2 class="tool-title text-xl font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
-                            SHEIN PCheck
-                        </h2>
-                        
-                        <p class="tool-desc text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-4">
-                            Smart calculator for orders. Auto-detects free shipping & discounts.
-                        </p>
-
-                        <!-- Category Tags -->
+                        <h2 class="tool-title text-xl font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">SHEIN PCheck</h2>
+                        <p class="tool-desc text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-4">Smart calculator for orders. Auto-detects free shipping & discounts.</p>
                         <div class="tool-tags flex flex-wrap gap-2 mt-auto">
                             <span class="text-[10px] font-bold px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-600">Shopping</span>
                             <span class="text-[10px] font-bold px-2 py-1 rounded-md bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 border border-blue-100 dark:border-blue-800">Finance</span>
@@ -434,31 +420,20 @@
 
             <!-- Tool 2: MailDot Gen -->
             <a href="maildot.html" class="glass-card p-6 rounded-3xl group relative overflow-hidden tool-item" data-name="maildot gen email generator">
-                <!-- Status Badge -->
                 <div class="status-badge absolute top-4 right-4 z-20">
                      <span class="px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/50 text-[9px] font-bold text-purple-600 dark:text-purple-300 border border-purple-200 dark:border-purple-700">NEW</span>
                 </div>
-
                 <div class="tool-bg-icon absolute -bottom-4 -right-4 p-3 opacity-[0.03] dark:opacity-[0.05] group-hover:opacity-10 transition-all transform group-hover:scale-110 group-hover:-rotate-12 duration-500">
                     <i data-lucide="at-sign" class="w-32 h-32 text-brand-600"></i>
                 </div>
-                
                 <div class="relative z-10 flex flex-col h-full tool-content">
                     <div class="tool-icon-wrapper w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-2xl flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300 ring-1 ring-black/5 dark:ring-white/10">
                         <i data-lucide="mail" class="w-6 h-6"></i>
                     </div>
-                    
                     <div class="flex-1 min-w-0">
-                        <h2 class="tool-title text-xl font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
-                            MailDot Gen
-                        </h2>
-                        
-                        <p class="tool-desc text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-4">
-                            Generate email aliases instantly. Includes earnings tracker & auto-save.
-                        </p>
-
-                         <!-- Category Tags -->
-                         <div class="tool-tags flex flex-wrap gap-2 mt-auto">
+                        <h2 class="tool-title text-xl font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">MailDot Gen</h2>
+                        <p class="tool-desc text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-4">Generate email aliases instantly. Includes earnings tracker & auto-save.</p>
+                        <div class="tool-tags flex flex-wrap gap-2 mt-auto">
                             <span class="text-[10px] font-bold px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-600">Utility</span>
                             <span class="text-[10px] font-bold px-2 py-1 rounded-md bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-800">Productivity</span>
                         </div>
@@ -466,45 +441,31 @@
                 </div>
             </a>
             
-            <!-- Tool 3: Placeholder to show the 3rd column -->
+            <!-- Tool 3: Placeholder -->
              <a href="#" class="glass-card p-6 rounded-3xl group relative overflow-hidden tool-item" data-name="placeholder tool">
                 <div class="tool-bg-icon absolute -bottom-4 -right-4 p-3 opacity-[0.03] dark:opacity-[0.05] group-hover:opacity-10 transition-all transform group-hover:scale-110 group-hover:-rotate-12 duration-500">
                     <i data-lucide="wrench" class="w-32 h-32 text-slate-500"></i>
                 </div>
-                
                 <div class="relative z-10 flex flex-col h-full tool-content">
                     <div class="tool-icon-wrapper w-12 h-12 bg-gradient-to-br from-slate-500 to-slate-600 text-white rounded-2xl flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300 ring-1 ring-black/5 dark:ring-white/10">
                         <i data-lucide="wrench" class="w-6 h-6"></i>
                     </div>
-                    
                     <div class="flex-1 min-w-0">
-                        <h2 class="tool-title text-xl font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
-                            Coming Soon
-                        </h2>
-                        
-                        <p class="tool-desc text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-4">
-                            More tools are being developed. Check back later for updates.
-                        </p>
-
-                         <!-- Category Tags -->
-                         <div class="tool-tags flex flex-wrap gap-2 mt-auto">
+                        <h2 class="tool-title text-xl font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">Coming Soon</h2>
+                        <p class="tool-desc text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-4">More tools are being developed. Check back later for updates.</p>
+                        <div class="tool-tags flex flex-wrap gap-2 mt-auto">
                             <span class="text-[10px] font-bold px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-600">Dev</span>
                         </div>
                     </div>
                 </div>
             </a>
-
         </div>
-
     </div>
 
     <!-- Fixed Footer -->
     <footer class="fixed bottom-6 w-full text-center z-40 pointer-events-none">
         <div class="inline-flex items-center gap-2 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/40 dark:border-white/5 shadow-lg pointer-events-auto transform hover:scale-105 transition-transform">
-            <!-- Removed Live Indicator Pulse -->
-            <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
-                © 2026 SynkPH
-            </p>
+            <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">© 2026 SynkPH</p>
         </div>
     </footer>
 
@@ -521,31 +482,24 @@
                     Help keep the servers running.
                 </p>
             </div>
+
+            <!-- Bank Selector Tabs -->
+            <div class="flex justify-center gap-2 mb-5">
+                <div id="bank-tabs" class="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl"></div>
+            </div>
             
-            <div class="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-5 mb-5 text-left border border-slate-200 dark:border-slate-700/50 relative overflow-visible">
+            <!-- Details Card -->
+            <div class="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-5 mb-5 text-left border border-slate-200 dark:border-slate-700/50 relative overflow-visible transition-all duration-300">
                 <!-- Background Decoration -->
-                <div class="absolute -top-6 -right-6 w-24 h-24 bg-orange-500/10 rounded-full blur-2xl pointer-events-none overflow-hidden"></div>
+                <div class="absolute -top-6 -right-6 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl pointer-events-none overflow-hidden" id="modal-bg-decor"></div>
 
                 <!-- Bank Header -->
-                <div class="flex items-center justify-between mb-5 relative z-10">
-                    <!-- MariBank Logo -->
-                    <img src="https://banking-aka-storage.maribank.com.sg/maribank/sg/app_infra/live/ccf/logo/logo_text.svg" alt="MariBank" class="h-5 w-auto object-contain dark:brightness-0 dark:invert">
+                <div class="flex items-center justify-between mb-5 relative z-10 h-8">
+                    <!-- Logo -->
+                    <img id="modal-bank-logo" src="" alt="Bank Logo" class="w-auto object-contain transition-all duration-300">
                     
-                    <!-- Referral Code with Tooltip -->
-                    <div class="group relative cursor-help">
-                        <div class="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-white dark:bg-slate-700 border border-slate-100 dark:border-slate-600 shadow-sm transition-colors hover:border-orange-200 dark:hover:border-orange-900/50">
-                            <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Ref</span>
-                            <span class="text-[10px] font-bold text-slate-700 dark:text-slate-200 font-mono">JC811366</span>
-                            <i data-lucide="info" class="w-3 h-3 text-slate-400"></i>
-                        </div>
-                        
-                        <!-- Tooltip - Updated to be 1 line -->
-                        <div class="absolute right-0 bottom-full mb-2 w-max p-3 bg-slate-900 dark:bg-slate-800 text-white text-[10px] leading-relaxed rounded-xl shadow-xl border border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 text-left pointer-events-none transform translate-y-1 group-hover:translate-y-0">
-                            <p class="font-bold text-orange-400 mb-0.5">Get ₱150 Bonus</p>
-                            <p class="text-slate-300 whitespace-nowrap">Deposit ₱1k & keep for 3 days.</p>
-                            <div class="absolute -bottom-1 right-6 w-2 h-2 bg-slate-900 dark:bg-slate-800 rotate-45 border-b border-r border-slate-700"></div>
-                        </div>
-                    </div>
+                    <!-- Right Side: Type or Ref Code (Dynamic) -->
+                    <div id="modal-header-right"></div>
                 </div>
 
                 <!-- Details Grid -->
@@ -553,7 +507,7 @@
                     <!-- Account Name -->
                     <div>
                         <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-1">Account Name</p>
-                        <p class="text-xs font-bold text-slate-700 dark:text-slate-200">Joven Campomanes</p>
+                        <p id="modal-acc-name" class="text-xs font-bold text-slate-700 dark:text-slate-200 transition-all"></p>
                     </div>
                     
                     <!-- Divider -->
@@ -562,8 +516,8 @@
                     <!-- Account Number -->
                     <div>
                         <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-1.5">Account Number</p>
-                        <div class="flex items-center justify-between bg-white dark:bg-slate-900 rounded-xl p-1.5 pl-3 border border-slate-200 dark:border-slate-700 shadow-sm">
-                            <p class="text-sm font-mono font-bold text-slate-800 dark:text-slate-100 tracking-widest">10527398950</p>
+                        <div class="flex items-center justify-between bg-white dark:bg-slate-900 rounded-xl p-1.5 pl-3 border border-slate-200 dark:border-slate-700 shadow-sm transition-colors">
+                            <p id="modal-acc-num" class="text-sm font-mono font-bold text-slate-800 dark:text-slate-100 tracking-widest"></p>
                             <button onclick="copyAccount()" id="btn-copy-acc" class="p-2 rounded-lg text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active:scale-95">
                                 <i data-lucide="copy" class="w-4 h-4"></i>
                             </button>
@@ -572,9 +526,9 @@
                 </div>
             </div>
 
-            <!-- New Open MariBank Button -->
-            <a href="https://seabankph.onelink.me/RMD2/qbs7mr9j" target="_blank" class="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold py-3.5 rounded-xl text-xs hover:opacity-90 hover:scale-[1.02] transition-all shadow-lg shadow-orange-500/20 flex items-center justify-center gap-2 mb-3">
-                <span>Open MariBank</span>
+            <!-- External Link Button (Dynamic) -->
+            <a id="modal-link-btn" href="#" target="_blank" class="hidden w-full bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold py-3.5 rounded-xl text-xs hover:opacity-90 hover:scale-[1.02] transition-all shadow-lg shadow-orange-500/20 flex items-center justify-center gap-2 mb-3">
+                <span id="modal-link-text">Open Bank</span>
                 <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
             </a>
 
@@ -587,7 +541,6 @@
     <!-- Lucide & Theme Script -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <script>
-        // Init Icons
         lucide.createIcons();
 
         const btnTheme = document.getElementById('btn-theme');
@@ -598,44 +551,177 @@
         const donateModal = document.getElementById('donate-modal');
         const typewriterEl = document.getElementById('typewriter');
 
-        // View Modes: Compact (3 col) -> Grid (2 col) -> Standard (1 col)
+        // View Modes
         const modes = ['compact', 'grid', 'standard'];
         let currentModeIndex = modes.indexOf(localStorage.getItem('synkph_view_mode') || 'compact');
         if (currentModeIndex === -1) currentModeIndex = 0;
 
-        // Init UI states immediately
+        // --- DONATION DATA ---
+        const banks = [
+            {
+                id: 'maribank',
+                name: 'MariBank',
+                type: 'Savings',
+                accName: 'Joven Campomanes',
+                accNum: '10527398950',
+                logo: 'https://banking-aka-storage.maribank.com.sg/maribank/sg/app_infra/live/ccf/logo/logo_text.svg',
+                logoClass: 'h-5 dark:brightness-0 dark:invert', // White in dark mode
+                refCode: 'JC811366',
+                refTooltip: 'Deposit ₱1k & keep for 3 days.',
+                link: 'https://seabankph.onelink.me/RMD2/qbs7mr9j',
+                linkText: 'Open MariBank',
+                themeColor: 'from-orange-500 to-red-500',
+                bgDecor: 'bg-orange-500/10'
+            },
+            {
+                id: 'maya',
+                name: 'Maya',
+                type: 'Wallet',
+                accName: 'Joven Campomanes',
+                accNum: '09988079228',
+                logo: 'https://logodix.com/logo/2206762.png',
+                logoClass: 'h-6',
+                refCode: '@itzmebenz13',
+                refTooltip: 'Get ₱100 welcome reward.',
+                link: 'https://official.maya.ph/3xMF/w3xi2eyw?_gl=1*1o47yt0*_gcl_au*MTEzODA4MDY5MS4xNzY5OTAzMTA2*_ga*NjMxNjc2Mzg4LjE3Njk5MDMxMDU.*_ga_XFXXT1C87R*czE3Njk5MDMxMDQkbzEkZzEkdDE3Njk5MDMxODUkajU1JGwwJGgw',
+                linkText: 'Open Maya',
+                themeColor: 'from-green-500 to-emerald-600',
+                bgDecor: 'bg-green-500/10'
+            },
+            {
+                id: 'ownbank',
+                name: 'OwnBank',
+                type: 'Savings',
+                accName: 'Joven Campomanes',
+                accNum: '09988079228',
+                logo: 'https://cstatic.ownbank.com.ph/pc-web/_next/static/media/logo.0f42d6ae.svg?w=256&q=80',
+                logoClass: 'h-4 ownbank-filter', // Invert light, Normal dark, Reduced size
+                refCode: 'DA67BL',
+                refTooltip: 'Get trial bonus vouchers.',
+                link: null,
+                themeColor: 'from-emerald-500 to-teal-600',
+                bgDecor: 'bg-emerald-500/10'
+            }
+        ];
+        
+        let currentBankIndex = 0;
+
         function init() {
-            // Restore transitions after a brief timeout to allow initial layout to settle
             setTimeout(() => {
                 document.body.classList.remove('preload');
-                html.classList.add('loaded'); // Enable theme transition on HTML
-                toolsGrid.classList.add('transition-all', 'duration-300'); // Re-enable grid transition
+                html.classList.add('loaded');
+                toolsGrid.classList.add('transition-all', 'duration-300');
             }, 100);
 
             updateThemeIcon();
             applyViewMode(modes[currentModeIndex]);
             typeEffect();
+            renderBankTabs(); // Init bank tabs
+            updateDonationModal(0); // Init modal content
         }
 
-        // Update Theme Icon
+        // --- DONATION LOGIC ---
+        function renderBankTabs() {
+            const container = document.getElementById('bank-tabs');
+            container.innerHTML = banks.map((bank, index) => `
+                <button onclick="updateDonationModal(${index})" 
+                        class="w-8 h-8 rounded-lg flex items-center justify-center transition-all ${index === currentBankIndex ? 'bg-white dark:bg-slate-700 shadow-sm ring-1 ring-black/5 dark:ring-white/10 scale-110' : 'opacity-50 hover:opacity-100'}">
+                    <div class="w-5 h-5 rounded-full overflow-hidden flex items-center justify-center">
+                         <img src="${bank.logo}" class="w-full h-full object-contain ${bank.id === 'ownbank' ? 'ownbank-filter' : ''} ${bank.id === 'maribank' && document.documentElement.classList.contains('dark') ? 'invert' : ''}">
+                    </div>
+                </button>
+            `).join('');
+        }
+
+        function updateDonationModal(index) {
+            currentBankIndex = index;
+            const bank = banks[index];
+            
+            // Re-render tabs to update active state
+            const tabs = document.getElementById('bank-tabs').children;
+            Array.from(tabs).forEach((tab, i) => {
+                if(i === index) {
+                    tab.className = "w-8 h-8 rounded-lg flex items-center justify-center transition-all bg-white dark:bg-slate-700 shadow-sm ring-1 ring-black/5 dark:ring-white/10 scale-110";
+                } else {
+                    tab.className = "w-8 h-8 rounded-lg flex items-center justify-center transition-all opacity-50 hover:opacity-100";
+                }
+            });
+
+            // Update Content
+            document.getElementById('modal-bank-logo').src = bank.logo;
+            document.getElementById('modal-bank-logo').className = `w-auto object-contain transition-all duration-300 ${bank.logoClass}`;
+            document.getElementById('modal-acc-name').textContent = bank.accName;
+            document.getElementById('modal-acc-num').textContent = bank.accNum;
+            document.getElementById('modal-bg-decor').className = `absolute -top-6 -right-6 w-24 h-24 rounded-full blur-2xl pointer-events-none overflow-hidden ${bank.bgDecor}`;
+
+            // Header Right Side (Ref Code OR Type Badge)
+            const rightContainer = document.getElementById('modal-header-right');
+            if (bank.refCode) {
+                rightContainer.innerHTML = `
+                    <div class="group relative cursor-help">
+                        <div class="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-white dark:bg-slate-700 border border-slate-100 dark:border-slate-600 shadow-sm transition-colors">
+                            <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Ref</span>
+                            <span class="text-[10px] font-bold text-slate-700 dark:text-slate-200 font-mono">${bank.refCode}</span>
+                            <i data-lucide="info" class="w-3 h-3 text-slate-400"></i>
+                        </div>
+                        <div class="absolute right-0 bottom-full mb-2 w-max p-3 bg-slate-900 dark:bg-slate-800 text-white text-[10px] leading-relaxed rounded-xl shadow-xl border border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none transform translate-y-1 group-hover:translate-y-0">
+                            <p class="font-bold text-orange-400 mb-0.5">Get Bonus</p>
+                            <p class="text-slate-300 whitespace-nowrap">${bank.refTooltip}</p>
+                            <div class="absolute -bottom-1 right-6 w-2 h-2 bg-slate-900 dark:bg-slate-800 rotate-45 border-b border-r border-slate-700"></div>
+                        </div>
+                    </div>`;
+                lucide.createIcons();
+            } else {
+                rightContainer.innerHTML = `
+                    <span class="text-[9px] font-bold px-2 py-0.5 rounded bg-white dark:bg-slate-700 text-slate-400 dark:text-slate-300 border border-slate-100 dark:border-slate-600 shadow-sm uppercase tracking-wide">
+                        ${bank.type}
+                    </span>`;
+            }
+
+            // Link Button
+            const linkBtn = document.getElementById('modal-link-btn');
+            if (bank.link) {
+                linkBtn.href = bank.link;
+                linkBtn.className = `w-full bg-gradient-to-r ${bank.themeColor} text-white font-bold py-3.5 rounded-xl text-xs hover:opacity-90 hover:scale-[1.02] transition-all shadow-lg flex items-center justify-center gap-2 mb-3`;
+                linkBtn.classList.remove('hidden');
+                document.getElementById('modal-link-text').textContent = bank.linkText;
+            } else {
+                linkBtn.classList.add('hidden');
+            }
+        }
+
+        function copyAccount() {
+            const accNum = banks[currentBankIndex].accNum;
+            navigator.clipboard.writeText(accNum).then(() => {
+                const btn = document.getElementById('btn-copy-acc');
+                const original = btn.innerHTML;
+                btn.innerHTML = '<i data-lucide="check" class="w-3.5 h-3.5 text-green-500"></i>';
+                lucide.createIcons();
+                setTimeout(() => {
+                    btn.innerHTML = original;
+                    lucide.createIcons();
+                }, 2000);
+            });
+        }
+
+        // --- EXISTING LOGIC ---
         function updateThemeIcon() {
             const isDark = html.classList.contains('dark');
             const icon = isDark ? 'sun' : 'moon';
             btnTheme.innerHTML = `<i data-lucide="${icon}" class="w-4 h-4 text-slate-600 dark:text-slate-300 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors"></i>`;
             lucide.createIcons();
-            
             const metaTheme = document.querySelector('meta[name="theme-color"]');
             metaTheme.setAttribute('content', isDark ? '#0f172a' : '#f8fafc');
+            
+            // Re-render tabs to fix icon colors in tabs if needed
+            renderBankTabs();
         }
 
-        // Apply View Mode
         function applyViewMode(mode) {
             document.documentElement.setAttribute('data-view', mode);
-            
-            let icon = 'grid-3x3'; // Default compact
+            let icon = 'grid-3x3'; 
             if (mode === 'grid') icon = 'grid-2x2';
             if (mode === 'standard') icon = 'list';
-            
             btnView.innerHTML = `<i data-lucide="${icon}" class="w-4 h-4 text-slate-600 dark:text-slate-300 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors"></i>`;
             lucide.createIcons();
         }
@@ -647,7 +733,6 @@
             applyViewMode(newMode);
         }
 
-        // Typewriter Effect
         const phrases = ["Daily Needs", "Productivity", "Business", "Efficiency"];
         let phraseIndex = 0;
         let charIndex = 0;
@@ -674,10 +759,8 @@
             setTimeout(typeEffect, speed);
         }
 
-        // Run Init
         init();
 
-        // Theme Toggle Logic
         btnTheme.addEventListener('click', () => {
             html.classList.toggle('dark');
             const isDark = html.classList.contains('dark');
@@ -685,7 +768,6 @@
             updateThemeIcon();
         });
 
-        // Search Logic
         function filterTools() {
             const query = searchInput.value.toLowerCase();
             const tools = document.querySelectorAll('.tool-item');
@@ -699,26 +781,12 @@
             });
         }
 
-        // Donate Modal Logic
         function openDonate() {
             donateModal.classList.add('show');
         }
 
         function closeDonate() {
             donateModal.classList.remove('show');
-        }
-
-        function copyAccount() {
-            navigator.clipboard.writeText('10527398950').then(() => {
-                const btn = document.getElementById('btn-copy-acc');
-                const original = btn.innerHTML;
-                btn.innerHTML = '<i data-lucide="check" class="w-3.5 h-3.5 text-green-500"></i>';
-                lucide.createIcons();
-                setTimeout(() => {
-                    btn.innerHTML = original;
-                    lucide.createIcons();
-                }, 2000);
-            });
         }
         
         donateModal.addEventListener('click', (e) => {
