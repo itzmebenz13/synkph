@@ -8,7 +8,6 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <meta name="theme-color" content="#ffffff">
 
-    <!-- Theme Init (No Flash) -->
     <script>
         if (localStorage.getItem('shein_pcal_theme') === 'dark') {
             document.documentElement.classList.add('dark-mode');
@@ -33,7 +32,7 @@
         html.dark-mode .stat-card { background-color: #1e1e1e; border-color: #333; }
         html.dark-mode textarea { background-color: #262626; color: white; border-color: #444; }
         
-        /* Dark Mode Red Button Fixes */
+        /* Dark Mode Colors */
         html.dark-mode .border-red-200 { border-color: #7f1d1d !important; }
         html.dark-mode .hover\:bg-red-50:hover { background-color: #450a0a !important; }
         html.dark-mode .border-orange-200 { border-color: #7c2d12 !important; }
@@ -52,7 +51,7 @@
         html { scrollbar-width: none; }
         body { -ms-overflow-style: none; }
 
-        /* SWIPE CONTAINER WRAPPER */
+        /* --- SWIPE & CARD STYLES --- */
         .swipe-outer {
             position: relative;
             overflow: hidden;
@@ -61,87 +60,105 @@
             background-color: #ef4444; /* Red background for delete */
         }
         
-        .delete-action {
+        /* The Delete Button Layer */
+        .delete-layer {
             position: absolute;
             top: 0; bottom: 0; right: 0;
             width: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
+            z-index: 1; /* Behind content */
             color: white;
-            z-index: 0;
+            font-weight: bold;
+            font-size: 12px;
             cursor: pointer;
         }
 
-        /* Email Item Standard */
+        /* The Content Card */
         .email-item {
             position: relative;
-            z-index: 10;
+            z-index: 10; /* Above delete layer */
             display: flex; flex-direction: column; gap: 8px;
-            padding: 12px; background: white; border-radius: 8px;
-            border: 1px solid #e5e7eb; 
-            /* No margin bottom here, handled by wrapper */
-            transition: transform 0.1s linear; 
-            touch-action: pan-y; /* Allow vertical scroll, handle horizontal in JS */
+            padding: 12px; background: white; 
+            border: 1px solid #e5e7eb; border-radius: 8px;
+            transition: transform 0.2s ease-out; /* Smooth snapping */
+            touch-action: pan-y; /* Allow vertical scroll */
+            user-select: none; /* Prevent text selection while swiping */
         }
         
-        /* Dark Mode Fix for Email Item Background */
         html.dark-mode .email-item {
             background-color: #1e1e1e;
             border-color: #333;
         }
 
-        /* COMPACT MODE OVERRIDES (Fixed Selector) */
+        /* --- COMPACT MODE FIXES --- */
+        /* Force remove Tailwind gap when compact class is present */
+        #results-list.compact {
+            gap: 0 !important; 
+        }
+
         #results-list.compact .swipe-outer {
-            margin-bottom: 4px;
+            margin-bottom: 2px;
+            border-radius: 4px;
         }
         
         #results-list.compact .email-item {
-            padding: 6px 8px;
-            gap: 4px;
+            padding: 4px 8px;
+            gap: 2px;
+            border-radius: 4px;
         }
+        
         #results-list.compact .email-row {
-            margin-bottom: 2px;
+            margin-bottom: 0;
         }
+        
         #results-list.compact .email-text {
             font-size: 11px;
             padding: 0;
         }
+        
         #results-list.compact .row-number {
             font-size: 9px;
             margin-right: 4px;
             min-width: 18px;
         }
+        
         #results-list.compact .item-controls {
             gap: 4px;
+            margin-top: 2px;
         }
+        
         #results-list.compact .tiny-input {
-            padding: 2px 4px;
+            padding: 0 4px;
             font-size: 10px;
-            height: 24px;
+            height: 20px;
         }
+        
         #results-list.compact .status-btn {
             font-size: 9px;
-            padding: 2px 0;
-            width: 45px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            padding: 0;
+            width: 40px;
+            height: 20px;
+            line-height: 20px;
         }
+        
         #results-list.compact .copy-btn-icon {
-            padding: 2px 4px;
-            font-size: 12px;
+            padding: 2px;
+            font-size: 11px;
         }
+        
         #results-list.compact .relative span.absolute {
             font-size: 9px;
-            top: 5px;
+            top: 3px;
             left: 4px;
         }
+        
         #results-list.compact .relative input.pl-4 {
             padding-left: 12px;
         }
 
+        /* --- INNER ELEMENTS --- */
         .email-row {
             display: flex; justify-content: space-between; align-items: center;
         }
@@ -153,9 +170,8 @@
         }
         html.dark-mode .email-text { color: #e5e5e5; }
         
-        /* State Colors */
-        .email-text.copied { color: #16a34a !important; } /* Green when copied */
-        .email-text.sold { color: #ef4444 !important; text-decoration: line-through; opacity: 0.8; } /* Red when sold */
+        .email-text.copied { color: #16a34a !important; }
+        .email-text.sold { color: #ef4444 !important; text-decoration: line-through; opacity: 0.8; }
 
         .copy-btn-icon {
             padding: 4px 8px; color: #9ca3af; font-size: 14px;
@@ -164,17 +180,14 @@
         .copy-btn-icon:hover { color: #2563eb; }
         html.dark-mode .copy-btn-icon:hover { color: #60a5fa; }
         
-        /* Locked Icon */
         .copy-btn-icon.locked { cursor: not-allowed; color: #ef4444 !important; }
 
-        /* Controls Row */
         .item-controls { display: flex; gap: 8px; align-items: center; }
         .tiny-input {
             padding: 6px; border: 1px solid #e5e7eb; border-radius: 4px; font-size: 11px;
             width: 80px; background: transparent;
         }
         
-        /* Status Toggle */
         .status-btn {
             font-size: 10px; font-weight: 800; padding: 4px 0; border-radius: 4px;
             text-transform: uppercase; cursor: pointer; border: 1px solid;
@@ -188,7 +201,7 @@
         html.dark-mode .status-active { background-color: #172554; color: #93c5fd; border-color: #1e3a8a; }
         html.dark-mode .status-sold { background-color: #052e16; color: #86efac; border-color: #14532d; }
 
-        /* Stats Grid */
+        /* Stats & Utils */
         .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 8px; }
         .stat-card { background: white; padding: 12px; border-radius: 8px; border: 1px solid #e5e7eb; position: relative; }
         .stat-val { font-size: 18px; font-weight: 900; }
@@ -207,56 +220,20 @@
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
         .modal-overlay.show .modal-card { transform: translateY(0); }
-        
-        /* Dark Mode Modal Fix */
-        html.dark-mode .modal-card {
-            background-color: #1e1e1e;
-            color: #ffffff;
-            border: 1px solid #333;
-        }
+        html.dark-mode .modal-card { background-color: #1e1e1e; color: #ffffff; border: 1px solid #333; }
 
-        /* Saved Email Item */
-        .saved-email-row {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 10px; border-bottom: 1px solid #f3f4f6; cursor: pointer;
-        }
+        /* Other Components */
+        .row-number { font-size: 10px; color: #9ca3af; font-family: monospace; min-width: 24px; text-align: right; margin-right: 8px; user-select: none; }
+        .batch-container { background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px; margin-bottom: 12px; display: flex; gap: 8px; align-items: center; }
+        html.dark-mode .batch-container { background-color: #1e1e1e; border-color: #333; }
+        .chart-container { height: 60px; width: 100%; margin-bottom: 16px; position: relative; background: white; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; }
+        html.dark-mode .chart-container { background-color: #1e1e1e; border-color: #333; }
+        .filter-select { background: transparent; border: none; font-size: 12px; font-weight: bold; color: #6b7280; outline: none; cursor: pointer; }
+        html.dark-mode .filter-select { color: #a3a3a3; }
+        .saved-email-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #f3f4f6; cursor: pointer; }
         .saved-email-row:hover { background-color: #f9fafb; }
         html.dark-mode .saved-email-row { border-color: #333; }
         html.dark-mode .saved-email-row:hover { background-color: #262626; }
-
-        /* Number Badge */
-        .row-number {
-            font-size: 10px; color: #9ca3af; font-family: monospace;
-            min-width: 24px; text-align: right; margin-right: 8px;
-            user-select: none;
-        }
-        
-        /* Batch Input */
-        .batch-container {
-            background: white; border: 1px solid #e5e7eb; border-radius: 8px;
-            padding: 8px; margin-bottom: 12px; display: flex; gap: 8px; align-items: center;
-        }
-        html.dark-mode .batch-container { background-color: #1e1e1e; border-color: #333; }
-
-        /* Graph */
-        .chart-container {
-            height: 60px; width: 100%; margin-bottom: 16px; position: relative;
-            background: white; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;
-        }
-        html.dark-mode .chart-container { background-color: #1e1e1e; border-color: #333; }
-        
-        .chart-tooltip {
-            position: absolute; top: 4px; right: 4px; font-size: 10px; 
-            background: rgba(0,0,0,0.7); color: white; padding: 2px 6px; 
-            border-radius: 4px; display: none; pointer-events: none;
-        }
-        
-        /* Filter Bar */
-        .filter-select {
-            background: transparent; border: none; font-size: 12px; font-weight: bold;
-            color: #6b7280; outline: none; cursor: pointer;
-        }
-        html.dark-mode .filter-select { color: #a3a3a3; }
     </style>
 </head>
 <body class="min-h-screen">
@@ -309,10 +286,7 @@
             <!-- Analytics Chart -->
             <div class="chart-container" id="earnings-chart-container">
                 <div class="absolute top-2 left-2 text-[9px] text-gray-400 font-bold uppercase tracking-wider">Last 7 Days Trend</div>
-                <div class="chart-tooltip" id="chart-tooltip"></div>
-                <svg id="earnings-chart" width="100%" height="100%" preserveAspectRatio="none" class="w-full h-full">
-                    <!-- Path injected via JS -->
-                </svg>
+                <svg id="earnings-chart" width="100%" height="100%" preserveAspectRatio="none" class="w-full h-full"></svg>
             </div>
 
             <!-- Input Section -->
@@ -384,6 +358,8 @@
             </div>
 
             <!-- Results List -->
+            <!-- Note: 'flex flex-col' removed to allow 'block' for gap overrides in CSS if needed, 
+                 but we use flex gap utility. Will rely on JS viewMode class to override gap via CSS -->
             <div id="results-list" class="flex flex-col gap-2 pb-10">
                 <div class="text-center text-gray-400 text-xs mt-10">
                     Enter an email to generate combinations.
@@ -614,7 +590,6 @@
                 if (emailIndex >= 0 && emailIndex < currentEmails.length) {
                     const email = currentEmails[emailIndex];
                     saveData(email, 'status', 'sold');
-                    // Also Apply Price if exists
                     if (appSettings.defaultPrice && (!db[email].price || db[email].price === '')) {
                         saveData(email, 'price', appSettings.defaultPrice);
                     }
@@ -723,7 +698,6 @@
                 pathD += `L${x},${y} `;
             });
 
-            // Gradient Fill Area
             const areaD = pathD + `L${width},${height} L0,${height} Z`;
 
             svg.innerHTML = `
@@ -736,7 +710,6 @@
                 <path d="${areaD}" fill="url(#grad)" />
                 <path d="${pathD}" fill="none" stroke="#22c55e" stroke-width="2" vector-effect="non-scaling-stroke" />
             `;
-            // Note: SVG viewBox is controlled by CSS width/height, simplified for sparkline
             svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
         }
 
@@ -746,7 +719,6 @@
             }
             db[email][field] = value;
             
-            // Auto Active Logic
             if (field === 'price' && value !== '' && db[email].status === 'unused') {
                 db[email].status = 'active';
             }
@@ -758,7 +730,6 @@
             localStorage.setItem('maildot_db', JSON.stringify(db));
             updateStats();
             
-            // Simple UI refresh for button if price triggered active
             if (field === 'price') {
                 const btn = document.querySelector(`button[data-email="${email}"]`);
                 if (btn && db[email].status === 'active') {
@@ -810,7 +781,6 @@
                 const saved = db[email] || { price: '', note: '', status: 'unused', copied: false };
                 const status = saved.status || 'unused'; 
                 
-                // Filtering
                 if (filterVal !== 'all' && status !== filterVal) return;
 
                 const isCopied = saved.copied === true;
@@ -819,49 +789,83 @@
                 const wrapper = document.createElement('div');
                 wrapper.className = 'swipe-outer';
                 
-                // Content for Swipe Delete Action
-                const deleteAction = document.createElement('div');
-                deleteAction.className = 'delete-action';
-                deleteAction.innerHTML = '<i class="fas fa-trash-alt"></i>';
-                deleteAction.onclick = () => deleteItem(email);
+                // Delete Back Layer
+                const deleteLayer = document.createElement('div');
+                deleteLayer.className = 'delete-layer';
+                deleteLayer.innerHTML = '<span><i class="fas fa-trash-alt mr-1"></i></span>';
+                // Mouse/Touch click logic for the layer
+                deleteLayer.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteItem(email);
+                });
                 
                 const item = document.createElement('div');
                 item.className = 'email-item';
                 
-                // Touch Events for Swipe
-                let touchStartX = 0;
-                let touchEndX = 0;
+                // --- SWIPE LOGIC (Touch + Mouse) ---
+                let startX = 0;
+                let currentX = 0;
+                let isDragging = false;
                 
-                item.addEventListener('touchstart', (e) => {
-                    touchStartX = e.changedTouches[0].screenX;
-                }, {passive: true});
+                const startDrag = (x) => {
+                    startX = x;
+                    isDragging = true;
+                    item.style.transition = 'none'; // Disable transition during drag
+                };
                 
-                item.addEventListener('touchmove', (e) => {
-                    touchEndX = e.changedTouches[0].screenX;
-                    const diff = touchEndX - touchStartX;
-                    // Only allow sliding left (negative diff) and limit drag
-                    if(diff < 0 && diff > -100) {
+                const moveDrag = (x) => {
+                    if (!isDragging) return;
+                    const diff = x - startX;
+                    // Only dragging left allowed, max -80px
+                    if (diff < 0 && diff > -100) {
+                        currentX = diff;
                         item.style.transform = `translateX(${diff}px)`;
                     }
-                }, {passive: true});
+                };
                 
-                item.addEventListener('touchend', (e) => {
-                    touchEndX = e.changedTouches[0].screenX;
-                    if(touchStartX - touchEndX > 50) { // Swiped left enough
-                        item.style.transform = 'translateX(-80px)'; // Snap open
+                const endDrag = (x) => {
+                    if (!isDragging) return;
+                    isDragging = false;
+                    item.style.transition = 'transform 0.2s ease-out'; // Re-enable transition
+                    const diff = x - startX;
+                    
+                    if (diff < -40) { // Threshold to snap open
+                        currentX = -80;
+                        item.style.transform = 'translateX(-80px)';
                     } else {
-                        item.style.transform = 'translateX(0)'; // Snap back
+                        currentX = 0;
+                        item.style.transform = 'translateX(0)';
                     }
+                };
+
+                // Touch Events
+                item.addEventListener('touchstart', (e) => startDrag(e.touches[0].clientX), {passive: true});
+                item.addEventListener('touchmove', (e) => moveDrag(e.touches[0].clientX), {passive: true});
+                item.addEventListener('touchend', (e) => endDrag(e.changedTouches[0].clientX));
+
+                // Mouse Events (Desktop Support)
+                item.addEventListener('mousedown', (e) => {
+                    // Don't drag if clicking inputs or buttons
+                    if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.closest('button')) return;
+                    startDrag(e.clientX);
+                });
+                window.addEventListener('mousemove', (e) => { // Window listener for smooth drag out
+                    if(isDragging) moveDrag(e.clientX);
+                }); 
+                window.addEventListener('mouseup', (e) => {
+                    if(isDragging) endDrag(e.clientX);
                 });
                 
-                // Helper to close swipe if clicked elsewhere
+                // Click to close if open
                 item.addEventListener('click', (e) => {
-                    if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT') {
-                         item.style.transform = 'translateX(0)';
+                    if (currentX < 0 && !e.target.closest('.delete-layer')) {
+                        currentX = 0;
+                        item.style.transition = 'transform 0.2s ease-out';
+                        item.style.transform = 'translateX(0)';
                     }
                 });
 
-                
+                // Content
                 let statusClass = 'status-unused';
                 let statusText = 'UNUSED';
                 if (status === 'active') { statusClass = 'status-active'; statusText = 'ACTIVE'; }
@@ -899,7 +903,7 @@
                     </div>
                 `;
                 
-                wrapper.appendChild(deleteAction);
+                wrapper.appendChild(deleteLayer);
                 wrapper.appendChild(item);
                 resultsList.appendChild(wrapper);
             });
@@ -910,7 +914,7 @@
             delete db[email];
             localStorage.setItem('maildot_db', JSON.stringify(db));
             updateStats();
-            // Re-render
+            
             const total = (inputLimit.value === '0' || getCombinations(inputEmail.value).length <= parseInt(inputLimit.value)) 
                           ? currentEmails.length 
                           : getCombinations(inputEmail.value).length;
@@ -953,12 +957,10 @@
                 const textEl = document.getElementById(`txt-${text}`);
                 if(textEl) textEl.classList.add('copied');
                 
-                // Auto-fill price if set
                 if (appSettings.defaultPrice) {
                     const saved = db[text] || {};
                     if (!saved.price) {
                        saveData(text, 'price', appSettings.defaultPrice);
-                       // Update input in DOM
                        const row = btn.closest('.email-item');
                        const inputPrice = row.querySelector('input[placeholder="Price"]');
                        if(inputPrice) inputPrice.value = appSettings.defaultPrice;
@@ -984,13 +986,10 @@
 
             saveData(email, 'status', nextStatus);
             
-            // Auto-fill price on status change
             if (appSettings.defaultPrice && (!db[email] || !db[email].price)) {
                 saveData(email, 'price', appSettings.defaultPrice);
             }
 
-            // Re-render handled by logic inside toggleStatus in DOM update below
-            // Ideally call renderList to be clean, but for performance we toggle classes
             let nextClass = 'status-active';
             let nextLabel = 'ACTIVE';
             if (nextStatus === 'unused') { nextClass = 'status-unused'; nextLabel = 'UNUSED'; }
@@ -999,7 +998,6 @@
             btn.innerText = nextLabel;
             btn.className = `status-btn ${nextClass}`;
 
-            // Check Price Input update
             const row = btn.closest('.email-item');
             if (appSettings.defaultPrice && row) {
                const inputPrice = row.querySelector('input[placeholder="Price"]');
@@ -1007,12 +1005,11 @@
             }
 
             const textEl = row.querySelector('.email-text');
-            const iconContainer = row.querySelector('.copy-btn-icon'); // simplified selector
+            const iconContainer = row.querySelector('.copy-btn-icon'); 
 
             if (nextStatus === 'sold') {
                 textEl.classList.add('sold');
                 textEl.classList.remove('copied'); 
-                // Swap Icon
                 if (iconContainer) {
                     iconContainer.className = "copy-btn-icon locked";
                     iconContainer.title = "Sold (Locked)";
@@ -1045,7 +1042,7 @@
                 resultsList.innerHTML = '<div class="text-center text-gray-400 text-xs mt-10">Enter an email to generate combinations.</div>';
                 actionBar.classList.add('hidden');
                 batchBar.classList.add('hidden');
-                drawChart({}); // Clear chart
+                drawChart({}); 
                 updateStats();
                 alert("All data and settings have been reset.");
                 dataModal.classList.remove('show');
@@ -1066,7 +1063,6 @@
             localStorage.setItem('maildot_db', JSON.stringify(db));
             updateStats();
             
-            // Refresh list if currently generated
             if(inputEmail.value) btnGenerate.click();
             
             alert(`Deleted ${count} sold records.`);
@@ -1076,7 +1072,6 @@
         window.exportCSV = function() {
             if (currentEmails.length === 0) { alert("No emails to export"); return; }
             
-            // Join emails with newlines for a clean list
             const content = currentEmails.join("\n");
             
             const blob = new Blob([content], { type: 'text/plain' });
