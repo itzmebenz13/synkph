@@ -6,6 +6,13 @@
     <title>SynkPH</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Updated Newsreader weight to 453 as requested, kept other fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@1,6..72,453&family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
     <!-- Initial Theme Color -->
     <meta name="theme-color" content="#f8fafc">
 
@@ -27,6 +34,13 @@
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+        /* .font-newsreader class for specific usage */
+        .font-newsreader {
+            font-family: 'Newsreader', serif;
+            /* Ensure the specific weight is used */
+            font-weight: 453; 
+        }
 
         .preload * {
             transition: none !important;
@@ -389,9 +403,9 @@
         <!-- Hero Section -->
         <div class="text-center mb-10 relative w-full max-w-lg">
             
-            <!-- Title with Animation -->
-            <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight mb-3 animate-float">
-                Synk<span class="text-gradient">PH</span>
+            <!-- Title with Animation and Custom Font -->
+            <h1 class="text-5xl md:text-7xl tracking-tight mb-3 animate-float">
+                <span class="font-newsreader italic font-light">Synk</span><span class="text-gradient font-extrabold">PH</span>
             </h1>
             
             <!-- Dynamic Subtitle -->
@@ -533,9 +547,9 @@
 
     </div>
 
-    <!-- Fixed Footer -->
-    <footer class="fixed bottom-6 w-full text-center z-40 pointer-events-none">
-        <div class="inline-flex items-center gap-2 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/40 dark:border-white/5 shadow-lg pointer-events-auto transform hover:scale-105 transition-transform">
+    <!-- Fixed Footer at Layout Bottom (Not Floating) -->
+    <footer class="w-full text-center py-8 z-40 mt-auto">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full opacity-60 hover:opacity-100 transition-opacity">
             <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">© 2026 SynkPH</p>
         </div>
     </footer>
