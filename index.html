@@ -595,7 +595,7 @@
                 accName: 'Joven Campomanes',
                 accNum: '09988079228',
                 logo: 'https://cstatic.ownbank.com.ph/pc-web/_next/static/media/logo.0f42d6ae.svg?w=256&q=80',
-                logoClass: 'h-4 ownbank-filter', // Invert light, Normal dark, Reduced size
+                logoClass: 'h-4 ownbank-filter', // Significantly smaller (h-4 vs h-6/h-5)
                 refCode: 'DA67BL',
                 refTooltip: 'Get trial bonus vouchers.',
                 link: null,
@@ -783,10 +783,12 @@
 
         function openDonate() {
             donateModal.classList.add('show');
+            document.body.style.overflow = 'hidden'; // Prevent scrolling
         }
 
         function closeDonate() {
             donateModal.classList.remove('show');
+            document.body.style.overflow = ''; // Restore scrolling
         }
         
         donateModal.addEventListener('click', (e) => {
