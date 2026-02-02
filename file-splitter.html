@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Splitr | Mobile Page Splitter</title>
+    <title>Splitr | PDF Splitter & Compressor</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -92,12 +92,21 @@
             backdrop-filter: blur(8px);
             background: rgba(18, 18, 18, 0.8);
         }
+
+        /* Switch Toggle Styling */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #3b82f6;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #3b82f6;
+        }
     </style>
 </head>
 <body class="h-full w-full flex flex-col font-sans text-gray-100 selection:bg-accent selection:text-white">
 
-    <!-- HIDDEN FILE INPUT: Placed at top of body to ensure existence -->
-    <input type="file" id="fileInput" style="display:none;" accept=".pdf,.docx,.pptx" />
+    <!-- HIDDEN FILE INPUT -->
+    <input type="file" id="fileInput" style="display:none;" accept=".pdf" />
 
     <!-- HEADER -->
     <header class="h-14 md:h-16 bg-panel border-b border-black flex items-center justify-between px-3 md:px-6 shrink-0 z-30 shadow-sm relative">
@@ -109,17 +118,18 @@
             
             <div class="h-5 w-[1px] bg-border mx-1 md:mx-2 shrink-0"></div>
             
-            <!-- OPEN FILE BUTTON (Header) -->
+            <!-- OPEN FILE BUTTON -->
             <button onclick="document.getElementById('fileInput').click()" class="flex items-center gap-2 px-3 py-2 text-xs md:text-sm font-medium text-white bg-white/5 hover:bg-white/10 rounded-lg transition border border-white/5 active:bg-white/10 truncate max-w-[160px] md:max-w-none">
                 <i class="ph ph-folder-open text-base md:text-lg shrink-0"></i> 
-                <span class="truncate">Open File</span>
+                <span class="truncate">Open PDF</span>
             </button>
         </div>
 
         <div class="flex items-center gap-2 md:gap-3 shrink-0">
             <span id="page-count-badge" class="hidden md:inline-block text-xs bg-black/40 border border-white/5 px-3 py-1.5 rounded-full text-gray-400 font-mono">0 Pages</span>
             
-            <button id="exportBtn" onclick="exportFile()" class="hidden flex items-center justify-center gap-2 bg-accent hover:bg-accentHover active:bg-blue-600 text-white px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium transition shadow-lg shadow-blue-900/20">
+            <!-- Standard Export (Hidden initially) -->
+            <button id="exportBtn" onclick="exportFile(false)" class="hidden flex items-center justify-center gap-2 bg-accent hover:bg-accentHover active:bg-blue-600 text-white px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium transition shadow-lg shadow-blue-900/20">
                 <i class="ph ph-export font-bold text-lg md:text-base"></i> 
                 <span class="hidden md:inline">Export</span>
             </button>
@@ -145,13 +155,12 @@
             <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center z-10 px-6">
                 <div class="bg-panel/90 backdrop-blur border border-white/10 p-6 md:p-10 rounded-2xl shadow-2xl flex flex-col items-center gap-4 max-w-sm text-center w-full mx-4">
                     <div class="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center ring-1 ring-white/10">
-                        <i class="ph ph-cloud-arrow-up text-3xl text-gray-500"></i>
+                        <i class="ph ph-file-pdf text-3xl text-gray-500"></i>
                     </div>
                     <div>
-                        <h3 class="text-lg md:text-xl font-semibold text-white">Upload Document</h3>
-                        <p class="text-xs md:text-sm text-gray-400 mt-2">Tap to browse or drop file</p>
+                        <h3 class="text-lg md:text-xl font-semibold text-white">Upload PDF</h3>
+                        <p class="text-xs md:text-sm text-gray-400 mt-2">Split and Compress PDF Files</p>
                     </div>
-                    <!-- OPEN FILE BUTTON (Empty State) -->
                     <button onclick="document.getElementById('fileInput').click()" class="w-full py-3 bg-accent hover:bg-accentHover text-white rounded-xl font-medium transition shadow-lg text-sm">
                         Browse Files
                     </button>
@@ -171,7 +180,7 @@
         </div>
 
         <!-- PROPERTIES PANEL -->
-        <div id="properties-panel" class="fixed inset-0 z-50 bg-bg md:bg-panel md:static md:w-72 md:border-l md:border-black flex-col md:shrink-0 hidden md:flex transition-all duration-300">
+        <div id="properties-panel" class="fixed inset-0 z-50 bg-bg md:bg-panel md:static md:w-80 md:border-l md:border-black flex-col md:shrink-0 hidden md:flex transition-all duration-300">
             <div class="h-14 md:h-12 border-b border-border flex items-center px-4 md:px-5 justify-between bg-panel md:bg-white/5">
                 <span class="text-sm md:text-xs font-bold text-white md:text-gray-400 uppercase tracking-widest">Properties</span>
                 <button onclick="toggleProperties(false)" class="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 md:bg-transparent text-gray-300 md:text-gray-400">
@@ -179,6 +188,7 @@
                 </button>
             </div>
 
+            <!-- File Info -->
             <div class="p-5 border-b border-border/50">
                 <div class="flex items-center gap-4 mb-5">
                     <div class="w-12 h-12 md:w-10 md:h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 shrink-0">
@@ -192,33 +202,42 @@
                 
                 <div class="space-y-3 bg-panel md:bg-black/20 p-4 md:p-3 rounded-lg border border-white/5">
                     <div class="flex justify-between text-sm md:text-xs">
-                        <span class="text-gray-500">Format</span>
-                        <span id="file-type" class="text-gray-300 font-mono">-</span>
-                    </div>
-                    <div class="flex justify-between text-sm md:text-xs">
-                        <span class="text-gray-500">Page Count</span>
+                        <span class="text-gray-500">Total Pages</span>
                         <span id="total-pages-prop" class="text-gray-300 font-mono">-</span>
                     </div>
                 </div>
             </div>
 
+            <!-- COMPRESSION TOOLS -->
+            <div class="p-5 border-b border-border/50">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Compressor</span>
+                </div>
+                
+                <div class="bg-panel md:bg-black/20 p-4 rounded-lg border border-white/5 flex flex-col gap-3">
+                    <div class="flex flex-col gap-1">
+                        <span class="text-sm text-white font-medium">Aggressive Compression</span>
+                        <span class="text-[10px] text-gray-500 leading-tight">Flatten pages to images. Reduces quality but saves space.</span>
+                    </div>
+                    
+                    <button onclick="calculateSavings()" class="w-full py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded font-medium text-xs transition flex items-center justify-center gap-2">
+                        <i class="ph ph-calculator"></i> Calculate Savings
+                    </button>
+                </div>
+            </div>
+
+            <!-- SELECTION LIST -->
             <div class="p-5 flex-1 overflow-y-auto">
                 <div class="flex justify-between items-center mb-4">
-                    <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Selection</span>
-                    <span id="selected-count" class="text-xs bg-red-500/10 border border-red-500/20 text-red-400 px-2 py-0.5 rounded-full hidden">0</span>
+                    <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Splitter</span>
+                    <span id="selected-count" class="text-xs bg-red-500/10 border border-red-500/20 text-red-400 px-2 py-0.5 rounded-full hidden">0 Removed</span>
                 </div>
                 
                 <div id="selection-guide" class="text-sm md:text-xs text-gray-500 leading-relaxed p-4 border border-dashed border-gray-600 rounded-lg text-center">
-                    Tap pages to mark them for removal.
+                    Tap pages on the canvas to remove them from the document.
                 </div>
 
                 <div id="selection-actions" class="hidden flex flex-col gap-3">
-                    <div class="p-3 rounded-lg bg-orange-500/10 border border-orange-500/20 flex gap-3">
-                        <i class="ph ph-warning text-orange-400 text-xl md:text-lg shrink-0"></i>
-                        <p class="text-sm md:text-xs text-orange-200/80 leading-tight">
-                            Selected pages will be permanently removed.
-                        </p>
-                    </div>
                     <button onclick="clearSelection()" class="w-full py-3 md:py-2 border border-border bg-panel hover:bg-white/5 rounded-lg text-sm md:text-xs text-gray-300 transition flex items-center justify-center gap-2 font-medium">
                         <i class="ph ph-arrow-counter-clockwise"></i> Clear Selection
                     </button>
@@ -227,6 +246,46 @@
             
             <div class="p-4 border-t border-border md:hidden bg-panel">
                  <button onclick="toggleProperties(false)" class="w-full py-3 bg-white text-black font-semibold rounded-lg">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- COMPARISON MODAL -->
+    <div id="comparison-modal" class="hidden fixed inset-0 z-[150] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div class="bg-panel border border-white/10 rounded-2xl w-full max-w-sm p-6 flex flex-col gap-6 shadow-2xl">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h3 class="text-lg font-semibold text-white">Compression Result</h3>
+                    <p class="text-xs text-gray-400">Comparison of estimated file sizes</p>
+                </div>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-white"><i class="ph ph-x text-lg"></i></button>
+            </div>
+
+            <div class="flex gap-4">
+                <div class="flex-1 bg-white/5 rounded-lg p-3 text-center border border-white/5">
+                    <p class="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Original</p>
+                    <p id="modal-orig-size" class="text-lg font-mono text-white font-semibold">0 MB</p>
+                </div>
+                <div class="flex items-center justify-center text-gray-500">
+                    <i class="ph ph-arrow-right"></i>
+                </div>
+                <div class="flex-1 bg-accent/10 rounded-lg p-3 text-center border border-accent/20">
+                    <p class="text-[10px] text-accent uppercase tracking-wider mb-1">Compressed</p>
+                    <p id="modal-new-size" class="text-lg font-mono text-white font-semibold">0 MB</p>
+                </div>
+            </div>
+
+            <div class="bg-green-500/10 border border-green-500/20 rounded-lg p-2 text-center">
+                <p id="modal-savings" class="text-sm text-green-400 font-medium">0% Reduction</p>
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <button id="btn-download-compressed" class="w-full py-3 bg-accent hover:bg-accentHover text-white rounded-lg font-medium text-sm transition flex items-center justify-center gap-2">
+                    <i class="ph ph-download-simple"></i> Download Compressed
+                </button>
+                <button onclick="exportFile(false)" class="w-full py-3 bg-transparent hover:bg-white/5 text-gray-400 hover:text-white border border-white/10 rounded-lg font-medium text-sm transition">
+                    Download Original (Split Only)
+                </button>
             </div>
         </div>
     </div>
@@ -246,13 +305,13 @@
         <div class="w-[1px] h-6 bg-white/10"></div>
         <button onclick="toggleProperties()" class="flex flex-col items-center gap-1 p-2 text-gray-400 hover:text-white active:text-accent relative">
             <i class="ph ph-sliders-horizontal text-xl"></i>
-            <span class="text-[10px]">Props</span>
+            <span class="text-[10px]">Tools</span>
             <div id="mobile-selection-dot" class="hidden absolute top-2 right-2 w-2 h-2 rounded-full bg-red-500"></div>
         </button>
     </div>
 
     <!-- LOADER -->
-    <div id="loader" class="hidden fixed inset-0 loader-overlay z-[100] flex flex-col items-center justify-center gap-6 transition-opacity duration-300 px-4 text-center">
+    <div id="loader" class="hidden fixed inset-0 loader-overlay z-[200] flex flex-col items-center justify-center gap-6 transition-opacity duration-300 px-4 text-center">
         <div class="relative">
             <div class="w-14 h-14 border-4 border-white/10 border-t-accent rounded-full animate-spin"></div>
         </div>
@@ -263,7 +322,7 @@
     </div>
 
     <!-- TOAST -->
-    <div id="toast" class="fixed top-4 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:w-auto bg-[#0f0f0f] border border-white/10 text-white px-4 py-3 rounded-xl shadow-2xl transform transition-all duration-300 -translate-y-28 opacity-0 z-[110] flex items-center gap-3">
+    <div id="toast" class="fixed top-4 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:w-auto bg-[#0f0f0f] border border-white/10 text-white px-4 py-3 rounded-xl shadow-2xl transform transition-all duration-300 -translate-y-28 opacity-0 z-[210] flex items-center gap-3">
         <i id="toast-icon" class="ph ph-check-circle text-green-400 text-xl shrink-0"></i>
         <div class="flex flex-col min-w-0">
             <span id="toast-title" class="text-sm font-semibold truncate">Success</span>
@@ -272,55 +331,46 @@
     </div>
 
     <script>
-        // --- EVENT BINDING ---
-        const fileInput = document.getElementById('fileInput');
-        // Define these globally to fix ReferenceError
-        const loaderText = document.getElementById('loader-text');
-        const loaderSub = document.getElementById('loader-sub');
-
-        if(fileInput) {
-            fileInput.addEventListener('change', (e) => {
-                if (e.target.files && e.target.files.length > 0) {
-                    handleFile(e.target.files[0]);
-                }
-            });
-            fileInput.addEventListener('click', (e) => {
-                e.target.value = null;
-            });
-        }
-
-        // Drop Zone Logic
-        document.body.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            document.body.classList.add('bg-white/5');
-        });
-        document.body.addEventListener('dragleave', (e) => {
-            e.preventDefault();
-            document.body.classList.remove('bg-white/5');
-        });
-        document.body.addEventListener('drop', (e) => {
-            e.preventDefault();
-            document.body.classList.remove('bg-white/5');
-            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-                handleFile(e.dataTransfer.files[0]);
-            }
-        });
-
-        // Initialize Library Settings
-        if (typeof pdfjsLib !== 'undefined') {
-            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-        }
-
-        // --- GLOBAL STATE ---
+        // --- GLOBAL VARIABLES ---
         let currentFile = null;
-        let currentFileBytes = null;
+        let currentFileBytes = null; // ArrayBuffer of original
+        let compressedPdfBytes = null; // ArrayBuffer of compressed result
         let originalFileName = "";
         let totalPages = 0;
         let pagesToRemove = new Set();
         let zoom = 100;
 
-        // --- FILE HANDLING ---
+        // Elements
+        const fileInput = document.getElementById('fileInput');
+        const loaderText = document.getElementById('loader-text');
+        const loaderSub = document.getElementById('loader-sub');
+        const comparisonModal = document.getElementById('comparison-modal');
 
+        // --- INIT ---
+        document.addEventListener('DOMContentLoaded', () => {
+            if(fileInput) {
+                fileInput.addEventListener('change', (e) => {
+                    if (e.target.files && e.target.files.length > 0) handleFile(e.target.files[0]);
+                });
+                fileInput.addEventListener('click', (e) => e.target.value = null);
+            }
+
+            // Drag & Drop
+            const dropZone = document.body;
+            dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('bg-white/5'); });
+            dropZone.addEventListener('dragleave', (e) => { e.preventDefault(); dropZone.classList.remove('bg-white/5'); });
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('bg-white/5');
+                if (e.dataTransfer.files && e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]);
+            });
+
+            if (typeof pdfjsLib !== 'undefined') {
+                pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+            }
+        });
+
+        // --- FILE HANDLING ---
         function readFileAsArrayBuffer(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -333,72 +383,36 @@
         async function handleFile(file) {
             try {
                 if (!file) return;
-                
                 resetApp(false);
-                showLoader(true, "Reading File", "Loading data...");
+                showLoader(true, "Reading PDF", "Loading data...");
 
                 currentFile = file;
                 originalFileName = file.name;
+                const ext = file.name.split('.').pop().toLowerCase();
+                if (ext !== 'pdf') throw new Error("Only PDF files are supported.");
+
                 currentFileBytes = await readFileAsArrayBuffer(file);
 
                 document.getElementById('file-name').textContent = file.name;
-                document.getElementById('file-size').textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
-                const ext = file.name.split('.').pop().toLowerCase();
-                document.getElementById('file-type').textContent = ext.toUpperCase();
+                document.getElementById('file-size').textContent = formatBytes(file.size);
 
-                // Show UI
                 document.getElementById('empty-state').classList.add('hidden');
                 document.getElementById('grid-container').classList.remove('hidden');
 
-                if (ext === 'pdf') {
-                    await processPDFSafely(currentFileBytes);
-                } else if (['docx', 'pptx'].includes(ext)) {
-                    await simulateOfficeDoc(ext);
-                } else {
-                    throw new Error("Unsupported file format. Please use PDF, DOCX, or PPTX.");
-                }
-
+                await loadPDF(currentFileBytes);
                 if (window.innerWidth >= 768) toggleProperties(true);
 
             } catch (error) {
-                console.error("File Handler Error:", error);
+                console.error(error);
                 showToast("Error", error.message, "error");
-                resetApp(); 
+                resetApp();
             } finally {
                 showLoader(false);
             }
         }
 
-        // --- ROBUST PDF PROCESSING ---
-
-        async function processPDFSafely(arrayBuffer) {
-            try {
-                // Attempt 1: Standard Worker
-                await loadPDF(arrayBuffer);
-            } catch (err) {
-                console.warn("Standard Worker Failed:", err);
-                
-                if (err.message && (err.message.includes('Worker') || err.name === 'SecurityError' || err.message.includes('Setting up fake worker failed'))) {
-                    showLoader(true, "Security Block Detected", "Switching to Compatibility Mode...");
-                    
-                    // FALLBACK: Disable Worker (Main Thread Mode)
-                    pdfjsLib.GlobalWorkerOptions.workerSrc = ''; 
-                    
-                    try {
-                        await loadPDF(arrayBuffer);
-                        showToast("Compatibility Mode", "Loaded using main thread fallback", "warning");
-                    } catch (fatalErr) {
-                         throw new Error("Failed to load PDF even in compatibility mode: " + fatalErr.message);
-                    }
-                } else {
-                    throw err; 
-                }
-            }
-        }
-
         async function loadPDF(arrayBuffer) {
             if(loaderText) loaderText.textContent = "Parsing PDF...";
-            
             const typedArray = new Uint8Array(arrayBuffer);
             const loadingTask = pdfjsLib.getDocument(typedArray);
             const pdf = await loadingTask.promise;
@@ -408,7 +422,7 @@
             document.getElementById('exportBtn').classList.remove('hidden');
 
             if(loaderText) loaderText.textContent = "Rendering...";
-            
+            const pagesGrid = document.getElementById('pages-grid');
             const isMobile = window.innerWidth < 768;
             const scale = isMobile ? 0.4 : 0.6; 
 
@@ -418,13 +432,12 @@
                 await createPageCard(page, i, scale);
                 if (i % 5 === 0) await new Promise(r => setTimeout(r, 0));
             }
-            showToast("Success", "PDF loaded successfully", "success");
+            showToast("Success", "PDF loaded", "success");
         }
 
         async function createPageCard(page, pageNum, scale) {
             const viewport = page.getViewport({ scale: scale });
             const pagesGrid = document.getElementById('pages-grid');
-            
             const card = document.createElement('div');
             card.className = 'page-card flex flex-col gap-1 group cursor-pointer relative touch-manipulation';
             card.dataset.index = pageNum - 1;
@@ -439,38 +452,24 @@
                 <div class="canvas-container relative bg-white rounded-lg overflow-hidden shadow-sm border-2 border-transparent transition-all w-full">
                     <canvas class="block w-full h-auto"></canvas>
                     <div class="deleted-overlay absolute inset-0 bg-red-500/20 hidden items-center justify-center z-10">
-                        <div class="bg-red-500/90 text-white p-3 rounded-full shadow-lg">
-                            <i class="ph ph-trash text-2xl"></i>
-                        </div>
+                        <div class="bg-red-500/90 text-white p-3 rounded-full shadow-lg"><i class="ph ph-trash text-2xl"></i></div>
                     </div>
                 </div>
             `;
-
             const canvas = card.querySelector('canvas');
             const context = canvas.getContext('2d');
             canvas.height = viewport.height;
             canvas.width = viewport.width;
-            
             await page.render({ canvasContext: context, viewport: viewport }).promise;
-
             card.addEventListener('click', () => togglePageSelection(card, pageNum - 1));
             pagesGrid.appendChild(card);
         }
 
         function togglePageSelection(card, index) {
-            // SAFEGUARD: Don't allow selecting (deleting) if we only have 1 page total
-            if (totalPages <= 1) {
-                showToast("Locked", "Document must have at least one page", "error");
-                return;
-            }
-
-            // SAFEGUARD: Don't allow deleting ALL pages
-            // If the card is NOT currently selected (meaning we are ABOUT TO select/delete it)
-            if (!pagesToRemove.has(index)) {
-                 if (pagesToRemove.size + 1 >= totalPages) {
-                     showToast("Limit Reached", "You cannot remove all pages", "error");
-                     return;
-                 }
+            if (totalPages <= 1) { showToast("Locked", "Document must have at least one page", "error"); return; }
+            if (!pagesToRemove.has(index) && pagesToRemove.size + 1 >= totalPages) {
+                 showToast("Limit Reached", "Cannot remove all pages", "error");
+                 return;
             }
 
             const indicator = card.querySelector('.chk-indicator');
@@ -481,8 +480,8 @@
             if (pagesToRemove.has(index)) {
                 pagesToRemove.delete(index);
                 card.classList.remove('selected');
-                indicator.classList.remove('bg-red-500', 'border-red-500');
-                indicator.classList.add('border-gray-600');
+                indicator.classList.replace('bg-red-500', 'border-gray-600');
+                indicator.classList.remove('border-red-500');
                 icon.classList.add('opacity-0', 'scale-50');
                 overlay.classList.add('hidden');
                 overlay.classList.remove('flex');
@@ -490,8 +489,8 @@
             } else {
                 pagesToRemove.add(index);
                 card.classList.add('selected');
-                indicator.classList.remove('border-gray-600');
-                indicator.classList.add('bg-red-500', 'border-red-500');
+                indicator.classList.replace('border-gray-600', 'bg-red-500');
+                indicator.classList.add('border-red-500');
                 icon.classList.remove('opacity-0', 'scale-50');
                 overlay.classList.remove('hidden');
                 overlay.classList.add('flex');
@@ -504,78 +503,160 @@
             const count = pagesToRemove.size;
             document.getElementById('selected-count').textContent = `${count} Removed`;
             const mobileDot = document.getElementById('mobile-selection-dot');
-            
-            if (count > 0) {
-                document.getElementById('selected-count').classList.remove('hidden');
-                document.getElementById('selection-guide').classList.add('hidden');
-                document.getElementById('selection-actions').classList.remove('hidden');
-                mobileDot.classList.remove('hidden');
-            } else {
-                document.getElementById('selected-count').classList.add('hidden');
-                document.getElementById('selection-guide').classList.remove('hidden');
-                document.getElementById('selection-actions').classList.add('hidden');
-                mobileDot.classList.add('hidden');
-            }
+            const state = count > 0;
+            document.getElementById('selected-count').classList.toggle('hidden', !state);
+            document.getElementById('selection-guide').classList.toggle('hidden', state);
+            document.getElementById('selection-actions').classList.toggle('hidden', !state);
+            mobileDot.classList.toggle('hidden', !state);
         }
 
         function clearSelection() {
-            // FIX: Iterate through a COPY of the indices.
-            // If we iterate directly while modifying, it might cause issues or loop incorrectly.
             const indices = Array.from(pagesToRemove);
-            
             indices.forEach(index => {
-                // Find the card for this index
                 const card = document.querySelector(`.page-card[data-index="${index}"]`);
-                if (card) {
-                    togglePageSelection(card, index); // This will effectively deselect it
-                }
+                if (card) togglePageSelection(card, index); 
             });
-            
-            // Just in case, force clear the set
             pagesToRemove.clear();
             updateSelectionUI();
         }
 
-        async function exportFile() {
-            if (!currentFileBytes) return;
-            if (pagesToRemove.size === 0) {
-                showToast("Notice", "No pages selected", "warning");
-                return;
+        // --- COMPRESSION & EXPORT LOGIC ---
+
+        function getKeepIndices() {
+            const indices = [];
+            for (let i = 0; i < totalPages; i++) {
+                if (!pagesToRemove.has(i)) indices.push(i);
             }
+            return indices;
+        }
+
+        async function calculateSavings() {
+            if (!currentFileBytes) return;
+            const keepIndices = getKeepIndices();
+            if (keepIndices.length === 0) return;
 
             try {
-                showLoader(true, "Exporting", "Creating PDF...");
-                await new Promise(r => setTimeout(r, 100));
+                showLoader(true, "Compressing", "Analyzing potential savings...");
+                // Note: We need to access PDFLib specifically from window
+                if(typeof window.PDFLib === 'undefined') throw new Error("PDFLib not loaded");
 
-                const { PDFDocument } = PDFLib;
-                const pdfDoc = await PDFDocument.load(currentFileBytes);
-                const count = pdfDoc.getPageCount();
-                const keepIndices = [];
+                const newPdf = await window.PDFLib.PDFDocument.create();
+                
+                // Use standard typed array for pdfjs processing
+                const typedArray = new Uint8Array(currentFileBytes);
+                const loadingTask = pdfjsLib.getDocument(typedArray);
+                const pdfSrc = await loadingTask.promise;
 
-                for (let i = 0; i < count; i++) {
-                    if (!pagesToRemove.has(i)) keepIndices.push(i);
+                for (let i = 0; i < keepIndices.length; i++) {
+                    const originalPageIndex = keepIndices[i] + 1;
+                    if(loaderSub) loaderSub.textContent = `Processing Page ${i + 1} of ${keepIndices.length}`;
+
+                    const page = await pdfSrc.getPage(originalPageIndex);
+                    // Use scale 1.0 for decent quality but lower size
+                    const viewport = page.getViewport({ scale: 1.0 });
+
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+
+                    await page.render({ canvasContext: context, viewport: viewport }).promise;
+
+                    // 0.6 Quality (60%)
+                    const imgData = canvas.toDataURL('image/jpeg', 0.6);
+                    const imgBytes = await fetch(imgData).then(res => res.arrayBuffer());
+                    
+                    const jpgImage = await newPdf.embedJpg(imgBytes);
+                    const newPage = newPdf.addPage([viewport.width, viewport.height]);
+                    newPage.drawImage(jpgImage, { x: 0, y: 0, width: viewport.width, height: viewport.height });
+                    
+                    await new Promise(r => setTimeout(r, 0));
                 }
 
-                if (keepIndices.length === 0) throw new Error("Cannot delete all pages");
+                compressedPdfBytes = await newPdf.save();
+                showComparisonModal(currentFileBytes.byteLength, compressedPdfBytes.byteLength);
 
-                const newPdf = await PDFDocument.create();
-                const pages = await newPdf.copyPages(pdfDoc, keepIndices);
-                pages.forEach(p => newPdf.addPage(p));
+            } catch (err) {
+                console.error(err);
+                showToast("Error", "Compression Failed: " + err.message, "error");
+            } finally {
+                showLoader(false);
+            }
+        }
 
-                const pdfBytes = await newPdf.save();
-                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-                const name = originalFileName.replace('.pdf', '_edited.pdf');
-                
-                saveAs(blob, name);
-                showToast("Saved!", "File downloaded", "success");
-                
-                if(window.innerWidth < 768) toggleProperties(false);
+        async function exportFile(useCompressed = false) {
+            if (!currentFileBytes) return;
+            const keepIndices = getKeepIndices();
 
+            try {
+                if (useCompressed && compressedPdfBytes) {
+                    // User chose to download the already compressed buffer
+                    downloadPDF(compressedPdfBytes, true);
+                    closeModal();
+                } else {
+                    // Standard Split Export (No Compression)
+                    showLoader(true, "Exporting", "Creating PDF...");
+                    await new Promise(r => setTimeout(r, 100));
+
+                    const pdfDoc = await window.PDFLib.PDFDocument.load(currentFileBytes);
+                    const newPdf = await window.PDFLib.PDFDocument.create();
+                    const pages = await newPdf.copyPages(pdfDoc, keepIndices);
+                    pages.forEach(p => newPdf.addPage(p));
+                    
+                    const pdfBytes = await newPdf.save();
+                    downloadPDF(pdfBytes, false);
+                }
             } catch (err) {
                 showToast("Error", err.message, "error");
             } finally {
                 showLoader(false);
             }
+        }
+
+        // --- UI HELPERS ---
+
+        function showComparisonModal(origSize, newSize) {
+            document.getElementById('modal-orig-size').textContent = formatBytes(origSize);
+            document.getElementById('modal-new-size').textContent = formatBytes(newSize);
+            
+            const saved = origSize - newSize;
+            const pct = Math.round((saved / origSize) * 100);
+            
+            const savingsEl = document.getElementById('modal-savings');
+            if (saved > 0) {
+                savingsEl.textContent = `${pct}% Reduction (${formatBytes(saved)} saved)`;
+                savingsEl.className = "text-sm text-green-400 font-medium";
+            } else {
+                savingsEl.textContent = "No reduction (File already optimized)";
+                savingsEl.className = "text-sm text-orange-400 font-medium";
+            }
+
+            // Bind the download button to the specific compressed bytes
+            const btn = document.getElementById('btn-download-compressed');
+            btn.onclick = () => exportFile(true);
+
+            comparisonModal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            comparisonModal.classList.add('hidden');
+        }
+
+        function downloadPDF(bytes, isCompressed) {
+            const blob = new Blob([bytes], { type: 'application/pdf' });
+            const suffix = isCompressed ? '_compressed.pdf' : '_split.pdf';
+            const name = originalFileName.replace('.pdf', suffix);
+            saveAs(blob, name);
+            showToast("Saved!", `File downloaded`, "success");
+        }
+
+        function formatBytes(bytes, decimals = 2) {
+            if (!+bytes) return '0 Bytes';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
         }
 
         function toggleProperties(forceState = null) {
@@ -595,30 +676,6 @@
             }
         }
 
-        async function simulateOfficeDoc(type) {
-            await new Promise(r => setTimeout(r, 800));
-            totalPages = 8;
-            updateStats(totalPages);
-            document.getElementById('exportBtn').classList.add('hidden');
-            
-            const pagesGrid = document.getElementById('pages-grid');
-            pagesGrid.innerHTML = '';
-            
-            for(let i=1; i<=totalPages; i++) {
-                const card = document.createElement('div');
-                card.className = 'page-card opacity-60 cursor-not-allowed flex flex-col gap-1';
-                card.innerHTML = `
-                    <div class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Slide ${i}</div>
-                    <div class="bg-white/5 rounded-lg aspect-[3/4] flex items-center justify-center border border-white/10 w-full flex-col gap-2 p-2 text-center">
-                         <i class="ph ph-${type === 'pptx' ? 'presentation-chart' : 'file-doc'} text-3xl text-gray-600"></i>
-                         <span class="text-[10px] text-gray-500">Preview Unavailable<br>(Simulation Mode)</span>
-                    </div>
-                `;
-                pagesGrid.appendChild(card);
-            }
-            showToast("Viewer", "Simulated Mode - PDF Split Supported", "warning");
-        }
-
         function updateStats(total) {
             document.getElementById('total-pages-prop').textContent = total;
             document.getElementById('page-count-badge').textContent = `${total} Pages`;
@@ -632,20 +689,18 @@
                 document.getElementById('grid-container').classList.add('hidden');
                 document.getElementById('exportBtn').classList.add('hidden');
                 document.getElementById('page-count-badge').classList.add('hidden');
-                const fi = document.getElementById('fileInput');
-                if(fi) fi.value = '';
+                if(fileInput) fileInput.value = '';
                 document.getElementById('mobile-selection-dot').classList.add('hidden');
+                closeModal();
             }
-            
             document.getElementById('pages-grid').innerHTML = '';
             currentFile = null;
             currentFileBytes = null;
+            compressedPdfBytes = null;
             pagesToRemove.clear();
             totalPages = 0;
-            
             document.getElementById('file-name').textContent = "No File";
             document.getElementById('file-size').textContent = "0 MB";
-            document.getElementById('file-type').textContent = "-";
             document.getElementById('total-pages-prop').textContent = "-";
             updateSelectionUI();
         }
@@ -654,11 +709,9 @@
             zoom = Math.max(50, Math.min(200, zoom + delta));
             document.getElementById('zoom-level-desktop').textContent = zoom + '%';
             document.getElementById('zoom-level-mobile').textContent = zoom + '%';
-            
             const pagesGrid = document.getElementById('pages-grid');
             const baseSize = window.innerWidth < 768 ? 140 : 160;
             const newSize = Math.floor(baseSize * (zoom / 100));
-            
             if (window.innerWidth >= 768) {
                 pagesGrid.style.gridTemplateColumns = `repeat(auto-fill, minmax(${newSize}px, 1fr))`;
             } else {
@@ -688,7 +741,6 @@
             document.getElementById('toast-title').textContent = title;
             document.getElementById('toast-message').textContent = message;
             const icon = document.getElementById('toast-icon');
-            
             toast.className = toast.className.replace(/border-.*? /g, 'border-white/10 ');
 
             if (type === 'error') {
@@ -700,11 +752,8 @@
             } else {
                 icon.className = 'ph ph-check-circle text-green-400 text-xl';
             }
-
             toast.classList.remove('-translate-y-28', 'opacity-0');
-            setTimeout(() => {
-                toast.classList.add('-translate-y-28', 'opacity-0');
-            }, 3500);
+            setTimeout(() => { toast.classList.add('-translate-y-28', 'opacity-0'); }, 3500);
         }
     </script>
 </body>
