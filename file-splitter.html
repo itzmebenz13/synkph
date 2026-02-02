@@ -98,6 +98,22 @@
             box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
+        /* Dot Animation */
+        .dots::after {
+            content: '';
+            animation: dots 1.5s steps(4, end) infinite;
+            display: inline-block;
+            width: 1em; /* reserve space */
+            text-align: left;
+        }
+        
+        @keyframes dots {
+            0%, 20% { content: ''; }
+            40% { content: '.'; }
+            60% { content: '..'; }
+            80%, 100% { content: '...'; }
+        }
+
         /* Switch Toggle Styling */
         .toggle-checkbox:checked {
             right: 0;
@@ -444,7 +460,7 @@
 
             for (let i = 1; i <= totalPages; i++) {
                 const progress = Math.round((i / totalPages) * 100);
-                showLoader(true, "Rendering Previews", `Processing Page ${i} of ${totalPages}`, progress, "ph-image");
+                showLoader(true, "Rendering<span class='dots'></span>", `Processing Page ${i} of ${totalPages}`, progress, "ph-image");
                 
                 const page = await pdf.getPage(i);
                 await createPageCard(page, i, scale);
@@ -564,7 +580,7 @@
 
                 for (let i = 0; i < keepIndices.length; i++) {
                     const progress = Math.round((i / keepIndices.length) * 100);
-                    showLoader(true, "Compressing", `Optimizing Page ${i + 1} of ${keepIndices.length}`, progress, "ph-arrows-in-line-horizontal");
+                    showLoader(true, "Compressing<span class='dots'></span>", `Optimizing Page ${i + 1} of ${keepIndices.length}`, progress, "ph-arrows-in-line-horizontal");
 
                     const originalPageIndex = keepIndices[i] + 1;
                     const page = await pdfSrc.getPage(originalPageIndex);
@@ -741,7 +757,7 @@
             const loader = document.getElementById('loader');
             if (show) {
                 loader.classList.remove('hidden');
-                if(loaderText) loaderText.textContent = text || "Processing";
+                if(loaderText) loaderText.innerHTML = text || "Processing";
                 if(loaderSub) loaderSub.textContent = sub || "Please wait...";
                 
                 // Update Progress
