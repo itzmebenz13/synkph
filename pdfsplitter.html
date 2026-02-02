@@ -2,27 +2,30 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Splitr | Professional Page Splitter</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Splitr | Mobile Page Splitter</title>
     
-    <!-- Tailwind CSS with explicit configuration for JIT scanning -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-            content: ["./**/*.{html,js}"], // Ensure JIT scans this file content
+            content: ["./**/*.{html,js}"],
             theme: {
                 extend: {
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
                     },
                     colors: {
-                        bg: '#1e1e1e',
-                        panel: '#2c2c2c',
-                        border: '#444444',
+                        bg: '#121212',
+                        panel: '#1e1e1e',
+                        border: '#333333',
                         accent: '#3b82f6',
                         accentHover: '#2563eb',
                         text: '#e5e5e5',
                         muted: '#a3a3a3'
+                    },
+                    screens: {
+                        'xs': '375px',
                     }
                 }
             }
@@ -35,91 +38,113 @@
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
-    <!-- PDF Libraries - USING LEGACY BUILDS FOR BETTER BROWSER COMPATIBILITY -->
-    <!-- Added crossorigin attribute to fix GitHub Pages CORS issues -->
+    <!-- PDF Libraries (Legacy Builds for Stability) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js" crossorigin="anonymous"></script>
 
     <style>
-        body {
-            background-color: #1e1e1e;
-            color: #e5e5e5;
+        /* Prevent elastic scrolling on iOS */
+        html, body {
+            height: 100%;
+            height: 100dvh; /* Dynamic Viewport Height */
             overflow: hidden;
-            -webkit-font-smoothing: antialiased;
+            background-color: #121212;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
 
         .grid-bg {
-            background-size: 40px 40px;
+            background-size: 20px 20px; /* Smaller grid for mobile feel */
             background-image:
-                linear-gradient(to right, #333 1px, transparent 1px),
-                linear-gradient(to bottom, #333 1px, transparent 1px);
-            background-position: center;
+                linear-gradient(to right, #222 1px, transparent 1px),
+                linear-gradient(to bottom, #222 1px, transparent 1px);
+        }
+        
+        @media (min-width: 768px) {
+            .grid-bg {
+                background-size: 40px 40px;
+                background-image:
+                    linear-gradient(to right, #2a2a2a 1px, transparent 1px),
+                    linear-gradient(to bottom, #2a2a2a 1px, transparent 1px);
+            }
         }
 
         /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #1e1e1e; }
-        ::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #555; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
 
-        .page-card { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .page-card { transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .page-card:active { transform: scale(0.96); }
 
-        .page-card.selected {
-            transform: scale(0.95);
-            opacity: 0.8;
+        .page-card.selected .canvas-container {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3);
         }
         
         .page-card.selected canvas {
+            opacity: 0.4;
             filter: grayscale(100%);
-            opacity: 0.5;
         }
 
         .loader-overlay {
-            backdrop-filter: blur(4px);
-            background: rgba(30, 30, 30, 0.85);
+            backdrop-filter: blur(8px);
+            background: rgba(18, 18, 18, 0.8);
+        }
+
+        /* Mobile specific adjustments */
+        .mobile-panel-enter {
+            transform: translateY(100%);
+        }
+        .mobile-panel-active {
+            transform: translateY(0);
         }
     </style>
 </head>
-<body class="h-screen w-screen flex flex-col font-sans text-gray-100">
+<body class="h-full w-full flex flex-col font-sans text-gray-100 selection:bg-accent selection:text-white">
 
     <!-- HEADER -->
-    <header class="h-14 bg-panel border-b border-black flex items-center justify-between px-4 shrink-0 z-30 shadow-md">
-        <div class="flex items-center gap-4">
-            <div class="flex items-center gap-2 text-white font-semibold tracking-tight select-none">
-                <i class="ph ph-squares-four text-accent text-2xl"></i>
-                <span class="text-lg">Splitr</span>
+    <header class="h-14 md:h-16 bg-panel border-b border-black flex items-center justify-between px-3 md:px-6 shrink-0 z-30 shadow-sm relative">
+        <div class="flex items-center gap-3 md:gap-4 overflow-hidden">
+            <!-- Logo -->
+            <div class="flex items-center gap-2 text-white font-semibold tracking-tight shrink-0">
+                <i class="ph ph-squares-four text-accent text-xl md:text-2xl"></i>
+                <span class="text-base md:text-lg hidden xs:inline">Splitr</span>
             </div>
-            <div class="h-6 w-[1px] bg-border mx-2"></div>
             
-            <div class="flex gap-2">
-                <button onclick="document.getElementById('fileInput').click()" class="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 rounded-md transition border border-transparent hover:border-white/10">
-                    <i class="ph ph-folder-open text-lg"></i> Open File
-                </button>
-                <input type="file" id="fileInput" class="hidden" accept=".pdf,.docx,.pptx" />
-            </div>
+            <div class="h-5 w-[1px] bg-border mx-1 md:mx-2 shrink-0"></div>
+            
+            <!-- Open File Button -->
+            <button onclick="document.getElementById('fileInput').click()" class="flex items-center gap-2 px-3 py-2 text-xs md:text-sm font-medium text-white bg-white/5 hover:bg-white/10 rounded-lg transition border border-white/5 active:bg-white/10 truncate max-w-[160px] md:max-w-none">
+                <i class="ph ph-folder-open text-base md:text-lg shrink-0"></i> 
+                <span class="truncate">Open File</span>
+            </button>
+            <input type="file" id="fileInput" class="hidden" accept=".pdf,.docx,.pptx" />
         </div>
 
-        <div class="flex items-center gap-3">
-            <span id="page-count-badge" class="hidden text-xs bg-black/40 border border-white/5 px-3 py-1.5 rounded-full text-gray-400 font-mono">0 Pages</span>
+        <div class="flex items-center gap-2 md:gap-3 shrink-0">
+            <!-- Badge (Hidden on small mobile) -->
+            <span id="page-count-badge" class="hidden md:inline-block text-xs bg-black/40 border border-white/5 px-3 py-1.5 rounded-full text-gray-400 font-mono">0 Pages</span>
             
-            <button id="exportBtn" onclick="exportFile()" class="hidden flex items-center gap-2 bg-accent hover:bg-accentHover text-white px-4 py-1.5 rounded-md text-sm font-medium transition shadow-lg shadow-blue-900/20 active:translate-y-0.5">
-                <i class="ph ph-export font-bold"></i> Export PDF
+            <!-- Export Button (Desktop Text / Mobile Icon) -->
+            <button id="exportBtn" onclick="exportFile()" class="hidden flex items-center justify-center gap-2 bg-accent hover:bg-accentHover active:bg-blue-600 text-white px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium transition shadow-lg shadow-blue-900/20">
+                <i class="ph ph-export font-bold text-lg md:text-base"></i> 
+                <span class="hidden md:inline">Export</span>
             </button>
 
-            <div class="h-6 w-[1px] bg-border mx-1"></div>
-
-            <button onclick="toggleProperties()" class="w-9 h-9 flex items-center justify-center rounded-md text-gray-400 hover:text-white hover:bg-white/10 transition" title="Toggle Properties">
-                <i id="sidebar-icon" class="ph ph-sidebar-simple text-xl"></i>
+            <!-- Properties Toggle (Desktop Only - Mobile uses bottom bar) -->
+            <button onclick="toggleProperties()" class="hidden md:flex w-9 h-9 items-center justify-center rounded-md text-gray-400 hover:text-white hover:bg-white/10 transition">
+                <i id="sidebar-icon-desktop" class="ph ph-sidebar-simple text-xl"></i>
             </button>
         </div>
     </header>
 
-    <!-- MAIN CONTENT -->
-    <div class="flex-1 flex overflow-hidden">
+    <!-- MAIN WORKSPACE -->
+    <div class="flex-1 flex overflow-hidden relative">
         
-        <!-- TOOLBAR (LEFT) -->
-        <div class="w-14 bg-panel border-r border-black flex flex-col items-center py-4 gap-4 shrink-0 z-20">
+        <!-- LEFT SIDEBAR (Desktop Only) -->
+        <div class="hidden md:flex w-14 bg-panel border-r border-black flex-col items-center py-4 gap-4 shrink-0 z-20">
             <button class="w-10 h-10 flex items-center justify-center rounded-lg bg-accent/10 text-accent border border-accent/20" title="Select Tool">
                 <i class="ph ph-cursor text-xl"></i>
             </button>
@@ -128,74 +153,240 @@
             </button>
         </div>
 
-        <!-- CANVAS (CENTER) -->
-        <div class="flex-1 relative bg-bg grid-bg overflow-hidden flex flex-col">
+        <!-- CANVAS AREA -->
+        <div class="flex-1 relative bg-bg grid-bg overflow-hidden flex flex-col w-full">
             
             <!-- Empty State -->
-            <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center z-0">
-                <div class="bg-panel border border-border p-10 rounded-2xl shadow-2xl flex flex-col items-center gap-6 max-w-md text-center">
-                    <div class="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center ring-1 ring-white/10">
-                        <i class="ph ph-cloud-arrow-up text-4xl text-gray-500"></i>
+            <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center z-10 px-6">
+                <div class="bg-panel/90 backdrop-blur border border-white/10 p-6 md:p-10 rounded-2xl shadow-2xl flex flex-col items-center gap-4 max-w-sm text-center w-full mx-4">
+                    <div class="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center ring-1 ring-white/10">
+                        <i class="ph ph-cloud-arrow-up text-3xl text-gray-500"></i>
                     </div>
                     <div>
-                        <h3 class="text-xl font-semibold text-white">Upload Document</h3>
-                        <p class="text-sm text-gray-400 mt-2">Drag & drop PDF, PPTX or DOCX</p>
+                        <h3 class="text-lg md:text-xl font-semibold text-white">Upload Document</h3>
+                        <p class="text-xs md:text-sm text-gray-400 mt-2">Tap to browse or drop file</p>
                     </div>
-                    <button onclick="document.getElementById('fileInput').click()" class="w-full py-2.5 bg-accent hover:bg-accentHover text-white rounded-lg font-medium transition shadow-lg shadow-blue-500/10">
-                        Select File
+                    <button onclick="document.getElementById('fileInput').click()" class="w-full py-3 bg-accent hover:bg-accentHover text-white rounded-xl font-medium transition shadow-lg text-sm">
+                        Browse Files
                     </button>
+                    <p class="text-[10px] text-gray-600 uppercase tracking-widest mt-2">100% Local Processing</p>
                 </div>
             </div>
 
-            <!-- Grid -->
-            <div id="grid-container" class="flex-1 overflow-y-auto p-8 hidden z-10 scroll-smooth">
-                <div id="pages-grid" class="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-6 pb-24">
-                    <!-- Pages injected here -->
+            <!-- Page Grid Container -->
+            <div id="grid-container" class="flex-1 overflow-y-auto p-4 md:p-8 hidden z-10 scroll-smooth w-full">
+                <!-- Mobile: 2 columns, Desktop: Auto-fill -->
+                <div id="pages-grid" class="grid grid-cols-2 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-3 md:gap-6 pb-24 md:pb-24">
+                    <!-- Pages will be injected here -->
                 </div>
             </div>
 
-            <!-- Zoom Controls -->
-            <div class="absolute bottom-6 left-1/2 -translate-x-1/2 bg-panel/90 backdrop-blur border border-white/10 rounded-full shadow-2xl px-4 py-2 flex items-center gap-4 z-20">
+            <!-- Desktop Zoom Controls (Hidden on Mobile) -->
+            <div class="hidden md:flex absolute bottom-6 left-1/2 -translate-x-1/2 bg-panel/90 backdrop-blur border border-white/10 rounded-full shadow-2xl px-4 py-2 items-center gap-4 z-20">
                 <button onclick="adjustZoom(-10)" class="text-gray-400 hover:text-white p-1"><i class="ph ph-minus"></i></button>
-                <span id="zoom-level" class="text-xs font-mono w-12 text-center text-gray-300">100%</span>
+                <span id="zoom-level-desktop" class="text-xs font-mono w-12 text-center text-gray-300">100%</span>
                 <button onclick="adjustZoom(10)" class="text-gray-400 hover:text-white p-1"><i class="ph ph-plus"></i></button>
             </div>
         </div>
 
-        <!-- PROPERTIES (RIGHT) -->
-        <div id="properties-panel" class="w-72 bg-panel border-l border-black flex flex-col shrink-0 z-20 hidden">
-            <div class="h-12 border-b border-border flex items-center px-5 justify-between bg-white/5">
-                <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Properties</span>
-                <button onclick="toggleProperties(false)" class="text-gray-400 hover:text-white"><i class="ph ph-x text-lg"></i></button>
+        <!-- PROPERTIES PANEL (Responsive) -->
+        <!-- Desktop: Sidebar / Mobile: Full Screen Overlay -->
+        <div id="properties-panel" class="fixed inset-0 z-50 bg-bg md:bg-panel md:static md:w-72 md:border-l md:border-black flex-col md:shrink-0 hidden md:flex transition-all duration-300">
+            <!-- Header -->
+            <div class="h-14 md:h-12 border-b border-border flex items-center px-4 md:px-5 justify-between bg-panel md:bg-white/5">
+                <span class="text-sm md:text-xs font-bold text-white md:text-gray-400 uppercase tracking-widest">Properties</span>
+                <button onclick="toggleProperties(false)" class="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 md:bg-transparent text-gray-300 md:text-gray-400">
+                    <i class="ph ph-x text-lg"></i>
+                </button>
             </div>
 
             <div class="p-5 border-b border-border/50">
                 <div class="flex items-center gap-4 mb-5">
-                    <div class="w-10 h-10 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 shrink-0">
-                        <i id="file-icon" class="ph ph-file-pdf text-xl"></i>
+                    <div class="w-12 h-12 md:w-10 md:h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 shrink-0">
+                        <i id="file-icon" class="ph ph-file-pdf text-2xl md:text-xl"></i>
                     </div>
                     <div class="min-w-0">
-                        <h4 id="file-name" class="text-sm font-medium text-white truncate" title="">No File</h4>
-                        <p id="file-size" class="text-xs text-gray-500 mt-0.5">0 MB</p>
+                        <h4 id="file-name" class="text-base md:text-sm font-medium text-white truncate">No File</h4>
+                        <p id="file-size" class="text-sm md:text-xs text-gray-500 mt-0.5">0 MB</p>
                     </div>
                 </div>
                 
-                <div class="space-y-3 bg-black/20 p-3 rounded-lg border border-white/5">
-                    <div class="flex justify-between text-xs">
+                <div class="space-y-3 bg-panel md:bg-black/20 p-4 md:p-3 rounded-lg border border-white/5">
+                    <div class="flex justify-between text-sm md:text-xs">
                         <span class="text-gray-500">Format</span>
                         <span id="file-type" class="text-gray-300 font-mono">-</span>
                     </div>
-                    <div class="flex justify-between text-xs">
+                    <div class="flex justify-between text-sm md:text-xs">
                         <span class="text-gray-500">Page Count</span>
                         <span id="total-pages-prop" class="text-gray-300 font-mono">-</span>
                     </div>
                 </div>
             </div>
 
-            <div class="p-5">
+            <div class="p-5 flex-1 overflow-y-auto">
                 <div class="flex justify-between items-center mb-4">
                     <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Selection</span>
                     <span id="selected-count" class="text-xs bg-red-500/10 border border-red-500/20 text-red-400 px-2 py-0.5 rounded-full hidden">0</span>
+                </div>
+                
+                <div id="selection-guide" class="text-sm md:text-xs text-gray-500 leading-relaxed p-4 border border-dashed border-gray-600 rounded-lg text-center">
+                    Tap pages to mark them for removal.
+                </div>
+
+                <div id="selection-actions" class="hidden flex flex-col gap-3">
+                    <div class="p-3 rounded-lg bg-orange-500/10 border border-orange-500/20 flex gap-3">
+                        <i class="ph ph-warning text-orange-400 text-xl md:text-lg shrink-0"></i>
+                        <p class="text-sm md:text-xs text-orange-200/80 leading-tight">
+                            Selected pages will be permanently removed.
+                        </p>
+                    </div>
+                    <button onclick="clearSelection()" class="w-full py-3 md:py-2 border border-border bg-panel hover:bg-white/5 rounded-lg text-sm md:text-xs text-gray-300 transition flex items-center justify-center gap-2 font-medium">
+                        <i class="ph ph-arrow-counter-clockwise"></i> Clear Selection
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile Only: Bottom Actions inside Property Panel -->
+            <div class="p-4 border-t border-border md:hidden bg-panel">
+                 <button onclick="toggleProperties(false)" class="w-full py-3 bg-white text-black font-semibold rounded-lg">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MOBILE BOTTOM APP BAR (Fixed) -->
+    <div class="md:hidden h-16 bg-panel border-t border-black flex items-center justify-around px-2 shrink-0 z-40 pb-safe">
+        <!-- Reset -->
+        <button onclick="resetApp()" class="flex flex-col items-center gap-1 p-2 text-gray-400 hover:text-red-400 active:text-red-400">
+            <i class="ph ph-trash text-xl"></i>
+            <span class="text-[10px]">Reset</span>
+        </button>
+        
+        <div class="w-[1px] h-6 bg-white/10"></div>
+
+        <!-- Zoom Controls -->
+        <div class="flex items-center gap-3 bg-black/20 rounded-full px-3 py-1.5 border border-white/5">
+            <button onclick="adjustZoom(-10)" class="text-gray-400 active:text-white"><i class="ph ph-minus"></i></button>
+            <span id="zoom-level-mobile" class="text-[10px] font-mono w-8 text-center text-gray-300">100%</span>
+            <button onclick="adjustZoom(10)" class="text-gray-400 active:text-white"><i class="ph ph-plus"></i></button>
+        </div>
+
+        <div class="w-[1px] h-6 bg-white/10"></div>
+
+        <!-- Properties Toggle -->
+        <button onclick="toggleProperties()" class="flex flex-col items-center gap-1 p-2 text-gray-400 hover:text-white active:text-accent relative">
+            <i class="ph ph-sliders-horizontal text-xl"></i>
+            <span class="text-[10px]">Props</span>
+            <!-- Notification dot if pages selected -->
+            <div id="mobile-selection-dot" class="hidden absolute top-2 right-2 w-2 h-2 rounded-full bg-red-500"></div>
+        </button>
+    </div>
+
+    <!-- LOADER -->
+    <div id="loader" class="hidden fixed inset-0 loader-overlay z-[100] flex flex-col items-center justify-center gap-6 transition-opacity duration-300 px-4 text-center">
+        <div class="relative">
+            <div class="w-14 h-14 border-4 border-white/10 border-t-accent rounded-full animate-spin"></div>
+        </div>
+        <div>
+            <p id="loader-text" class="text-lg font-medium text-white tracking-wide">Processing...</p>
+            <p id="loader-sub" class="text-sm text-gray-400 mt-1">Please wait</p>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast" class="fixed top-4 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:w-auto bg-[#0f0f0f] border border-white/10 text-white px-4 py-3 rounded-xl shadow-2xl transform transition-all duration-300 -translate-y-28 opacity-0 z-[110] flex items-center gap-3">
+        <i id="toast-icon" class="ph ph-check-circle text-green-400 text-xl shrink-0"></i>
+        <div class="flex flex-col min-w-0">
+            <span id="toast-title" class="text-sm font-semibold truncate">Success</span>
+            <span id="toast-message" class="text-xs text-gray-400 truncate">Operation completed</span>
+        </div>
+    </div>
+
+    <script>
+        // --- CONFIGURATION ---
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        const { PDFDocument } = PDFLib;
+
+        // State
+        let currentFile = null;
+        let currentFileBytes = null;
+        let originalFileName = "";
+        let totalPages = 0;
+        let pagesToRemove = new Set();
+        let zoom = 100;
+
+        // DOM Elements
+        const fileInput = document.getElementById('fileInput');
+        const gridContainer = document.getElementById('grid-container');
+        const pagesGrid = document.getElementById('pages-grid');
+        const emptyState = document.getElementById('empty-state');
+        const loader = document.getElementById('loader');
+        const loaderText = document.getElementById('loader-text');
+        const loaderSub = document.getElementById('loader-sub');
+        const exportBtn = document.getElementById('exportBtn');
+        const propertiesPanel = document.getElementById('properties-panel');
+        const desktopSidebarIcon = document.getElementById('sidebar-icon-desktop');
+        const mobileSelectionDot = document.getElementById('mobile-selection-dot');
+        
+        // --- INITIALIZATION ---
+        
+        // Drag & Drop
+        const dropZone = document.body;
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('bg-white/5');
+        });
+        dropZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('bg-white/5');
+        });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('bg-white/5');
+            if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) handleFile(e.target.files[0]);
+        });
+
+        // --- RESPONSIVE LAYOUT LOGIC ---
+
+        function toggleProperties(forceState = null) {
+            const isHidden = propertiesPanel.classList.contains('hidden');
+            const shouldShow = forceState !== null ? forceState : isHidden;
+
+            if (shouldShow) {
+                propertiesPanel.classList.remove('hidden');
+                propertiesPanel.classList.add('flex');
+                if(desktopSidebarIcon) {
+                    desktopSidebarIcon.classList.add('text-accent');
+                    desktopSidebarIcon.classList.remove('text-gray-400');
+                }
+            } else {
+                propertiesPanel.classList.add('hidden');
+                propertiesPanel.classList.remove('flex');
+                if(desktopSidebarIcon) {
+                    desktopSidebarIcon.classList.remove('text-accent');
+                    desktopSidebarIcon.classList.add('text-gray-400');
+                }
+            }
+        }
+
+        // --- CORE FILE PROCESSING ---
+
+        async function handleFile(file) {
+            if (!file) return;
+
+            resetApp(false);
+            currentFile = file;
+            originalFileName = file.name;
+            
+            showLoader(true, "Analyzing File", "Reading local data...");
+
+            // Update Metadata
+            document.getElementById('file-name').textContent = file.name;
+            document.getElementById('file-size').textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+            const ext = file.name.split('.').pop().toLowerCa="text-xs bg-red-500/10 border border-red-500/20 text-red-400 px-2 py-0.5 rounded-full hidden">0</span>
                 </div>
                 
                 <div id="selection-guide" class="text-xs text-gray-500 leading-relaxed p-4 border border-dashed border-gray-600 rounded-lg text-center">
