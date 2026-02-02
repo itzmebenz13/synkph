@@ -101,17 +101,17 @@
         /* Dot Animation */
         .dots::after {
             content: '';
-            animation: dots 1.5s steps(4, end) infinite;
+            animation: dots 1.5s steps(1, end) infinite;
             display: inline-block;
-            width: 1em; /* reserve space */
+            width: 1.2em; /* reserve space */
             text-align: left;
         }
         
         @keyframes dots {
-            0%, 20% { content: ''; }
-            40% { content: '.'; }
-            60% { content: '..'; }
-            80%, 100% { content: '...'; }
+            0% { content: ''; }
+            25% { content: '.'; }
+            50% { content: '..'; }
+            75% { content: '...'; }
         }
 
         /* Switch Toggle Styling */
@@ -458,9 +458,16 @@
             const isMobile = window.innerWidth < 768;
             const scale = isMobile ? 0.4 : 0.6; 
 
+            // Initial loader state - Set HTML once to start animation
+            showLoader(true, "Rendering<span class='dots'></span>", `Preparing pages...`, 0, "ph-image");
+
             for (let i = 1; i <= totalPages; i++) {
                 const progress = Math.round((i / totalPages) * 100);
-                showLoader(true, "Rendering<span class='dots'></span>", `Processing Page ${i} of ${totalPages}`, progress, "ph-image");
+                
+                // Only update progress/subtitle, DO NOT reset HTML string
+                if(loaderSub) loaderSub.textContent = `Processing Page ${i} of ${totalPages}`;
+                if(loaderProgress) loaderProgress.style.width = `${progress}%`;
+                if(loaderPct) loaderPct.textContent = `${progress}%`;
                 
                 const page = await pdf.getPage(i);
                 await createPageCard(page, i, scale);
@@ -578,9 +585,16 @@
                 const loadingTask = pdfjsLib.getDocument(typedArray);
                 const pdfSrc = await loadingTask.promise;
 
+                // Start Compression Animation
+                showLoader(true, "Compressing<span class='dots'></span>", "Optimizing pages...", 0, "ph-arrows-in-line-horizontal");
+
                 for (let i = 0; i < keepIndices.length; i++) {
                     const progress = Math.round((i / keepIndices.length) * 100);
-                    showLoader(true, "Compressing<span class='dots'></span>", `Optimizing Page ${i + 1} of ${keepIndices.length}`, progress, "ph-arrows-in-line-horizontal");
+                    
+                    // Manual update to preserve animation
+                    if(loaderSub) loaderSub.textContent = `Optimizing Page ${i + 1} of ${keepIndices.length}`;
+                    if(loaderProgress) loaderProgress.style.width = `${progress}%`;
+                    if(loaderPct) loaderPct.textContent = `${progress}%`;
 
                     const originalPageIndex = keepIndices[i] + 1;
                     const page = await pdfSrc.getPage(originalPageIndex);
@@ -757,16 +771,22 @@
             const loader = document.getElementById('loader');
             if (show) {
                 loader.classList.remove('hidden');
-                if(loaderText) loaderText.innerHTML = text || "Processing";
-                if(loaderSub) loaderSub.textContent = sub || "Please wait...";
                 
-                // Update Progress
+                // SMART UPDATE: Only update HTML if different to preserve animations
+                if (loaderText) {
+                    const currentHTML = loaderText.innerHTML;
+                    if (currentHTML !== text) {
+                        loaderText.innerHTML = text || "Processing";
+                    }
+                }
+                
+                if (loaderSub) loaderSub.textContent = sub || "Please wait...";
+                
                 if (progress !== undefined && loaderProgress && loaderPct) {
                     loaderProgress.style.width = `${Math.min(100, Math.max(0, progress))}%`;
                     loaderPct.textContent = `${Math.round(progress)}%`;
                 }
                 
-                // Update Icon
                 if (loaderIcon) {
                     loaderIcon.className = `ph ${iconName} text-4xl text-accent mb-4 animate-bounce`;
                 }
