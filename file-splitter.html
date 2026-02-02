@@ -109,10 +109,14 @@
             
             <div class="h-5 w-[1px] bg-border mx-1 md:mx-2 shrink-0"></div>
             
-            <button id="openFileBtn" class="flex items-center gap-2 px-3 py-2 text-xs md:text-sm font-medium text-white bg-white/5 hover:bg-white/10 rounded-lg transition border border-white/5 active:bg-white/10 truncate max-w-[160px] md:max-w-none">
+            <!-- OPEN FILE BUTTON (Header) -->
+            <!-- Changed to direct onclick function call -->
+            <button onclick="triggerFileSelect()" class="flex items-center gap-2 px-3 py-2 text-xs md:text-sm font-medium text-white bg-white/5 hover:bg-white/10 rounded-lg transition border border-white/5 active:bg-white/10 truncate max-w-[160px] md:max-w-none">
                 <i class="ph ph-folder-open text-base md:text-lg shrink-0"></i> 
                 <span class="truncate">Open File</span>
             </button>
+            
+            <!-- File Input moved to body level via JS, but kept here for fallback -->
             <input type="file" id="fileInput" class="hidden" accept=".pdf,.docx,.pptx" />
         </div>
 
@@ -151,7 +155,9 @@
                         <h3 class="text-lg md:text-xl font-semibold text-white">Upload Document</h3>
                         <p class="text-xs md:text-sm text-gray-400 mt-2">Tap to browse or drop file</p>
                     </div>
-                    <button id="browseBtnEmpty" class="w-full py-3 bg-accent hover:bg-accentHover text-white rounded-xl font-medium transition shadow-lg text-sm">
+                    <!-- OPEN FILE BUTTON (Empty State) -->
+                    <!-- Changed to direct onclick function call -->
+                    <button onclick="triggerFileSelect()" class="w-full py-3 bg-accent hover:bg-accentHover text-white rounded-xl font-medium transition shadow-lg text-sm">
                         Browse Files
                     </button>
                     <p class="text-[10px] text-gray-600 uppercase tracking-widest mt-2">100% Local Processing</p>
@@ -267,18 +273,24 @@
     </div>
 
     <script>
+        // Global function to trigger file selection
+        // This is attached directly to onclick events for maximum reliability
+        function triggerFileSelect() {
+            const fileInput = document.getElementById('fileInput');
+            if (fileInput) {
+                fileInput.value = ''; // Reset so the same file can be selected again
+                fileInput.click();
+            } else {
+                console.error("File input element not found");
+                alert("Internal Error: File input missing");
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', async () => {
             const fileInput = document.getElementById('fileInput');
             
-            document.getElementById('openFileBtn').addEventListener('click', () => {
-                fileInput.value = ''; 
-                fileInput.click();
-            });
-            
-            document.getElementById('browseBtnEmpty').addEventListener('click', () => {
-                fileInput.value = ''; 
-                fileInput.click();
-            });
+            // Note: Click listeners are now handled via HTML attributes (onclick="triggerFileSelect()")
+            // This prevents issues where JS hasn't fully loaded before user interaction.
 
             fileInput.addEventListener('change', (e) => {
                 if (e.target.files && e.target.files.length > 0) {
@@ -358,25 +370,4 @@
                 document.getElementById('empty-state').classList.add('hidden');
                 document.getElementById('grid-container').classList.remove('hidden');
 
-                if (ext === 'pdf') {
-                    await processPDF(currentFileBytes);
-                } else if (['docx', 'pptx'].includes(ext)) {
-                    await simulateOfficeDoc(ext);
-                } else {
-                    throw new Error("Unsupported file format. Please use PDF, DOCX, or PPTX.");
-                }
-
-                if (window.innerWidth >= 768) toggleProperties(true);
-
-            } catch (error) {
-                console.error("File Handler Error:", error);
-                showToast("Error", error.message, "error");
-                resetApp(); 
-            } finally {
-                showLoader(false);
-            }
-        }
-
-        async function processPDF(arrayBuffer) {
-            try {
-                loaderText.t
+                if (ext ==
