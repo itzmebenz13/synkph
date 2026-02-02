@@ -2,30 +2,41 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Flux Pro | Creative Asset Hub</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Splitr | Professional Page Splitter</title>
     
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- PDF Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-    <script src="https://unpkg.com/jszip/dist/jszip.min.js"></script>
-    <script src="https://unpkg.com/docx-preview/dist/docx-preview.min.js"></script>
-    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
-                    colors: {
-                        canvas: '#121212',
-                        panel: '#1E1E1E',
-                        border: '#2A2A2A',
-                        accent: '#0C8CE9',
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
                     },
-                    screens: {
-                        'xs': '375px',
+                    colors: {
+                        bg: '#1e1e1e',
+                        panel: '#2c2c2c',
+                        border: '#444444',
+                        accent: '#3b82f6',
+                        accentHover: '#2563eb',
+                        text: '#e5e5e5',
+                        muted: '#a3a3a3'
+                    },
+                    animation: {
+                        'spin-slow': 'spin 3s linear infinite',
                     }
                 }
             }
@@ -33,183 +44,409 @@
     </script>
 
     <style>
-        body { background: #121212; color: #E0E0E0; overflow: hidden; }
-        
-        .dot-grid {
-            background-image: radial-gradient(#2A2A2A 1px, transparent 1px);
-            background-size: 24px 24px;
+        body {
+            background-color: #1e1e1e;
+            color: #e5e5e5;
+            overflow: hidden; /* App-like feel */
         }
 
-        /* Responsive Card */
-        .asset-card {
-            width: 100%;
-            transition: transform 0.2s;
-            cursor: pointer;
-            -webkit-tap-highlight-color: transparent;
+        /* Figma-like Grid Background */
+        .grid-bg {
+            background-size: 40px 40px;
+            background-image:
+                linear-gradient(to right, #333 1px, transparent 1px),
+                linear-gradient(to bottom, #333 1px, transparent 1px);
+            background-position: center;
         }
 
-        .asset-preview {
-            aspect-ratio: 3/4;
-            background: #181818;
-            border: 1px solid #2A2A2A;
-            border-radius: 8px;
-            position: relative;
-            overflow: hidden;
-            transition: border-color 0.2s;
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e1e1e; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #444; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555; 
         }
 
-        /* Hover only on Desktop to prevent sticky hover on mobile */
-        @media (hover: hover) {
-            .asset-card:hover .asset-preview {
-                border-color: #0C8CE9;
-                transform: translateY(-2px);
-                box-shadow: 0 10px 20px rgba(0,0,0,0.4);
-            }
+        .page-card {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .asset-card.selected .asset-preview {
-            border-color: #0C8CE9;
-            box-shadow: 0 0 0 2px rgba(12, 140, 233, 0.3);
+        .page-card.selected {
+            ring: 2px solid #ef4444; /* Red for deletion selection */
+            transform: scale(0.95);
+            opacity: 0.6;
+            filter: grayscale(100%);
         }
 
-        /* Inspector Animations */
-        #inspector {
-            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        /* Loading Spinner Overlay */
+        .loader-overlay {
+            backdrop-filter: blur(4px);
+            background: rgba(30, 30, 30, 0.8);
         }
-
-        /* Mobile: Slide Up */
-        .inspector-closed { transform: translateY(100%); }
-        .inspector-open { transform: translateY(0); }
-
-        /* Desktop: Slide Left */
-        @media (min-width: 768px) {
-            .inspector-closed { transform: translateX(100%); }
-            .inspector-open { transform: translateX(0); }
-        }
-
-        /* Utilities */
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-
-        .spinner {
-            width: 20px; height: 20px;
-            border: 2px solid rgba(255,255,255,0.1);
-            border-top-color: #0C8CE9;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        
-        .mini-table { font-size: 4px; color: #555; width: 100%; border-collapse: collapse; }
-        .mini-table td { border: 0.1px solid #222; padding: 1px; }
     </style>
 </head>
-<body class="h-[100dvh] w-screen flex flex-col font-sans text-sm selection:bg-accent selection:text-white">
+<body class="h-screen w-screen flex flex-col font-sans">
 
-    <header class="h-14 md:h-12 border-b border-border bg-panel flex items-center justify-between px-4 z-40 shrink-0">
-        <div class="flex items-center gap-6">
-            <div class="flex items-center gap-2.5">
-                <div class="w-7 h-7 bg-accent rounded flex items-center justify-center shadow-lg shadow-blue-900/20">
-                    <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                </div>
-                <span class="font-bold text-base md:text-sm tracking-tight">FLUX PRO</span>
+    <!-- TOP TOOLBAR -->
+    <header class="h-12 bg-panel border-b border-black flex items-center justify-between px-4 shrink-0 z-20">
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 text-white font-semibold tracking-tight">
+                <i class="ph ph-squares-four text-accent text-xl"></i>
+                <span>Splitr</span>
             </div>
-            <nav class="hidden md:flex gap-4 text-[11px] font-medium text-gray-500 uppercase tracking-widest">
-                <span class="text-white">Workspace</span>
-                <span class="hover:text-white cursor-pointer transition-colors">Assets</span>
-                <span class="hover:text-white cursor-pointer transition-colors">History</span>
-            </nav>
+            <div class="h-4 w-[1px] bg-border mx-2"></div>
+            
+            <!-- File Menu -->
+            <div class="flex gap-1">
+                <button onclick="document.getElementById('fileInput').click()" class="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-muted hover:text-white hover:bg-white/5 rounded transition">
+                    <i class="ph ph-folder-open text-lg"></i> Open File
+                </button>
+                <input type="file" id="fileInput" class="hidden" accept=".pdf,.docx,.pptx" />
+            </div>
         </div>
-        
+
         <div class="flex items-center gap-3">
-            <button onclick="document.getElementById('file-input').click()" class="bg-accent hover:bg-blue-500 text-white px-4 py-2 md:py-1.5 rounded-lg md:rounded text-xs font-bold transition-all active:scale-95 flex items-center gap-2 shadow-lg shadow-blue-500/20">
-                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                <span>IMPORT</span>
+            <span id="page-count-badge" class="hidden text-xs bg-white/10 px-2 py-1 rounded text-muted">0 Pages</span>
+            
+            <button id="exportBtn" onclick="exportFile()" class="hidden flex items-center gap-2 bg-accent hover:bg-accentHover text-white px-3 py-1.5 rounded text-xs font-medium transition shadow-lg shadow-blue-900/20">
+                <i class="ph ph-export"></i> Export Result
             </button>
-            <input type="file" id="file-input" class="hidden" multiple>
+
+            <div class="h-4 w-[1px] bg-border mx-1"></div>
+
+            <!-- Toggle Properties Button -->
+            <button onclick="toggleProperties()" class="w-8 h-8 flex items-center justify-center rounded text-muted hover:text-white hover:bg-white/5 transition" title="Toggle Properties Panel">
+                <i id="sidebar-icon" class="ph ph-sidebar-simple text-lg"></i>
+            </button>
         </div>
     </header>
 
-    <main class="flex-1 flex overflow-hidden relative">
+    <!-- MAIN WORKSPACE -->
+    <div class="flex-1 flex overflow-hidden">
         
-        <div id="canvas" class="flex-1 relative overflow-y-auto overflow-x-hidden dot-grid">
-            <div class="p-4 md:p-8 lg:p-12 pb-32"> <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none p-4 text-center">
-                    <div class="text-border mb-4">
-                        <svg class="w-12 h-12 md:w-16 md:h-16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
-                    </div>
-                    <p class="text-gray-600 text-xs font-mono">DRAG ASSETS OR TAP IMPORT</p>
-                </div>
+        <!-- LEFT SIDEBAR (Tools) -->
+        <div class="w-12 bg-panel border-r border-black flex flex-col items-center py-4 gap-4 shrink-0 z-10">
+            <button class="w-8 h-8 flex items-center justify-center rounded bg-accent text-white" title="Select Tool (V)">
+                <i class="ph ph-cursor"></i>
+            </button>
+            <button class="w-8 h-8 flex items-center justify-center rounded text-muted hover:text-white hover:bg-white/5 transition" title="Hand Tool (H)">
+                <i class="ph ph-hand-grabbing"></i>
+            </button>
+            <div class="w-4 h-[1px] bg-border my-1"></div>
+            <button onclick="resetApp()" class="w-8 h-8 flex items-center justify-center rounded text-red-400 hover:text-red-300 hover:bg-red-500/10 transition" title="Reset/Clear">
+                <i class="ph ph-trash"></i>
+            </button>
+        </div>
 
-                <div id="asset-grid" class="grid grid-cols-2 xs:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3 md:gap-6">
+        <!-- CANVAS AREA -->
+        <div class="flex-1 relative bg-bg grid-bg overflow-hidden flex flex-col">
+            
+            <!-- Empty State -->
+            <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center z-0 pointer-events-none">
+                <div class="bg-panel border border-border p-8 rounded-xl shadow-2xl flex flex-col items-center gap-4 max-w-md text-center pointer-events-auto">
+                    <div class="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-2">
+                        <i class="ph ph-cloud-arrow-up text-3xl text-muted"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-medium text-white">Upload a Document</h3>
+                        <p class="text-sm text-muted mt-1">Drag and drop PDF, PPTX or DOCX</p>
+                    </div>
+                    <button onclick="document.getElementById('fileInput').click()" class="mt-2 w-full py-2 bg-accent hover:bg-accentHover text-white rounded font-medium text-sm transition">
+                        Browse Files
+                    </button>
+                    <p class="text-[10px] text-zinc-500 mt-2 uppercase tracking-wider">Secure Client-Side Processing</p>
                 </div>
+            </div>
+
+            <!-- Page Grid Container -->
+            <div id="grid-container" class="flex-1 overflow-y-auto p-10 hidden z-10">
+                <div id="pages-grid" class="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-8 pb-20">
+                    <!-- Pages will be injected here -->
+                </div>
+            </div>
+
+            <!-- Zoom/Nav Controls (Bottom Center) -->
+            <div class="absolute bottom-6 left-1/2 -translate-x-1/2 bg-panel border border-border rounded-full shadow-xl px-4 py-2 flex items-center gap-4 z-20">
+                <button onclick="adjustZoom(-10)" class="text-muted hover:text-white"><i class="ph ph-minus"></i></button>
+                <span id="zoom-level" class="text-xs font-mono w-12 text-center text-muted">100%</span>
+                <button onclick="adjustZoom(10)" class="text-muted hover:text-white"><i class="ph ph-plus"></i></button>
             </div>
         </div>
 
-        <div id="inspector-overlay" onclick="closeInspector()" class="fixed inset-0 bg-black/50 z-50 opacity-0 pointer-events-none transition-opacity duration-300 md:hidden"></div>
-
-        <div id="inspector" class="inspector-closed fixed z-[60] shadow-2xl bg-[#1a1a1a] flex flex-col border-border
-            inset-x-0 bottom-0 h-[85vh] rounded-t-2xl border-t  /* Mobile Styles */
-            md:inset-auto md:right-0 md:top-0 md:h-full md:w-[400px] md:rounded-none md:border-l md:border-t-0 /* Desktop Styles */
-        ">
-            <div class="md:hidden w-full h-6 flex items-center justify-center shrink-0" onclick="closeInspector()">
-                <div class="w-12 h-1 bg-gray-700 rounded-full"></div>
+        <!-- RIGHT PROPERTIES PANEL (Hidden by default) -->
+        <div id="properties-panel" class="w-64 bg-panel border-l border-black flex flex-col shrink-0 z-20 hidden transition-all duration-300">
+            <!-- Panel Header -->
+            <div class="h-10 border-b border-border flex items-center px-4 justify-between">
+                <span class="text-xs font-bold text-muted uppercase tracking-wider">Properties</span>
+                <button onclick="toggleProperties(false)" class="text-muted hover:text-white">
+                    <i class="ph ph-x"></i>
+                </button>
             </div>
 
-            <div class="h-12 flex items-center justify-between px-4 border-b border-border shrink-0">
-                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest" id="ins-type">Asset Preview</span>
-                <button onclick="closeInspector()" class="text-gray-500 hover:text-white p-2">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M6 18L18 6M6 6l12 12"/></svg>
-                </button>
+            <!-- File Info Section -->
+            <div class="p-4 border-b border-border/50">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-8 h-8 rounded bg-blue-500/20 flex items-center justify-center text-blue-400">
+                        <i id="file-icon" class="ph ph-file-pdf"></i>
+                    </div>
+                    <div class="overflow-hidden">
+                        <h4 id="file-name" class="text-sm font-medium text-white truncate">No File Selected</h4>
+                        <p id="file-size" class="text-xs text-muted">0 MB</p>
+                    </div>
+                </div>
+                
+                <div class="space-y-2">
+                    <div class="flex justify-between text-xs">
+                        <span class="text-muted">Type</span>
+                        <span id="file-type" class="text-white">-</span>
+                    </div>
+                    <div class="flex justify-between text-xs">
+                        <span class="text-muted">Total Pages</span>
+                        <span id="total-pages-prop" class="text-white">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Selection Section -->
+            <div class="p-4">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-xs font-bold text-muted uppercase tracking-wider">Selection</span>
+                    <span id="selected-count" class="text-xs bg-red-500/20 text-red-400 px-1.5 py-0.5 rounded hidden">0 Removed</span>
+                </div>
+                
+                <p id="selection-guide" class="text-xs text-muted leading-relaxed">
+                    Click pages to mark them for removal. <br><br>
+                    Marked pages will be excluded from the final export.
+                </p>
+
+                <div id="selection-actions" class="hidden flex flex-col gap-2 mt-4">
+                    <div class="p-3 rounded bg-white/5 border border-white/10">
+                        <div class="flex items-start gap-2">
+                            <i class="ph ph-warning-circle text-orange-400 mt-0.5"></i>
+                            <p class="text-[10px] text-muted leading-tight">
+                                <span class="text-white font-medium">Warning:</span> 
+                                Exporting will permanently remove selected pages from the new file.
+                            </p>
+                        </div>
+                    </div>
+                    <button onclick="clearSelection()" class="w-full py-1.5 border border-border rounded text-xs text-muted hover:text-white hover:bg-white/5 transition">
+                        Reset Selection
+                    </button>
+                </div>
             </div>
             
-            <div class="flex-1 overflow-auto p-4 bg-[#151515]">
-                <div id="viewer-stage" class="w-full flex justify-center items-start min-h-[200px]">
-                </div>
-            </div>
-
-            <div class="p-4 border-t border-border bg-panel shrink-0 safe-area-bottom">
-                <div class="mb-4">
-                    <h3 class="text-sm font-medium mb-1 truncate text-white" id="ins-name">Filename.pdf</h3>
-                    <p class="text-[10px] text-gray-500 font-mono" id="ins-size">0 KB</p>
-                </div>
-                <button id="download-btn" class="w-full py-3 md:py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg md:rounded text-xs font-medium transition-colors text-white">
-                    Download Original
-                </button>
+            <div class="mt-auto p-4 border-t border-border">
+                <p class="text-[10px] text-zinc-600 text-center">
+                    Splitr v1.0.3 &copy; 2026<br>Local Processing Only
+                </p>
             </div>
         </div>
-    </main>
+    </div>
 
-    <div id="global-loader" class="fixed bottom-6 right-6 flex items-center gap-3 bg-panel border border-border p-3 rounded-lg shadow-2xl hidden z-50">
-        <div class="spinner"></div>
-        <span class="text-xs font-medium">Processing...</span>
+    <!-- Loading Overlay -->
+    <div id="loader" class="hidden fixed inset-0 loader-overlay z-50 flex items-center justify-center">
+        <div class="flex flex-col items-center gap-4">
+            <i class="ph ph-circle-notch animate-spin text-4xl text-accent"></i>
+            <p id="loader-text" class="text-sm font-medium text-white">Processing Document...</p>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed top-16 left-1/2 -translate-x-1/2 bg-black/90 border border-white/10 text-white px-4 py-2 rounded-lg shadow-2xl transform transition-all duration-300 translate-y-[-150%] opacity-0 z-50 flex items-center gap-3">
+        <i id="toast-icon" class="ph ph-check-circle text-green-400"></i>
+        <span id="toast-message" class="text-sm">Notification</span>
     </div>
 
     <script>
+        // --- CONFIG & STATE ---
+        const { PDFDocument } = PDFLib;
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-        const state = {
-            assets: [],
-            selectedId: null
-        };
+        let currentFile = null;
+        let currentFileBytes = null;
+        let originalFileName = "";
+        let pdfDoc = null; // The loaded PDFLib document
+        let totalPages = 0;
+        let pagesToRemove = new Set(); // Stores 0-based indices of pages to remove
+        let zoom = 100;
+        
+        // Mock data for DOCX/PPTX visual simulation
+        const mockPageColors = ['#e2e8f0', '#f1f5f9', '#f8fafc', '#ffffff'];
 
-        const grid = document.getElementById('asset-grid');
-        const fileInput = document.getElementById('file-input');
+        // --- DOM ELEMENTS ---
+        const fileInput = document.getElementById('fileInput');
+        const gridContainer = document.getElementById('grid-container');
+        const pagesGrid = document.getElementById('pages-grid');
+        const emptyState = document.getElementById('empty-state');
+        const loader = document.getElementById('loader');
+        const loaderText = document.getElementById('loader-text');
+        const exportBtn = document.getElementById('exportBtn');
+        const zoomLabel = document.getElementById('zoom-level');
+        const propertiesPanel = document.getElementById('properties-panel');
+        const sidebarIcon = document.getElementById('sidebar-icon');
+        
+        // Properties Elements
+        const fileNameEl = document.getElementById('file-name');
+        const fileSizeEl = document.getElementById('file-size');
+        const fileTypeEl = document.getElementById('file-type');
+        const totalPagesPropEl = document.getElementById('total-pages-prop');
+        const pageCountBadge = document.getElementById('page-count-badge');
+        const selectedCountEl = document.getElementById('selected-count');
+        const selectionActions = document.getElementById('selection-actions');
+        const selectionGuide = document.getElementById('selection-guide');
 
-        fileInput.addEventListener('change', (e) => {
-            Array.from(e.target.files).forEach(file => processFile(file));
+        // --- EVENT LISTENERS ---
+        
+        // Drag and Drop
+        document.body.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            document.body.classList.add('bg-white/5');
         });
-
-        document.body.addEventListener('dragover', (e) => e.preventDefault());
+        document.body.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            document.body.classList.remove('bg-white/5');
+        });
         document.body.addEventListener('drop', (e) => {
             e.preventDefault();
-            Array.from(e.dataTransfer.files).forEach(file => processFile(file));
+            document.body.classList.remove('bg-white/5');
+            if (e.dataTransfer.files.length) {
+                handleFile(e.dataTransfer.files[0]);
+            }
         });
 
-        async function processFile(file) {
-            document.getElementById('empty-state').classList.add('hidden');
-            document.getElementById('global-loader').classList.remove('hidden');
+        // File Input
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        // --- CORE LOGIC ---
+
+        function toggleProperties(forceState = null) {
+            const isHidden = propertiesPanel.classList.contains('hidden');
+            const shouldShow = forceState !== null ? forceState : isHidden;
+
+            if (shouldShow) {
+                propertiesPanel.classList.remove('hidden');
+                sidebarIcon.classList.add('text-accent');
+                sidebarIcon.classList.remove('text-muted');
+            } else {
+                propertiesPanel.classList.add('hidden');
+                sidebarIcon.classList.remove('text-accent');
+                sidebarIcon.classList.add('text-muted');
+            }
+        }
+
+        async function handleFile(file) {
+            currentFile = file;
+            originalFileName = file.name;
             
+            // Reset state
+            pagesToRemove.clear();
+            updateSelectionUI();
+            
+            // UI Update
+            showLoader(true, "Analyzing file structure...");
+            emptyState.classList.add('hidden');
+            gridContainer.classList.remove('hidden');
+            
+            // Auto-open properties on file load
+            toggleProperties(true);
+            
+            // Metadata Update
+            fileNameEl.textContent = file.name;
+            fileSizeEl.textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+            const extension = file.name.split('.').pop().toLowerCase();
+            fileTypeEl.textContent = extension.toUpperCase();
+
+            // Processing based on type
+            if (extension === 'pdf') {
+                await processPDF(file);
+            } else if (['docx', 'pptx'].includes(extension)) {
+                await simulateOfficeDoc(file, extension);
+            } else {
+                showToast("Unsupported file format", "error");
+                resetApp();
+            }
+        }
+
+        async function processPDF(file) {
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                currentFileBytes = arrayBuffer;
+
+                // Load via PDF.js for rendering
+                const loadingTask = pdfjsLib.getDocument(arrayBuffer);
+                const pdf = await loadingTask.promise;
+                
+                totalPages = pdf.numPages;
+                updateStats(totalPages);
+                exportBtn.classList.remove('hidden');
+
+                // Clear Grid
+                pagesGrid.innerHTML = '';
+
+                // Render Pages
+                for (let i = 1; i <= totalPages; i++) {
+                    const page = await pdf.getPage(i);
+                    await createPageCard(page, i, 'pdf');
+                }
+
+                showLoader(false);
+                showToast("PDF Loaded Successfully", "success");
+
+            } catch (err) {
+                console.error(err);
+                showLoader(false);
+                showToast("Error parsing PDF", "error");
+                resetApp();
+            }
+        }
+
+        async function simulateOfficeDoc(file, type) {
+            currentFileBytes = null; // Disable export for simulation
+            
+            // Simulate reading
+            setTimeout(() => {
+                totalPages = Math.floor(Math.random() * 15) + 5; // Random mock page count
+                updateStats(totalPages);
+                
+                pagesGrid.innerHTML = '';
+                
+                for (let i = 1; i <= totalPages; i++) {
+                    createMockPageCard(i, type);
+                }
+
+                showLoader(false);
+                exportBtn.classList.add('hidden'); // Cannot export simulated files
+                
+                // Show informative toast
+                showToast(`${type.toUpperCase()} Viewer Mode (Read-Only)`, "warning");
+                
+                // Add note to sidebar
+                selectionGuide.innerHTML = `<span class="text-orange-400">Note:</span> Browser-based editing for Office files is limited. This is a visual demo of the UI. <br><br>PDF export is fully functional.`;
+
+            }, 1500);
+        }
+
+        async function createPageCard(page, pageNum, type) {
+            const viewport = page.getViewport({ scale: 0.5 }); // Thumbnail scale
+            
+            const card = document.createElement('div');
+            card.className = 'page-card flex flex-col gap-2 group cursor-pointer relative';
+            card.dataset.index = pageNum - 1; // 0-based index for logic
+            
+            // Header (Page Number)
+            cons         
             const id = Math.random().toString(36).substr(2, 9);
             const ext = file.name.split('.').pop().toLowerCase();
             const asset = { id, file, ext, name: file.name, size: formatBytes(file.size) };
