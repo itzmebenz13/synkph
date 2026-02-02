@@ -413,7 +413,8 @@
 
         async function loadPDF(arrayBuffer) {
             if(loaderText) loaderText.textContent = "Parsing PDF...";
-            const typedArray = new Uint8Array(arrayBuffer);
+            // CRITICAL FIX: Always slice to prevent detachment
+            const typedArray = new Uint8Array(arrayBuffer.slice(0));
             const loadingTask = pdfjsLib.getDocument(typedArray);
             const pdf = await loadingTask.promise;
             
@@ -537,13 +538,12 @@
 
             try {
                 showLoader(true, "Compressing", "Analyzing potential savings...");
-                // Note: We need to access PDFLib specifically from window
                 if(typeof window.PDFLib === 'undefined') throw new Error("PDFLib not loaded");
 
                 const newPdf = await window.PDFLib.PDFDocument.create();
                 
-                // Use standard typed array for pdfjs processing
-                const typedArray = new Uint8Array(currentFileBytes);
+                // CRITICAL FIX: Slice to copy, preventing detachment
+                const typedArray = new Uint8Array(currentFileBytes.slice(0));
                 const loadingTask = pdfjsLib.getDocument(typedArray);
                 const pdfSrc = await loadingTask.promise;
 
@@ -552,7 +552,6 @@
                     if(loaderSub) loaderSub.textContent = `Processing Page ${i + 1} of ${keepIndices.length}`;
 
                     const page = await pdfSrc.getPage(originalPageIndex);
-                    // Use scale 1.0 for decent quality but lower size
                     const viewport = page.getViewport({ scale: 1.0 });
 
                     const canvas = document.createElement('canvas');
@@ -562,7 +561,6 @@
 
                     await page.render({ canvasContext: context, viewport: viewport }).promise;
 
-                    // 0.6 Quality (60%)
                     const imgData = canvas.toDataURL('image/jpeg', 0.6);
                     const imgBytes = await fetch(imgData).then(res => res.arrayBuffer());
                     
@@ -590,7 +588,7 @@
 
             try {
                 if (useCompressed && compressedPdfBytes) {
-                    // User chose to download the already compressed buffer
+                    // Download already compressed buffer (no slicing needed for saveAs, it reads)
                     downloadPDF(compressedPdfBytes, true);
                     closeModal();
                 } else {
@@ -598,7 +596,8 @@
                     showLoader(true, "Exporting", "Creating PDF...");
                     await new Promise(r => setTimeout(r, 100));
 
-                    const pdfDoc = await window.PDFLib.PDFDocument.load(currentFileBytes);
+                    // CRITICAL FIX: Slice to copy
+                    const pdfDoc = await window.PDFLib.PDFDocument.load(currentFileBytes.slice(0));
                     const newPdf = await window.PDFLib.PDFDocument.create();
                     const pages = await newPdf.copyPages(pdfDoc, keepIndices);
                     pages.forEach(p => newPdf.addPage(p));
