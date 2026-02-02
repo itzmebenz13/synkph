@@ -390,584 +390,94 @@
                 // Process based on extension
                 if (ext === 'pdf') {
                     await processPDF(currentFileBytes);
-                } else if (['docx', 'pptx'].includes(ext)    
-    <!-- Phosphor Icons -->
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-
-    <!-- PDF Libraries (Legacy Builds for Stability) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js" crossorigin="anonymous"></script>
-
-    <style>
-        /* Prevent elastic scrolling on iOS */
-        html, body {
-            height: 100%;
-            height: 100dvh; /* Dynamic Viewport Height */
-            overflow: hidden;
-            background-color: #121212;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-        }
-
-        .grid-bg {
-            background-size: 20px 20px; /* Smaller grid for mobile feel */
-            background-image:
-                linear-gradient(to right, #222 1px, transparent 1px),
-                linear-gradient(to bottom, #222 1px, transparent 1px);
-        }
-        
-        @media (min-width: 768px) {
-            .grid-bg {
-                background-size: 40px 40px;
-                background-image:
-                    linear-gradient(to right, #2a2a2a 1px, transparent 1px),
-                    linear-gradient(to bottom, #2a2a2a 1px, transparent 1px);
-            }
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
-
-        .page-card { transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
-        .page-card:active { transform: scale(0.96); }
-
-        .page-card.selected .canvas-container {
-            border-color: #ef4444;
-            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3);
-        }
-        
-        .page-card.selected canvas {
-            opacity: 0.4;
-            filter: grayscale(100%);
-        }
-
-        .loader-overlay {
-            backdrop-filter: blur(8px);
-            background: rgba(18, 18, 18, 0.8);
-        }
-
-        /* Mobile specific adjustments */
-        .mobile-panel-enter {
-            transform: translateY(100%);
-        }
-        .mobile-panel-active {
-            transform: translateY(0);
-        }
-    </style>
-</head>
-<body class="h-full w-full flex flex-col font-sans text-gray-100 selection:bg-accent selection:text-white">
-
-    <!-- HEADER -->
-    <header class="h-14 md:h-16 bg-panel border-b border-black flex items-center justify-between px-3 md:px-6 shrink-0 z-30 shadow-sm relative">
-        <div class="flex items-center gap-3 md:gap-4 overflow-hidden">
-            <!-- Logo -->
-            <div class="flex items-center gap-2 text-white font-semibold tracking-tight shrink-0">
-                <i class="ph ph-squares-four text-accent text-xl md:text-2xl"></i>
-                <span class="text-base md:text-lg hidden xs:inline">Splitr</span>
-            </div>
-            
-            <div class="h-5 w-[1px] bg-border mx-1 md:mx-2 shrink-0"></div>
-            
-            <!-- Open File Button -->
-            <button onclick="document.getElementById('fileInput').click()" class="flex items-center gap-2 px-3 py-2 text-xs md:text-sm font-medium text-white bg-white/5 hover:bg-white/10 rounded-lg transition border border-white/5 active:bg-white/10 truncate max-w-[160px] md:max-w-none">
-                <i class="ph ph-folder-open text-base md:text-lg shrink-0"></i> 
-                <span class="truncate">Open File</span>
-            </button>
-            <input type="file" id="fileInput" class="hidden" accept=".pdf,.docx,.pptx" />
-        </div>
-
-        <div class="flex items-center gap-2 md:gap-3 shrink-0">
-            <!-- Badge (Hidden on small mobile) -->
-            <span id="page-count-badge" class="hidden md:inline-block text-xs bg-black/40 border border-white/5 px-3 py-1.5 rounded-full text-gray-400 font-mono">0 Pages</span>
-            
-            <!-- Export Button (Desktop Text / Mobile Icon) -->
-            <button id="exportBtn" onclick="exportFile()" class="hidden flex items-center justify-center gap-2 bg-accent hover:bg-accentHover active:bg-blue-600 text-white px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium transition shadow-lg shadow-blue-900/20">
-                <i class="ph ph-export font-bold text-lg md:text-base"></i> 
-                <span class="hidden md:inline">Export</span>
-            </button>
-
-            <!-- Properties Toggle (Desktop Only - Mobile uses bottom bar) -->
-            <button onclick="toggleProperties()" class="hidden md:flex w-9 h-9 items-center justify-center rounded-md text-gray-400 hover:text-white hover:bg-white/10 transition">
-                <i id="sidebar-icon-desktop" class="ph ph-sidebar-simple text-xl"></i>
-            </button>
-        </div>
-    </header>
-
-    <!-- MAIN WORKSPACE -->
-    <div class="flex-1 flex overflow-hidden relative">
-        
-        <!-- LEFT SIDEBAR (Desktop Only) -->
-        <div class="hidden md:flex w-14 bg-panel border-r border-black flex-col items-center py-4 gap-4 shrink-0 z-20">
-            <button class="w-10 h-10 flex items-center justify-center rounded-lg bg-accent/10 text-accent border border-accent/20" title="Select Tool">
-                <i class="ph ph-cursor text-xl"></i>
-            </button>
-            <button onclick="resetApp()" class="w-10 h-10 flex items-center justify-center rounded-lg text-red-400 hover:text-red-300 hover:bg-red-500/10 transition" title="Reset All">
-                <i class="ph ph-trash text-xl"></i>
-            </button>
-        </div>
-
-        <!-- CANVAS AREA -->
-        <div class="flex-1 relative bg-bg grid-bg overflow-hidden flex flex-col w-full">
-            
-            <!-- Empty State -->
-            <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center z-10 px-6">
-                <div class="bg-panel/90 backdrop-blur border border-white/10 p-6 md:p-10 rounded-2xl shadow-2xl flex flex-col items-center gap-4 max-w-sm text-center w-full mx-4">
-                    <div class="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center ring-1 ring-white/10">
-                        <i class="ph ph-cloud-arrow-up text-3xl text-gray-500"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-lg md:text-xl font-semibold text-white">Upload Document</h3>
-                        <p class="text-xs md:text-sm text-gray-400 mt-2">Tap to browse or drop file</p>
-                    </div>
-                    <button onclick="document.getElementById('fileInput').click()" class="w-full py-3 bg-accent hover:bg-accentHover text-white rounded-xl font-medium transition shadow-lg text-sm">
-                        Browse Files
-                    </button>
-                    <p class="text-[10px] text-gray-600 uppercase tracking-widest mt-2">100% Local Processing</p>
-                </div>
-            </div>
-
-            <!-- Page Grid Container -->
-            <div id="grid-container" class="flex-1 overflow-y-auto p-4 md:p-8 hidden z-10 scroll-smooth w-full">
-                <!-- Mobile: 2 columns, Desktop: Auto-fill -->
-                <div id="pages-grid" class="grid grid-cols-2 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-3 md:gap-6 pb-24 md:pb-24">
-                    <!-- Pages will be injected here -->
-                </div>
-            </div>
-
-            <!-- Desktop Zoom Controls (Hidden on Mobile) -->
-            <div class="hidden md:flex absolute bottom-6 left-1/2 -translate-x-1/2 bg-panel/90 backdrop-blur border border-white/10 rounded-full shadow-2xl px-4 py-2 items-center gap-4 z-20">
-                <button onclick="adjustZoom(-10)" class="text-gray-400 hover:text-white p-1"><i class="ph ph-minus"></i></button>
-                <span id="zoom-level-desktop" class="text-xs font-mono w-12 text-center text-gray-300">100%</span>
-                <button onclick="adjustZoom(10)" class="text-gray-400 hover:text-white p-1"><i class="ph ph-plus"></i></button>
-            </div>
-        </div>
-
-        <!-- PROPERTIES PANEL (Responsive) -->
-        <!-- Desktop: Sidebar / Mobile: Full Screen Overlay -->
-        <div id="properties-panel" class="fixed inset-0 z-50 bg-bg md:bg-panel md:static md:w-72 md:border-l md:border-black flex-col md:shrink-0 hidden md:flex transition-all duration-300">
-            <!-- Header -->
-            <div class="h-14 md:h-12 border-b border-border flex items-center px-4 md:px-5 justify-between bg-panel md:bg-white/5">
-                <span class="text-sm md:text-xs font-bold text-white md:text-gray-400 uppercase tracking-widest">Properties</span>
-                <button onclick="toggleProperties(false)" class="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 md:bg-transparent text-gray-300 md:text-gray-400">
-                    <i class="ph ph-x text-lg"></i>
-                </button>
-            </div>
-
-            <div class="p-5 border-b border-border/50">
-                <div class="flex items-center gap-4 mb-5">
-                    <div class="w-12 h-12 md:w-10 md:h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 shrink-0">
-                        <i id="file-icon" class="ph ph-file-pdf text-2xl md:text-xl"></i>
-                    </div>
-                    <div class="min-w-0">
-                        <h4 id="file-name" class="text-base md:text-sm font-medium text-white truncate">No File</h4>
-                        <p id="file-size" class="text-sm md:text-xs text-gray-500 mt-0.5">0 MB</p>
-                    </div>
-                </div>
-                
-                <div class="space-y-3 bg-panel md:bg-black/20 p-4 md:p-3 rounded-lg border border-white/5">
-                    <div class="flex justify-between text-sm md:text-xs">
-                        <span class="text-gray-500">Format</span>
-                        <span id="file-type" class="text-gray-300 font-mono">-</span>
-                    </div>
-                    <div class="flex justify-between text-sm md:text-xs">
-                        <span class="text-gray-500">Page Count</span>
-                        <span id="total-pages-prop" class="text-gray-300 font-mono">-</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="p-5 flex-1 overflow-y-auto">
-                <div class="flex justify-between items-center mb-4">
-                    <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Selection</span>
-                    <span id="selected-count" class="text-xs bg-red-500/10 border border-red-500/20 text-red-400 px-2 py-0.5 rounded-full hidden">0</span>
-                </div>
-                
-                <div id="selection-guide" class="text-sm md:text-xs text-gray-500 leading-relaxed p-4 border border-dashed border-gray-600 rounded-lg text-center">
-                    Tap pages to mark them for removal.
-                </div>
-
-                <div id="selection-actions" class="hidden flex flex-col gap-3">
-                    <div class="p-3 rounded-lg bg-orange-500/10 border border-orange-500/20 flex gap-3">
-                        <i class="ph ph-warning text-orange-400 text-xl md:text-lg shrink-0"></i>
-                        <p class="text-sm md:text-xs text-orange-200/80 leading-tight">
-                            Selected pages will be permanently removed.
-                        </p>
-                    </div>
-                    <button onclick="clearSelection()" class="w-full py-3 md:py-2 border border-border bg-panel hover:bg-white/5 rounded-lg text-sm md:text-xs text-gray-300 transition flex items-center justify-center gap-2 font-medium">
-                        <i class="ph ph-arrow-counter-clockwise"></i> Clear Selection
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Mobile Only: Bottom Actions inside Property Panel -->
-            <div class="p-4 border-t border-border md:hidden bg-panel">
-                 <button onclick="toggleProperties(false)" class="w-full py-3 bg-white text-black font-semibold rounded-lg">Done</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MOBILE BOTTOM APP BAR (Fixed) -->
-    <div class="md:hidden h-16 bg-panel border-t border-black flex items-center justify-around px-2 shrink-0 z-40 pb-safe">
-        <!-- Reset -->
-        <button onclick="resetApp()" class="flex flex-col items-center gap-1 p-2 text-gray-400 hover:text-red-400 active:text-red-400">
-            <i class="ph ph-trash text-xl"></i>
-            <span class="text-[10px]">Reset</span>
-        </button>
-        
-        <div class="w-[1px] h-6 bg-white/10"></div>
-
-        <!-- Zoom Controls -->
-        <div class="flex items-center gap-3 bg-black/20 rounded-full px-3 py-1.5 border border-white/5">
-            <button onclick="adjustZoom(-10)" class="text-gray-400 active:text-white"><i class="ph ph-minus"></i></button>
-            <span id="zoom-level-mobile" class="text-[10px] font-mono w-8 text-center text-gray-300">100%</span>
-            <button onclick="adjustZoom(10)" class="text-gray-400 active:text-white"><i class="ph ph-plus"></i></button>
-        </div>
-
-        <div class="w-[1px] h-6 bg-white/10"></div>
-
-        <!-- Properties Toggle -->
-        <button onclick="toggleProperties()" class="flex flex-col items-center gap-1 p-2 text-gray-400 hover:text-white active:text-accent relative">
-            <i class="ph ph-sliders-horizontal text-xl"></i>
-            <span class="text-[10px]">Props</span>
-            <!-- Notification dot if pages selected -->
-            <div id="mobile-selection-dot" class="hidden absolute top-2 right-2 w-2 h-2 rounded-full bg-red-500"></div>
-        </button>
-    </div>
-
-    <!-- LOADER -->
-    <div id="loader" class="hidden fixed inset-0 loader-overlay z-[100] flex flex-col items-center justify-center gap-6 transition-opacity duration-300 px-4 text-center">
-        <div class="relative">
-            <div class="w-14 h-14 border-4 border-white/10 border-t-accent rounded-full animate-spin"></div>
-        </div>
-        <div>
-            <p id="loader-text" class="text-lg font-medium text-white tracking-wide">Processing...</p>
-            <p id="loader-sub" class="text-sm text-gray-400 mt-1">Please wait</p>
-        </div>
-    </div>
-
-    <!-- TOAST -->
-    <div id="toast" class="fixed top-4 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:w-auto bg-[#0f0f0f] border border-white/10 text-white px-4 py-3 rounded-xl shadow-2xl transform transition-all duration-300 -translate-y-28 opacity-0 z-[110] flex items-center gap-3">
-        <i id="toast-icon" class="ph ph-check-circle text-green-400 text-xl shrink-0"></i>
-        <div class="flex flex-col min-w-0">
-            <span id="toast-title" class="text-sm font-semibold truncate">Success</span>
-            <span id="toast-message" class="text-xs text-gray-400 truncate">Operation completed</span>
-        </div>
-    </div>
-
-    <script>
-        // --- CONFIGURATION ---
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-        const { PDFDocument } = PDFLib;
-
-        // State
-        let currentFile = null;
-        let currentFileBytes = null;
-        let originalFileName = "";
-        let totalPages = 0;
-        let pagesToRemove = new Set();
-        let zoom = 100;
-
-        // DOM Elements
-        const fileInput = document.getElementById('fileInput');
-        const gridContainer = document.getElementById('grid-container');
-        const pagesGrid = document.getElementById('pages-grid');
-        const emptyState = document.getElementById('empty-state');
-        const loader = document.getElementById('loader');
-        const loaderText = document.getElementById('loader-text');
-        const loaderSub = document.getElementById('loader-sub');
-        const exportBtn = document.getElementById('exportBtn');
-        const propertiesPanel = document.getElementById('properties-panel');
-        const desktopSidebarIcon = document.getElementById('sidebar-icon-desktop');
-        const mobileSelectionDot = document.getElementById('mobile-selection-dot');
-        
-        // --- INITIALIZATION ---
-        
-        // Drag & Drop
-        const dropZone = document.body;
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.classList.add('bg-white/5');
-        });
-        dropZone.addEventListener('dragleave', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('bg-white/5');
-        });
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('bg-white/5');
-            if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
-        });
-
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length) handleFile(e.target.files[0]);
-        });
-
-        // --- RESPONSIVE LAYOUT LOGIC ---
-
-        function toggleProperties(forceState = null) {
-            const isHidden = propertiesPanel.classList.contains('hidden');
-            const shouldShow = forceState !== null ? forceState : isHidden;
-
-            if (shouldShow) {
-                propertiesPanel.classList.remove('hidden');
-                propertiesPanel.classList.add('flex');
-                if(desktopSidebarIcon) {
-                    desktopSidebarIcon.classList.add('text-accent');
-                    desktopSidebarIcon.classList.remove('text-gray-400');
-                }
-            } else {
-                propertiesPanel.classList.add('hidden');
-                propertiesPanel.classList.remove('flex');
-                if(desktopSidebarIcon) {
-                    desktopSidebarIcon.classList.remove('text-accent');
-                    desktopSidebarIcon.classList.add('text-gray-400');
-                }
-            }
-        }
-
-        // --- CORE FILE PROCESSING ---
-
-        async function handleFile(file) {
-            if (!file) return;
-
-            resetApp(false);
-            currentFile = file;
-            originalFileName = file.name;
-            
-            showLoader(true, "Analyzing File", "Reading local data...");
-
-            // Update Metadata
-            document.getElementById('file-name').textContent = file.name;
-            document.getElementById('file-size').textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
-            const ext = file.name.split('.').pop().toLowerCa="text-xs bg-red-500/10 border border-red-500/20 text-red-400 px-2 py-0.5 rounded-full hidden">0</span>
-                </div>
-                
-                <div id="selection-guide" class="text-xs text-gray-500 leading-relaxed p-4 border border-dashed border-gray-600 rounded-lg text-center">
-                    Click pages to mark them for removal.
-                </div>
-
-                <div id="selection-actions" class="hidden flex flex-col gap-3">
-                    <div class="p-3 rounded-lg bg-orange-500/10 border border-orange-500/20 flex gap-3">
-                        <i class="ph ph-warning text-orange-400 text-lg shrink-0"></i>
-                        <p class="text-xs text-orange-200/80 leading-tight">
-                            Selected pages will be permanently removed from the exported file.
-                        </p>
-                    </div>
-                    <button onclick="clearSelection()" class="w-full py-2 border border-border bg-white/5 hover:bg-white/10 rounded-lg text-xs text-gray-300 transition flex items-center justify-center gap-2">
-                        <i class="ph ph-arrow-counter-clockwise"></i> Clear Selection
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- LOADER -->
-    <div id="loader" class="hidden fixed inset-0 loader-overlay z-50 flex flex-col items-center justify-center gap-4 transition-opacity duration-300">
-        <div class="relative">
-            <div class="w-12 h-12 border-4 border-white/10 border-t-accent rounded-full animate-spin"></div>
-        </div>
-        <p id="loader-text" class="text-sm font-medium text-white tracking-wide">Processing...</p>
-        <p id="loader-sub" class="text-xs text-gray-500">Please wait</p>
-    </div>
-
-    <!-- TOAST -->
-    <div id="toast" class="fixed top-6 left-1/2 -translate-x-1/2 bg-[#0f0f0f] border border-white/10 text-white px-4 py-3 rounded-lg shadow-2xl transform transition-all duration-300 -translate-y-24 opacity-0 z-[60] flex items-center gap-3 min-w-[300px]">
-        <i id="toast-icon" class="ph ph-check-circle text-green-400 text-xl"></i>
-        <div class="flex flex-col">
-            <span id="toast-title" class="text-sm font-semibold">Success</span>
-            <span id="toast-message" class="text-xs text-gray-400">Operation completed</span>
-        </div>
-    </div>
-
-    <script>
-        // --- CONFIGURATION ---
-        // CRITICAL FIX: Use the specific worker file from the same CDN version to avoid CORS/Version mismatches
-        // We use the full URL to ensure it works on GitHub Pages subdirectories
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
-        const { PDFDocument } = PDFLib;
-
-        // State
-        let currentFile = null;
-        let currentFileBytes = null;
-        let originalFileName = "";
-        let totalPages = 0;
-        let pagesToRemove = new Set();
-        let zoom = 100;
-
-        // Elements
-        const fileInput = document.getElementById('fileInput');
-        const gridContainer = document.getElementById('grid-container');
-        const pagesGrid = document.getElementById('pages-grid');
-        const emptyState = document.getElementById('empty-state');
-        const loader = document.getElementById('loader');
-        const loaderText = document.getElementById('loader-text');
-        const loaderSub = document.getElementById('loader-sub');
-        const exportBtn = document.getElementById('exportBtn');
-        const zoomLabel = document.getElementById('zoom-level');
-        const propertiesPanel = document.getElementById('properties-panel');
-        const sidebarIcon = document.getElementById('sidebar-icon');
-        
-        // --- INITIALIZATION ---
-        
-        // Handle Drag & Drop
-        const dropZone = document.body;
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.classList.add('bg-white/5');
-        });
-        dropZone.addEventListener('dragleave', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('bg-white/5');
-        });
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('bg-white/5');
-            if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
-        });
-
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length) handleFile(e.target.files[0]);
-        });
-
-        // --- CORE LOGIC ---
-
-        function toggleProperties(forceState = null) {
-            const isHidden = propertiesPanel.classList.contains('hidden');
-            const shouldShow = forceState !== null ? forceState : isHidden;
-
-            if (shouldShow) {
-                propertiesPanel.classList.remove('hidden');
-                sidebarIcon.classList.add('text-accent');
-                sidebarIcon.classList.remove('text-gray-400');
-            } else {
-                propertiesPanel.classList.add('hidden');
-                sidebarIcon.classList.remove('text-accent');
-                sidebarIcon.classList.add('text-gray-400');
-            }
-        }
-
-        async function handleFile(file) {
-            if (!file) return;
-
-            resetApp(false); // Clear previous data but keep UI clean
-            currentFile = file;
-            originalFileName = file.name;
-            
-            showLoader(true, "Reading File", "This happens locally on your device");
-
-            // Update Metadata
-            document.getElementById('file-name').textContent = file.name;
-            document.getElementById('file-name').title = file.name;
-            document.getElementById('file-size').textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
-            const ext = file.name.split('.').pop().toLowerCase();
-            document.getElementById('file-type').textContent = ext.toUpperCase();
-
-            // Toggle Views
-            emptyState.classList.add('hidden');
-            gridContainer.classList.remove('hidden');
-            toggleProperties(true);
-
-            try {
-                if (ext === 'pdf') {
-                    await processPDF(file);
                 } else if (['docx', 'pptx'].includes(ext)) {
                     await simulateOfficeDoc(ext);
                 } else {
-                    throw new Error("Unsupported format");
+                    throw new Error("Unsupported file format. Please use PDF, DOCX, or PPTX.");
                 }
+
+                // Show Properties on Desktop
+                if (window.innerWidth >= 768) toggleProperties(true);
+
             } catch (error) {
-                console.error(error);
-                showToast("Error", error.message || "Failed to load file", "error");
-                resetApp();
+                console.error("File Handler Error:", error);
+                showToast("Error", error.message, "error");
+                resetApp(); // Go back to empty state on error
             } finally {
                 showLoader(false);
             }
         }
 
-        async function processPDF(file) {
+        async function processPDF(arrayBuffer) {
             try {
-                const arrayBuffer = await file.arrayBuffer();
-                currentFileBytes = arrayBuffer;
-
-                loaderText.textContent = "Parsing PDF Structure...";
+                loaderText.textContent = "Parsing PDF...";
                 
-                // Load PDF
-                const loadingTask = pdfjsLib.getDocument(arrayBuffer);
+                // Use standard typed array for PDF.js
+                const typedArray = new Uint8Array(arrayBuffer);
+                const loadingTask = pdfjsLib.getDocument(typedArray);
                 const pdf = await loadingTask.promise;
                 
                 totalPages = pdf.numPages;
                 updateStats(totalPages);
-                exportBtn.classList.remove('hidden');
+                document.getElementById('exportBtn').classList.remove('hidden');
 
-                loaderText.textContent = "Rendering Thumbnails...";
-                
-                // Render Loop with "Breathing Room" to prevent UI freeze
+                loaderText.textContent = "Rendering...";
+                const pagesGrid = document.getElementById('pages-grid');
+
+                const isMobile = window.innerWidth < 768;
+                const scale = isMobile ? 0.4 : 0.6; 
+
                 for (let i = 1; i <= totalPages; i++) {
                     loaderSub.textContent = `Page ${i} of ${totalPages}`;
                     
                     const page = await pdf.getPage(i);
-                    await createPageCard(page, i);
+                    await createPageCard(page, i, scale);
                     
-                    // Critical: Allow UI to update every few pages
-                    if (i % 3 === 0) await new Promise(r => setTimeout(r, 0));
+                    // Throttle to prevent freezing
+                    if (i % 5 === 0) await new Promise(r => setTimeout(r, 0));
                 }
                 
                 showToast("Success", "PDF loaded successfully", "success");
-
             } catch (err) {
-                console.error("PDF Load Error:", err);
-                // Handle specific worker errors
-                if (err.name === 'MissingPDFException') {
-                    throw new Error("Invalid or corrupted PDF file.");
-                } else if (err.message && err.message.includes('Worker')) {
-                    throw new Error("Browser security blocked the PDF worker. Try a different browser.");
-                } else {
-                    throw err;
-                }
+                if (err.name === 'MissingPDFException') throw new Error("File is invalid or corrupted.");
+                if (err.name === 'PasswordException') throw new Error("Password protected PDFs are not supported.");
+                console.error(err);
+                throw new Error("Failed to process PDF. Browser security may be blocking the worker.");
             }
         }
 
-        async function createPageCard(page, pageNum) {
-            // High-DPI Canvas Rendering
-            const scale = 0.6; // Thumbnail scale
+        async function createPageCard(page, pageNum, scale) {
             const viewport = page.getViewport({ scale: scale });
+            const pagesGrid = document.getElementById('pages-grid');
             
             const card = document.createElement('div');
-            card.className = 'page-card flex flex-col gap-2 group cursor-pointer relative';
+            card.className = 'page-card flex flex-col gap-1 group cursor-pointer relative touch-manipulation';
             card.dataset.index = pageNum - 1;
             
-            // Card HTML Structure
             card.innerHTML = `
                 <div class="flex justify-between items-center px-1">
-                    <span class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider group-hover:text-gray-300 transition">Page ${pageNum}</span>
-                    <div class="chk-indicator w-4 h-4 rounded-full border border-gray-600 flex items-center justify-center transition-all duration-200">
-                        <i class="ph ph-trash text-white text-[10px] opacity-0 transform scale-50 transition-all"></i>
+                    <span class="text-[10px] md:text-xs font-semibold text-gray-500 uppercase tracking-wider">Page ${pageNum}</span>
+                    <div class="chk-indicator w-4 h-4 md:w-5 md:h-5 rounded-full border border-gray-600 flex items-center justify-center transition-colors">
+                        <i class="ph ph-trash text-white text-[10px] md:text-xs opacity-0 scale-50 transition-all"></i>
                     </div>
                 </div>
-                <div class="canvas-wrapper relative bg-white rounded-md overflow-hidden shadow-lg border-2 border-transparent transition-all duration-200 group-hover:border-white/10">
+                <div class="canvas-container relative bg-white rounded-lg overflow-hidden shadow-sm border-2 border-transparent transition-all w-full">
                     <canvas class="block w-full h-auto"></canvas>
-                    <div class="deleted-overlay absolute inset-0 bg-red-500/20 backdrop-grayscale hidden items-center justify-center z-10">
-                        <div class="bg-red-500/90 text-white p-2 rounded-full shadow-lg">
-                            <i class="ph ph-trash text-xl"></i>
+                    <div class="deleted-overlay absolute inset-0 bg-red-500/20 hidden items-center justify-center z-10">
+                        <div class="bg-red-500/90 text-white p-3 rounded-full shadow-lg">
+                            <i class="ph ph-trash text-2xl"></i>
                         </div>
                     </div>
                 </div>
             `;
 
-            // Canvas Setup
             const canvas = card.querySelector('canvas');
             const context = canvas.getContext('2d');
             canvas.height = viewport.height;
             canvas.width = viewport.width;
             
-            // Render
             await page.render({ canvasContext: context, viewport: viewport }).promise;
 
-            // Events
             card.addEventListener('click', () => togglePageSelection(card, pageNum - 1));
             pagesGrid.appendChild(card);
         }
@@ -976,83 +486,69 @@
             const indicator = card.querySelector('.chk-indicator');
             const icon = indicator.querySelector('i');
             const overlay = card.querySelector('.deleted-overlay');
-            const wrapper = card.querySelector('.canvas-wrapper');
+            const container = card.querySelector('.canvas-container');
 
             if (pagesToRemove.has(index)) {
-                // Deselect
                 pagesToRemove.delete(index);
                 card.classList.remove('selected');
-                
                 indicator.classList.remove('bg-red-500', 'border-red-500');
                 indicator.classList.add('border-gray-600');
-                
                 icon.classList.add('opacity-0', 'scale-50');
                 overlay.classList.add('hidden');
                 overlay.classList.remove('flex');
-                
-                wrapper.classList.remove('ring-2', 'ring-red-500');
+                container.classList.remove('border-red-500');
             } else {
-                // Select
                 pagesToRemove.add(index);
                 card.classList.add('selected');
-                
                 indicator.classList.remove('border-gray-600');
                 indicator.classList.add('bg-red-500', 'border-red-500');
-                
                 icon.classList.remove('opacity-0', 'scale-50');
                 overlay.classList.remove('hidden');
                 overlay.classList.add('flex');
-                
-                wrapper.classList.add('ring-2', 'ring-red-500');
+                container.classList.add('border-red-500');
             }
             updateSelectionUI();
         }
 
         function updateSelectionUI() {
             const count = pagesToRemove.size;
-            const countEl = document.getElementById('selected-count');
-            const guideEl = document.getElementById('selection-guide');
-            const actionsEl = document.getElementById('selection-actions');
-
+            document.getElementById('selected-count').textContent = `${count} Removed`;
+            const mobileDot = document.getElementById('mobile-selection-dot');
+            
             if (count > 0) {
-                countEl.textContent = `${count} Removed`;
-                countEl.classList.remove('hidden');
-                guideEl.classList.add('hidden');
-                actionsEl.classList.remove('hidden');
+                document.getElementById('selected-count').classList.remove('hidden');
+                document.getElementById('selection-guide').classList.add('hidden');
+                document.getElementById('selection-actions').classList.remove('hidden');
+                mobileDot.classList.remove('hidden');
             } else {
-                countEl.classList.add('hidden');
-                guideEl.classList.remove('hidden');
-                actionsEl.classList.add('hidden');
+                document.getElementById('selected-count').classList.add('hidden');
+                document.getElementById('selection-guide').classList.remove('hidden');
+                document.getElementById('selection-actions').classList.add('hidden');
+                mobileDot.classList.add('hidden');
             }
         }
 
         function clearSelection() {
             pagesToRemove.clear();
-            const cards = document.querySelectorAll('.page-card');
-            cards.forEach(card => {
-                if (card.classList.contains('selected')) {
-                    // Trigger click to reuse logic or manual reset
-                    const index = parseInt(card.dataset.index);
-                    togglePageSelection(card, index); // This toggles it OFF since it's ON
-                }
+            document.querySelectorAll('.page-card.selected').forEach(card => {
+                const index = parseInt(card.dataset.index);
+                togglePageSelection(card, index); 
             });
             updateSelectionUI();
         }
 
-        // --- EXPORT ---
         async function exportFile() {
             if (!currentFileBytes) return;
             if (pagesToRemove.size === 0) {
-                showToast("Warning", "No pages marked for removal", "warning");
+                showToast("Notice", "No pages selected", "warning");
                 return;
             }
 
             try {
-                showLoader(true, "Generating PDF", "Compiling new document...");
-                
-                // Short delay to allow loader to render
+                showLoader(true, "Exporting", "Creating PDF...");
                 await new Promise(r => setTimeout(r, 100));
 
+                const { PDFDocument } = PDFLib;
                 const pdfDoc = await PDFDocument.load(currentFileBytes);
                 const count = pdfDoc.getPageCount();
                 const keepIndices = [];
@@ -1061,9 +557,7 @@
                     if (!pagesToRemove.has(i)) keepIndices.push(i);
                 }
 
-                if (keepIndices.length === 0) {
-                    throw new Error("You cannot remove all pages.");
-                }
+                if (keepIndices.length === 0) throw new Error("Cannot delete all pages");
 
                 const newPdf = await PDFDocument.create();
                 const pages = await newPdf.copyPages(pdfDoc, keepIndices);
@@ -1074,59 +568,76 @@
                 const name = originalFileName.replace('.pdf', '_edited.pdf');
                 
                 saveAs(blob, name);
-                showToast("Success", "File downloaded successfully", "success");
+                showToast("Saved!", "File downloaded", "success");
+                
+                if(window.innerWidth < 768) toggleProperties(false);
 
             } catch (err) {
-                showToast("Export Failed", err.message, "error");
+                showToast("Error", err.message, "error");
             } finally {
                 showLoader(false);
             }
         }
 
-        // --- UTILS ---
-        
+        // --- UTILS & UI HELPERS ---
+        function toggleProperties(forceState = null) {
+            const panel = document.getElementById('properties-panel');
+            const icon = document.getElementById('sidebar-icon-desktop');
+            const isHidden = panel.classList.contains('hidden');
+            const shouldShow = forceState !== null ? forceState : isHidden;
+
+            if (shouldShow) {
+                panel.classList.remove('hidden');
+                panel.classList.add('flex');
+                if(icon) { icon.classList.add('text-accent'); icon.classList.remove('text-gray-400'); }
+            } else {
+                panel.classList.add('hidden');
+                panel.classList.remove('flex');
+                if(icon) { icon.classList.remove('text-accent'); icon.classList.add('text-gray-400'); }
+            }
+        }
+
         async function simulateOfficeDoc(type) {
-            await new Promise(r => setTimeout(r, 1500)); // Fake load
-            
-            totalPages = 12; // Mock count
+            await new Promise(r => setTimeout(r, 800));
+            totalPages = 8;
             updateStats(totalPages);
-            exportBtn.classList.add('hidden');
+            document.getElementById('exportBtn').classList.add('hidden');
             
-            // Create Mock Pages
+            const pagesGrid = document.getElementById('pages-grid');
             pagesGrid.innerHTML = '';
+            
             for(let i=1; i<=totalPages; i++) {
                 const card = document.createElement('div');
-                card.className = 'page-card opacity-70 cursor-not-allowed';
+                card.className = 'page-card opacity-60 cursor-not-allowed flex flex-col gap-1';
                 card.innerHTML = `
-                    <div class="mb-2 text-[10px] text-gray-500 uppercase tracking-wider">Slide ${i}</div>
-                    <div class="bg-white/5 rounded-md aspect-[3/4] flex items-center justify-center border border-white/10">
+                    <div class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Slide ${i}</div>
+                    <div class="bg-white/5 rounded-lg aspect-[3/4] flex items-center justify-center border border-white/10 w-full">
                          <i class="ph ph-${type === 'pptx' ? 'presentation-chart' : 'file-doc'} text-3xl text-gray-600"></i>
                     </div>
                 `;
                 pagesGrid.appendChild(card);
             }
-            
-            showToast("Viewer Mode", "Office files are read-only in this demo", "warning");
+            showToast("Viewer", "Visual Demo Only", "warning");
         }
 
         function updateStats(total) {
             document.getElementById('total-pages-prop').textContent = total;
-            const badge = document.getElementById('page-count-badge');
-            badge.textContent = `${total} Pages`;
-            badge.classList.remove('hidden');
+            document.getElementById('page-count-badge').textContent = `${total} Pages`;
+            document.getElementById('page-count-badge').classList.remove('hidden');
         }
 
         function resetApp(full = true) {
             if (full) {
                 toggleProperties(false);
-                emptyState.classList.remove('hidden');
-                gridContainer.classList.add('hidden');
-                exportBtn.classList.add('hidden');
+                document.getElementById('empty-state').classList.remove('hidden');
+                document.getElementById('grid-container').classList.add('hidden');
+                document.getElementById('exportBtn').classList.add('hidden');
                 document.getElementById('page-count-badge').classList.add('hidden');
-                fileInput.value = '';
+                document.getElementById('fileInput').value = '';
+                document.getElementById('mobile-selection-dot').classList.add('hidden');
             }
             
-            pagesGrid.innerHTML = '';
+            document.getElementById('pages-grid').innerHTML = '';
             currentFile = null;
             currentFileBytes = null;
             pagesToRemove.clear();
@@ -1136,25 +647,37 @@
             document.getElementById('file-size').textContent = "0 MB";
             document.getElementById('file-type').textContent = "-";
             document.getElementById('total-pages-prop').textContent = "-";
-            
             updateSelectionUI();
         }
 
         function adjustZoom(delta) {
             zoom = Math.max(50, Math.min(200, zoom + delta));
-            zoomLabel.textContent = zoom + '%';
-            // Adjust grid column base size
-            const baseSize = 160;
+            document.getElementById('zoom-level-desktop').textContent = zoom + '%';
+            document.getElementById('zoom-level-mobile').textContent = zoom + '%';
+            
+            const pagesGrid = document.getElementById('pages-grid');
+            const baseSize = window.innerWidth < 768 ? 140 : 160;
             const newSize = Math.floor(baseSize * (zoom / 100));
-            pagesGrid.style.gridTemplateColumns = `repeat(auto-fill, minmax(${newSize}px, 1fr))`;
+            
+            if (window.innerWidth >= 768) {
+                pagesGrid.style.gridTemplateColumns = `repeat(auto-fill, minmax(${newSize}px, 1fr))`;
+            } else {
+                if (zoom < 70) {
+                     pagesGrid.classList.remove('grid-cols-2');
+                     pagesGrid.classList.add('grid-cols-3');
+                } else {
+                     pagesGrid.classList.add('grid-cols-2');
+                     pagesGrid.classList.remove('grid-cols-3');
+                }
+            }
         }
 
         function showLoader(show, text, sub) {
+            const loader = document.getElementById('loader');
             if (show) {
                 loader.classList.remove('hidden');
-                // Force layout reflow to enable transition if we added fade classes
-                loaderText.textContent = text || "Loading...";
-                if (sub) loaderSub.textContent = sub;
+                document.getElementById('loader-text').textContent = text || "Loading...";
+                if (sub) document.getElementById('loader-sub').textContent = sub;
             } else {
                 loader.classList.add('hidden');
             }
@@ -1164,26 +687,25 @@
             const toast = document.getElementById('toast');
             document.getElementById('toast-title').textContent = title;
             document.getElementById('toast-message').textContent = message;
-            
             const icon = document.getElementById('toast-icon');
+            
+            toast.className = toast.className.replace(/border-.*? /g, 'border-white/10 ');
+
             if (type === 'error') {
                 icon.className = 'ph ph-warning-circle text-red-400 text-xl';
-                toast.className = toast.className.replace(/border-.*? /g, 'border-red-500/30 ');
+                toast.classList.add('border-red-500/30');
             } else if (type === 'warning') {
                 icon.className = 'ph ph-info text-orange-400 text-xl';
-                toast.className = toast.className.replace(/border-.*? /g, 'border-orange-500/30 ');
+                toast.classList.add('border-orange-500/30');
             } else {
                 icon.className = 'ph ph-check-circle text-green-400 text-xl';
-                toast.className = toast.className.replace(/border-.*? /g, 'border-white/10 ');
             }
 
-            toast.classList.remove('-translate-y-24', 'opacity-0');
+            toast.classList.remove('-translate-y-28', 'opacity-0');
             setTimeout(() => {
-                toast.classList.add('-translate-y-24', 'opacity-0');
-            }, 4000);
+                toast.classList.add('-translate-y-28', 'opacity-0');
+            }, 3500);
         }
     </script>
 </body>
 </html>
-
-
