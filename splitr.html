@@ -249,6 +249,15 @@
                     <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Splitter</span>
                     <span id="selected-count" class="text-xs bg-red-500/10 border border-red-500/20 text-red-400 px-2 py-0.5 rounded-full hidden">0 Removed</span>
                 </div>
+
+                <!-- Range Selection Input -->
+                <div class="mb-4 bg-white/5 p-3 rounded-lg border border-white/5">
+                    <label class="text-[10px] text-gray-400 uppercase tracking-wider mb-2 block font-semibold">Quick Select (Remove)</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="range-input" onkeydown="if(event.key==='Enter') applyRangeSelection()" placeholder="e.g. 1-5, 8" class="flex-1 bg-black/40 border border-white/10 rounded px-2 py-1.5 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-accent transition-colors">
+                        <button onclick="applyRangeSelection()" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded text-xs transition border border-white/5">Apply</button>
+                    </div>
+                </div>
                 
                 <div id="selection-guide" class="text-sm md:text-xs text-gray-500 leading-relaxed p-4 border border-dashed border-gray-600 rounded-lg text-center">
                     Tap pages on the canvas to remove them from the document.
@@ -538,6 +547,63 @@
                 container.classList.add('border-red-500');
             }
             updateSelectionUI();
+        }
+
+        function applyRangeSelection() {
+            const input = document.getElementById('range-input');
+            if (!input) return;
+            
+            const text = input.value.trim();
+            if (!text) {
+                showToast("Empty Input", "Please enter page numbers (e.g. 1-3)", "warning");
+                return;
+            }
+
+            const parts = text.split(',');
+            const targets = new Set();
+
+            parts.forEach(part => {
+                part = part.trim();
+                if (part.includes('-')) {
+                    const range = part.split('-').map(s => parseInt(s.trim()));
+                    if (range.length === 2 && !isNaN(range[0]) && !isNaN(range[1])) {
+                        const start = Math.min(range[0], range[1]);
+                        const end = Math.max(range[0], range[1]);
+                        for (let i = start; i <= end; i++) targets.add(i - 1);
+                    }
+                } else {
+                    const num = parseInt(part);
+                    if (!isNaN(num)) targets.add(num - 1);
+                }
+            });
+
+            let changedCount = 0;
+            let limitReached = false;
+
+            targets.forEach(index => {
+                if (index >= 0 && index < totalPages) {
+                    if (!pagesToRemove.has(index)) {
+                        if (pagesToRemove.size + 1 < totalPages) {
+                            const card = document.querySelector(`.page-card[data-index="${index}"]`);
+                            if (card) {
+                                togglePageSelection(card, index);
+                                changedCount++;
+                            }
+                        } else {
+                            limitReached = true;
+                        }
+                    }
+                }
+            });
+
+            if (limitReached) {
+                showToast("Limit Reached", "Could not select all pages. At least one page must remain.", "warning");
+            } else if (changedCount > 0) {
+                showToast("Selection Updated", `${changedCount} pages marked for removal`, "success");
+                input.value = '';
+            } else {
+                showToast("No Changes", "Pages were already selected or invalid", "warning");
+            }
         }
 
         function updateSelectionUI() {
