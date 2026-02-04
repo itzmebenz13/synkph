@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SonicStream | Professional Converter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        zinc: {
+                            850: '#1f1f22',
+                            900: '#18181b',
+                            950: '#09090b',
+                        }
+                    },
+                    backgroundImage: {
+                        'grid-pattern': "linear-gradient(to right, #27272a 1px, transparent 1px), linear-gradient(to bottom, #27272a 1px, transparent 1px)",
+                    },
+                    animation: {
+                        'slide-up': 'slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+                        'fade-in': 'fade-in 0.6s ease-out forwards',
+                    },
+                    keyframes: {
+                        'slide-up': {
+                            '0%': { transform: 'translateY(10px)', opacity: 0 },
+                            '100%': { transform: 'translateY(0)', opacity: 1 },
+                        },
+                        'fade-in': {
+                            '0%': { opacity: 0 },
+                            '100%': { opacity: 1 },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #09090b;
+            background-size: 40px 40px;
+            background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            min-height: 100vh;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #52525b; }
+
+        .glass-card {
+            background: rgba(24, 24, 27, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .input-ring {
+            transition: all 0.2s ease;
+        }
+        .input-ring:focus-within {
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1), 0 0 0 4px rgba(59, 130, 246, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .switch-checkbox:checked + div { background-color: #fff; }
+        .switch-checkbox:checked + div span { transform: translateX(100%); background-color: #000; }
+        
+        .format-btn.active {
+            background-color: white;
+            color: black;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+        .format-btn.inactive {
+            color: #71717a; /* zinc-500 */
+        }
+        .format-btn.inactive:hover {
+            color: #d4d4d8; /* zinc-300 */
+        }
+    </style>
+</head>
+<body class="text-zinc-300 flex flex-col selection:bg-white selection:text-black">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 w-full px-6 py-4 flex justify-between items-center z-50 border-b border-white/5 bg-zinc-950/80 backdrop-blur-md">
+        <div class="flex items-center gap-2">
+            <div class="w-6 h-6 bg-white rounded-md flex items-center justify-center shadow-lg shadow-white/10">
+                <i class="fa-solid fa-bolt text-xs text-black"></i>
+            </div>
+            <span class="text-sm font-semibold text-white tracking-tight">SonicStream</span>
+        </div>
+        <div class="hidden md:flex items-center gap-6 text-xs font-medium text-zinc-500">
+            <span class="text-zinc-200 cursor-pointer">Dashboard</span>
+            <span class="hover:text-zinc-300 transition-colors cursor-pointer">Analytics</span>
+            <span class="hover:text-zinc-300 transition-colors cursor-pointer">API</span>
+            <div class="w-px h-4 bg-zinc-800"></div>
+            <span class="hover:text-zinc-300 transition-colors cursor-pointer">Log In</span>
+        </div>
+        <div class="md:hidden text-zinc-400">
+            <i class="fa-solid fa-bars"></i>
+        </div>
+    </nav>
+
+    <!-- Main Layout -->
+    <main class="w-full max-w-5xl mx-auto px-6 py-12 flex-grow animate-slide-up">
+        
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+            
+            <!-- Left Column: Primary Converter (Span 7) -->
+            <div class="md:col-span-7 space-y-6">
+                
+                <div class="mb-2">
+                    <h1 class="text-2xl font-semibold text-white tracking-tight">Media Converter</h1>
+                    <p class="text-sm text-zinc-500 mt-1">High-fidelity audio extraction for content creators.</p>
+                </div>
+
+                <!-- Main Converter Card -->
+                <div class="glass-card rounded-xl p-1 relative overflow-hidden">
+                    <div class="bg-zinc-900/40 rounded-lg p-6 border border-white/5 min-h-[400px] flex flex-col">
+                        
+                        <!-- Format Tabs -->
+                        <div class="flex items-center justify-between mb-8">
+                            <div class="inline-flex bg-zinc-900/80 rounded-lg p-1 border border-white/5 shadow-inner" id="formatSelector">
+                                <button onclick="setFormat('MP3')" class="format-btn active px-5 py-1.5 text-xs font-medium rounded-[4px] transition-all" data-format="MP3">MP3</button>
+                                <button onclick="setFormat('MP4')" class="format-btn inactive px-5 py-1.5 text-xs font-medium rounded-[4px] transition-all" data-format="MP4">MP4</button>
+                                <button onclick="setFormat('WAV')" class="format-btn inactive px-5 py-1.5 text-xs font-medium rounded-[4px] transition-all" data-format="WAV">WAV</button>
+                            </div>
+                            <div class="text-[10px] font-mono text-zinc-600 bg-zinc-900/50 px-2 py-1 rounded border border-white/5">
+                                v2.4.0-stable
+                            </div>
+                        </div>
+
+                        <!-- States Container -->
+                        <div class="flex-grow flex flex-col justify-center">
+                            
+                            <!-- Input State -->
+                            <div id="inputState" class="space-y-5 w-full">
+                                <label class="block text-xs font-medium text-zinc-400 ml-1">Source URL</label>
+                                <div class="group relative">
+                                    <div class="input-ring flex items-center bg-black/40 border border-white/10 rounded-lg overflow-hidden transition-colors hover:border-white/20 h-12">
+                                        <div class="pl-4 text-zinc-500">
+                                            <i class="fa-brands fa-youtube text-sm"></i>
+                                        </div>
+                                        <input type="text" id="urlInput" 
+                                            class="w-full bg-transparent border-none text-sm text-white px-3 py-2 focus:outline-none placeholder-zinc-600 h-full" 
+                                            placeholder="https://youtube.com/watch?v=..." 
+                                            autocomplete="off">
+                                        <button onclick="pasteFromClipboard()" class="pr-4 text-[10px] font-bold text-zinc-500 hover:text-white transition-colors uppercase tracking-wider">
+                                            Paste
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div onclick="cycleBitrate()" class="p-3.5 rounded-lg border border-white/5 bg-zinc-800/20 flex flex-col justify-center gap-1.5 hover:bg-zinc-800/30 transition-colors cursor-pointer select-none active:bg-zinc-800/50">
+                                        <span class="text-[10px] uppercase text-zinc-500 font-semibold tracking-wider flex justify-between">
+                                            Bitrate Quality
+                                            <i class="fa-solid fa-chevron-down text-[8px] mt-0.5"></i>
+                                        </span>
+                                        <div class="flex items-center gap-2">
+                                            <i class="fa-solid fa-gauge-high text-xs text-zinc-400"></i>
+                                            <span class="text-xs font-medium text-zinc-200" id="bitrateDisplay">320 kbps (High)</span>
+                                        </div>
+                                    </div>
+                                    <label class="p-3.5 rounded-lg border border-white/5 bg-zinc-800/20 flex items-center justify-between cursor-pointer group hover:bg-zinc-800/30 transition-colors">
+                                        <div class="flex flex-col gap-1.5">
+                                            <span class="text-[10px] uppercase text-zinc-500 font-semibold tracking-wider group-hover:text-zinc-400">ID3 Tags</span>
+                                            <span class="text-xs font-medium text-zinc-300">Auto-Labeling</span>
+                                        </div>
+                                        <div class="relative">
+                                            <input type="checkbox" id="id3Toggle" class="sr-only switch-checkbox" checked>
+                                            <div class="w-9 h-5 bg-zinc-700 rounded-full transition-colors flex items-center px-0.5">
+                                                <span class="w-4 h-4 bg-zinc-400 rounded-full shadow-sm transition-transform duration-200"></span>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+
+                                <button onclick="startProcess()" class="w-full py-3.5 bg-white hover:bg-zinc-200 text-black rounded-lg text-sm font-semibold transition-all shadow-[0_0_20px_rgba(255,255,255,0.05)] flex items-center justify-center gap-2 group mt-2">
+                                    <span>Initialize Conversion</span>
+                                    <i class="fa-solid fa-arrow-right text-xs transition-transform group-hover:translate-x-1 opacity-70"></i>
+                                </button>
+                            </div>
+
+                            <!-- Processing State -->
+                            <div id="processState" class="hidden py-8 w-full">
+                                <div class="flex flex-col items-center justify-center space-y-8">
+                                    <div class="relative w-16 h-16">
+                                        <svg class="animate-spin text-zinc-700 w-full h-full" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        <div class="absolute inset-0 flex items-center justify-center">
+                                            <i class="fa-solid fa-wave-square text-xs text-zinc-500"></i>
+                                        </div>
+                                    </div>
+                                    <div class="text-center space-y-2 w-full max-w-xs">
+                                        <div class="flex justify-between items-baseline">
+                                            <h3 class="text-sm font-medium text-white" id="statusTitle">Processing</h3>
+                                            <span class="text-xs font-mono text-zinc-400" id="progressPercent">0%</span>
+                                        </div>
+                                        <div class="h-1 w-full bg-zinc-800 rounded-full overflow-hidden">
+                                            <div id="progressBar" class="h-full bg-white transition-all duration-300 ease-out w-0"></div>
+                                        </div>
+                                        <p class="text-[10px] text-zinc-500 font-mono text-left pt-1" id="statusDetail">Initializing engine...</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Success State -->
+                            <div id="successState" class="hidden w-full">
+                                <div class="bg-zinc-950/50 border border-white/5 rounded-xl p-4 flex gap-4 items-center mb-6 group hover:border-white/10 transition-colors">
+                                    <div class="w-16 h-16 rounded-lg bg-zinc-800 border border-white/5 flex items-center justify-center text-zinc-600 shrink-0 relative overflow-hidden">
+                                        <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=150&auto=format&fit=crop" class="w-full h-full object-cover opacity-60">
+                                        <div class="absolute inset-0 flex items-center justify-center">
+                                            <i class="fa-solid fa-play text-white opacity-80"></i>
+                                        </div>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <h4 class="text-sm font-semibold text-white truncate leading-tight" id="songTitle">Extracted Audio</h4>
+                                        <div class="flex items-center gap-2 mt-1.5">
+                                            <span class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-green-500/10 text-green-500 border border-green-500/20">Success</span>
+                                            <span class="text-[10px] text-zinc-500" id="resultMeta">• 3.4 MB • 320kbps</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex gap-3">
+                                    <button onclick="downloadFile()" class="flex-1 py-3 bg-white text-black rounded-lg text-sm font-medium hover:bg-zinc-200 transition-colors shadow-sm flex items-center justify-center gap-2">
+                                        <i class="fa-solid fa-download text-xs"></i> Download
+                                    </button>
+                                    <button onclick="resetUI()" class="px-4 py-3 bg-transparent border border-white/10 text-zinc-400 rounded-lg text-sm font-medium hover:text-white hover:border-white/20 transition-all" title="Reset">
+                                        <i class="fa-solid fa-rotate-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Activity Feed (Span 5) -->
+            <div class="md:col-span-5 space-y-6">
+                <div class="mb-2 flex items-end justify-between h-8">
+                    <h2 class="text-sm font-medium text-zinc-400 uppercase tracking-wider">Recent Activity</h2>
+                    <div class="flex items-center gap-2">
+                         <span class="text-[10px] text-zinc-600" id="historyCount">0 items</span>
+                         <button onclick="clearHistory()" class="text-[10px] text-zinc-500 hover:text-white transition-colors" title="Clear History">
+                            <i class="fa-solid fa-trash-can"></i>
+                         </button>
+                    </div>
+                </div>
+                
+                <div class="glass-card rounded-xl border border-white/5 bg-zinc-900/20 h-[460px] overflow-hidden flex flex-col">
+                    <!-- Static Header -->
+                    <div class="px-4 py-3 border-b border-white/5 bg-zinc-900/40 flex justify-between items-center">
+                        <span class="text-[10px] font-medium text-zinc-500">Source</span>
+                        <span class="text-[10px] font-medium text-zinc-500">Format</span>
+                    </div>
+
+                    <!-- Scrollable List -->
+                    <div class="flex-1 overflow-y-auto p-2 space-y-1 custom-scrollbar" id="activityList">
+                        <!-- Items injected by JS -->
+                        <div class="flex flex-col items-center justify-center h-full text-zinc-600 gap-2">
+                            <i class="fa-regular fa-folder-open text-xl opacity-50"></i>
+                            <span class="text-xs">No conversions yet</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/5 bg-zinc-950 py-6 mt-auto">
+        <div class="max-w-5xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] text-zinc-600">
+            <div class="flex gap-4">
+                <a href="#" class="hover:text-zinc-400 transition-colors">Terms</a>
+                <a href="#" class="hover:text-zinc-400 transition-colors">Privacy</a>
+                <a href="#" class="hover:text-zinc-400 transition-colors">DMCA</a>
+            </div>
+            <span>© 2026 SonicStream Inc. All rights reserved.</span>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-20 left-1/2 -translate-x-1/2 flex items-center gap-3 px-4 py-2.5 bg-zinc-900 border border-zinc-800 rounded-full text-sm shadow-xl translate-y-[-20px] opacity-0 transition-all duration-300 z-50 pointer-events-none">
+        <div class="w-4 h-4 bg-white rounded-full flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-check text-[8px] text-black"></i>
+        </div>
+        <span id="toastMsg" class="text-zinc-200 text-xs font-medium pr-2">Action successful</span>
+    </div>
+
+    <script>
+        // State Management
+        const state = {
+            format: 'MP3',
+            bitrates: [128, 192, 320],
+            bitrateIndex: 2, // Default to 320 (index 2)
+            id3Enabled: true,
+            history: []
+        };
+
+        // DOM Elements
+        const el = {
+            inputState: document.getElementById('inputState'),
+            processState: document.getElementById('processState'),
+            successState: document.getElementById('successState'),
+            urlInput: document.getElementById('urlInput'),
+            progressBar: document.getElementById('progressBar'),
+            progressPercent: document.getElementById('progressPercent'),
+            statusTitle: document.getElementById('statusTitle'),
+            statusDetail: document.getElementById('statusDetail'),
+            songTitle: document.getElementById('songTitle'),
+            resultMeta: document.getElementById('resultMeta'),
+            bitrateDisplay: document.getElementById('bitrateDisplay'),
+            activityList: document.getElementById('activityList'),
+            historyCount: document.getElementById('historyCount'),
+            formatBtns: document.querySelectorAll('.format-btn'),
+            toast: document.getElementById('toast'),
+            toastMsg: document.getElementById('toastMsg')
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadHistory();
+            updateBitrateUI();
+        });
+
+        // --- Core Logic ---
+
+        function setFormat(format) {
+            state.format = format;
+            el.formatBtns.forEach(btn => {
+                if(btn.dataset.format === format) {
+                    btn.classList.add('active');
+                    btn.classList.remove('inactive');
+                } else {
+                    btn.classList.add('inactive');
+                    btn.classList.remove('active');
+                }
+            });
+            showToast(`Format set to ${format}`);
+        }
+
+        function cycleBitrate() {
+            state.bitrateIndex = (state.bitrateIndex + 1) % state.bitrates.length;
+            updateBitrateUI();
+        }
+
+        function updateBitrateUI() {
+            const val = state.bitrates[state.bitrateIndex];
+            let label = "Standard";
+            if (val === 192) label = "Good";
+            if (val === 320) label = "High";
+            el.bitrateDisplay.innerText = `${val} kbps (${label})`;
+        }
+
+        async function pasteFromClipboard() {
+            try {
+                const text = await navigator.clipboard.readText();
+                el.urlInput.value = text;
+                showToast("Pasted from clipboard");
+                el.urlInput.focus();
+            } catch (err) {
+                showToast("Clipboard access denied", true);
+            }
+        }
+
+        // --- Simulation ---
+
+        const mockTitles = [
+            "Lofi Hip Hop Radio - Beats to Relax/Study To",
+            "Cyberpunk 2077 - Official Soundtrack [OST]",
+            "Hans Zimmer - Interstellar Main Theme",
+            "Rick Astley - Never Gonna Give You Up",
+            "Rain Sounds for Sleeping (10 Hours)",
+            "Top 50 Gaming Songs Mix 2026"
+        ];
+
+        function startProcess() {
+            const url = el.urlInput.value.trim();
+            
+            if (!url) {
+                showToast("Please enter a URL first", true);
+                el.urlInput.focus();
+                return;
+            }
+
+            if (!url.includes('youtube.com') && !url.includes('youtu.be')) {
+                showToast("Only YouTube links supported", true);
+                return;
+            }
+
+            // Transition
+            el.inputState.classList.add('hidden');
+            el.processState.classList.remove('hidden');
+
+            // Select random title or generate one
+            const randomTitle = mockTitles[Math.floor(Math.random() * mockTitles.length)];
+            el.songTitle.innerText = randomTitle;
+
+            // Simulation Steps
+            const steps = [
+                { title: "Resolving", detail: "Verifying video availability..." },
+                { title: "Extracting", detail: `Isolating audio stream (${state.bitrates[state.bitrateIndex]}kbps)...` },
+                { title: "Encoding", detail: `Converting to ${state.format} container...` },
+                { title: "Finalizing", detail: "Preparing secure download link..." }
+            ];
+
+            let progress = 0;
+            let stepIndex = 0;
+
+            const interval = setInterval(() => {
+                const increment = Math.random() > 0.5 ? 3 : 6;
+                progress += increment;
+                
+                if (progress > 100) progress = 100;
+
+                el.progressBar.style.width = `${progress}%`;
+                el.progressPercent.innerText = `${Math.floor(progress)}%`;
+
+                if (progress < 30) stepIndex = 0;
+                else if (progress < 60) stepIndex = 1;
+                else if (progress < 85) stepIndex = 2;
+                else stepIndex = 3;
+
+                el.statusTitle.innerText = steps[stepIndex].title;
+                el.statusDetail.innerText = steps[stepIndex].detail;
+
+                if (progress === 100) {
+                    clearInterval(interval);
+                    completeProcess(randomTitle);
+                }
+            }, 80); // Speed of simulation
+        }
+
+        function completeProcess(title) {
+            // Calculate mock file size based on bitrate (purely aesthetic math)
+            const duration = 180 + Math.random() * 120; // 3-5 mins
+            const bitrate = state.bitrates[state.bitrateIndex];
+            const sizeMB = ((duration * bitrate) / 8 / 1024).toFixed(1);
+
+            // Update Success UI
+            el.resultMeta.innerText = `• ${sizeMB} MB • ${bitrate}kbps`;
+            
+            // Add to History
+            const historyItem = {
+                id: Date.now(),
+                title: title,
+                format: state.format,
+                bitrate: bitrate,
+                timestamp: new Date().toISOString()
+            };
+            addToHistory(historyItem);
+
+            // Transition UI
+            setTimeout(() => {
+                el.processState.classList.add('hidden');
+                el.successState.classList.remove('hidden');
+                showToast("Extraction successful");
+            }, 500);
+        }
+
+        // --- History Management (LocalStorage) ---
+
+        function loadHistory() {
+            const stored = localStorage.getItem('sonicstream_history');
+            if (stored) {
+                try {
+                    state.history = JSON.parse(stored);
+                } catch(e) {
+                    console.error("History corrupted", e);
+                    state.history = [];
+                }
+            }
+            renderHistory();
+        }
+
+        function addToHistory(item) {
+            state.history.unshift(item); // Add to top
+            if (state.history.length > 20) state.history.pop(); // Keep last 20
+            localStorage.setItem('sonicstream_history', JSON.stringify(state.history));
+            renderHistory();
+        }
+
+        function clearHistory() {
+            state.history = [];
+            localStorage.removeItem('sonicstream_history');
+            renderHistory();
+            showToast("History cleared");
+        }
+
+        function renderHistory() {
+            el.historyCount.innerText = `${state.history.length} items`;
+            el.activityList.innerHTML = '';
+
+            if (state.history.length === 0) {
+                el.activityList.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-full text-zinc-600 gap-2">
+                        <i class="fa-regular fa-folder-open text-xl opacity-50"></i>
+                        <span class="text-xs">No conversions yet</span>
+                    </div>
+                `;
+                return;
+            }
+
+            state.history.forEach(item => {
+                const timeAgo = getTimeAgo(new Date(item.timestamp));
+                const div = document.createElement('div');
+                div.className = "flex items-center justify-between p-2.5 rounded-lg hover:bg-white/5 transition-colors cursor-default group border border-transparent hover:border-white/5";
+                div.innerHTML = `
+                    <div class="flex items-center gap-3 overflow-hidden">
+                        <div class="w-8 h-8 rounded bg-zinc-800 flex items-center justify-center text-red-500 bg-red-500/10 shrink-0">
+                            <i class="fa-brands fa-youtube text-xs"></i>
+                        </div>
+                        <div class="flex flex-col min-w-0">
+                            <span class="text-xs text-zinc-300 font-medium truncate w-32 sm:w-40" title="${item.title}">${item.title}</span>
+                            <span class="text-[10px] text-zinc-600">${timeAgo}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <span class="text-[10px] text-zinc-500 border border-white/5 px-1.5 py-0.5 rounded bg-zinc-900">${item.format}</span>
+                    </div>
+                `;
+                el.activityList.appendChild(div);
+            });
+        }
+
+        function getTimeAgo(date) {
+            const seconds = Math.floor((new Date() - date) / 1000);
+            if (seconds < 60) return `${seconds}s ago`;
+            const minutes = Math.floor(seconds / 60);
+            if (minutes < 60) return `${minutes}m ago`;
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return `${hours}h ago`;
+            return date.toLocaleDateString();
+        }
+
+        // --- Helpers ---
+
+        function resetUI() {
+            el.urlInput.value = "";
+            el.progressBar.style.width = "0%";
+            el.successState.classList.add('hidden');
+            el.inputState.classList.remove('hidden');
+        }
+
+        function downloadFile() {
+            const btn = event.currentTarget;
+            const originalHTML = btn.innerHTML;
+            
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-xs"></i> Saving...`;
+            btn.classList.add('bg-zinc-200', 'cursor-wait');
+            
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+                btn.classList.remove('bg-zinc-200', 'cursor-wait');
+                showToast("Download started");
+                
+                // Simulate download logic here (e.g., create hidden link)
+            }, 1000);
+        }
+
+        function showToast(message, isError = false) {
+            el.toastMsg.innerText = message;
+            const iconContainer = el.toast.querySelector('div');
+            const icon = el.toast.querySelector('i');
+            
+            if (isError) {
+                iconContainer.classList.replace('bg-white', 'bg-red-500');
+                icon.className = "fa-solid fa-xmark text-[8px] text-white";
+            } else {
+                iconContainer.classList.replace('bg-red-500', 'bg-white');
+                icon.className = "fa-solid fa-check text-[8px] text-black";
+            }
+
+            el.toast.classList.remove('translate-y-[-20px]', 'opacity-0');
+            
+            setTimeout(() => {
+                el.toast.classList.add('translate-y-[-20px]', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
